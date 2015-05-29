@@ -317,6 +317,31 @@ namespace Rialto.ViewModels
         }
         #endregion
 
+
+        #region ShowTagSettingWindowCommand
+        private ViewModelCommand _ShowTagSettingWindowCommand;
+
+        public ViewModelCommand ShowTagSettingWindowCommand
+        {
+            get
+            {
+                if (_ShowTagSettingWindowCommand == null)
+                {
+                    _ShowTagSettingWindowCommand = new ViewModelCommand(ShowTagSettingWindow);
+                }
+                return _ShowTagSettingWindowCommand;
+            }
+        }
+
+        public void ShowTagSettingWindow()
+        {
+            //TODO：MVVMに準拠
+            var scr = new Rialto.Views.TagSettingWindow();
+            scr.ShowDialog();
+        }
+        #endregion
+
+
         #endregion
 
         private ObservableCollection<TagMasterInfo> ExistsTags_ = new ObservableCollection<TagMasterInfo>();

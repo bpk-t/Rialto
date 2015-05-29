@@ -41,5 +41,17 @@ namespace Rialto.ViewModels.Contents
         /// </summary>
         [Column(Name = "IMG_COUNT", DbType = "INTEGER")]
         public int ImageCount { get; set; }
+
+        /// <summary>
+        /// 作成日時
+        /// </summary>
+        [Column(Name = "CREATE_LINE_DATE", DbType = "DATE")]
+        public DateTime CreatedAt { get; set; }
+
+        /// <summary>
+        /// 更新日時
+        /// </summary>
+        [Column(Name = "UPDATE_LINE_DATE", DbType = "DATE")]
+        public DateTime UpdatedAt { get; set; }
     }
 }

@@ -83,7 +83,13 @@
                 <MenuItem Header="リバース(_R)" />
             </MenuItem>
             <MenuItem Header="タグ(_T)">
-                <MenuItem Header="タグ設定画面の表示" />
+                <MenuItem Header="タグ設定画面の表示">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <i:InvokeCommandAction Command="{Binding ShowTagSettingWindowCommand}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
                 <MenuItem Header="タグリストの更新" />
             </MenuItem>
 
