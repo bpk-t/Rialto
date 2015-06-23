@@ -210,6 +210,7 @@ namespace Rialto.ViewModels
                 RaisePropertyChanged("SelectedTagNode");
             }
         }
+
         #region TagTreeSelectionChangedCommand
         private ViewModelCommand _TagTreeSelectionChangedCommand;
 
@@ -358,5 +359,18 @@ namespace Rialto.ViewModels
             }
         }
 
+        private string SearchTagText_ = string.Empty;
+        public string SearchTagText
+        {
+            get
+            {
+                return SearchTagText_;
+            }
+            set
+            {
+                SearchTagText_ = value;
+                RaisePropertyChanged("SearchTagText");
+            }
+        }
     }
 }

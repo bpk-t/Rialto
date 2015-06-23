@@ -87,6 +87,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="ViewModels\TagSettingWindowViewModel.cs" />
+    <Compile Include="Views\Behaviors\PlaceHolderBehavior.cs" />
     <Compile Include="Views\TagSettingWindow.xaml.cs">
       <DependentUpon>TagSettingWindow.xaml</DependentUpon>
     </Compile>
