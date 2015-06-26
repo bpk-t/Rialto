@@ -98,7 +98,7 @@ namespace Rialto.ViewModels
             set
             {
                 ThumbnailItemSizeHeight_ = value;
-                RaisePropertyChanged("ThumbnailItemSizeHeight");
+                RaisePropertyChanged(() => ThumbnailItemSizeHeight);
             }
         }
 
@@ -112,7 +112,7 @@ namespace Rialto.ViewModels
             set
             {
                 ThumbnailItemSizeWidth_ = value;
-                RaisePropertyChanged("ThumbnailItemSizeWidth");
+                RaisePropertyChanged(() => ThumbnailItemSizeWidth);
             }
         }
 
@@ -126,7 +126,7 @@ namespace Rialto.ViewModels
             set
             {
                 TagTreeItems_ = value;
-                RaisePropertyChanged("TagTreeItems");
+                RaisePropertyChanged(() => TagTreeItems);
             }
         }
 
@@ -140,7 +140,7 @@ namespace Rialto.ViewModels
             set
             {
                 SideImage_ = value;
-                RaisePropertyChanged("SideImage");
+                RaisePropertyChanged(() => SideImage);
             }
         }
 
@@ -154,7 +154,21 @@ namespace Rialto.ViewModels
             set
             {
                 ThumbnailImgList_ = value;
-                RaisePropertyChanged("ThumbnailImgLists");
+                RaisePropertyChanged(() => ThumbnailImgList);
+            }
+        }
+
+        private TagTreeNode SelectedTagNode_;
+        public TagTreeNode SelectedTagNode
+        {
+            get
+            {
+                return SelectedTagNode_;
+            }
+            set
+            {
+                SelectedTagNode_ = value;
+                RaisePropertyChanged("SelectedTagNode");
             }
         }
 
@@ -175,6 +189,49 @@ namespace Rialto.ViewModels
             }
         }
 
+        private ObservableCollection<TabInfo> TabPanels_ = new ObservableCollection<TabInfo>();
+        public ObservableCollection<TabInfo> TabPanels
+        {
+            get
+            {
+                return TabPanels_;
+            }
+            set
+            {
+                TabPanels_ = value;
+                RaisePropertyChanged("TabPanels");
+            }
+        }
+
+        private ObservableCollection<TagMasterInfo> ExistsTags_ = new ObservableCollection<TagMasterInfo>();
+        public ObservableCollection<TagMasterInfo> ExistsTags
+        {
+            get
+            {
+                return ExistsTags_;
+            }
+            set
+            {
+                ExistsTags_ = value;
+                RaisePropertyChanged(() => ExistsTags);
+            }
+        }
+
+        private string SearchTagText_ = string.Empty;
+        public string SearchTagText
+        {
+            get
+            {
+                return SearchTagText_;
+            }
+            set
+            {
+                SearchTagText_ = value;
+                RaisePropertyChanged(() => SearchTagText);
+            }
+        }
+
+        #region Command
         #region ListViewChengedCommand
         private ViewModelCommand _ListViewChengedCommand;
 
@@ -197,20 +254,6 @@ namespace Rialto.ViewModels
         #endregion
 
 
-        private TagTreeNode SelectedTagNode_;
-        public TagTreeNode SelectedTagNode
-        {
-            get
-            {
-                return SelectedTagNode_;
-            }
-            set
-            {
-                SelectedTagNode_ = value;
-                RaisePropertyChanged("SelectedTagNode");
-            }
-        }
-
         #region TagTreeSelectionChangedCommand
         private ViewModelCommand _TagTreeSelectionChangedCommand;
 
@@ -231,21 +274,6 @@ namespace Rialto.ViewModels
             Debug.WriteLine("Selected Tag Name : " + SelectedTagNode.Name);
         }
         #endregion
-
-        private ObservableCollection<TabInfo> TabPanels_ = new ObservableCollection<TabInfo>();
-        public ObservableCollection<TabInfo> TabPanels
-        {
-            get
-            {
-                return TabPanels_;
-            }
-            set
-            {
-                TabPanels_ = value;
-                RaisePropertyChanged("TabPanels");
-            }
-        }
-
 
         #region OpenFullScreenViewCommand
         private ViewModelCommand _OpenFullScreenViewCommand;
@@ -344,33 +372,6 @@ namespace Rialto.ViewModels
 
 
         #endregion
-
-        private ObservableCollection<TagMasterInfo> ExistsTags_ = new ObservableCollection<TagMasterInfo>();
-        public ObservableCollection<TagMasterInfo> ExistsTags
-        {
-            get
-            {
-                return ExistsTags_;
-            }
-            set
-            {
-                ExistsTags_ = value;
-                RaisePropertyChanged("ExistsTags");
-            }
-        }
-
-        private string SearchTagText_ = string.Empty;
-        public string SearchTagText
-        {
-            get
-            {
-                return SearchTagText_;
-            }
-            set
-            {
-                SearchTagText_ = value;
-                RaisePropertyChanged("SearchTagText");
-            }
-        }
+        #endregion
     }
 }
