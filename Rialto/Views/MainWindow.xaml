@@ -169,6 +169,10 @@
                     <i:InvokeCommandAction Command="{Binding ListViewChengedCommand}" />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
+            
+            <ListView.InputBindings>
+                <KeyBinding Gesture="Enter" Command="{Binding OpenFullScreenViewCommand}" />
+            </ListView.InputBindings>
         </ListView>
 
         <!-- 画像情報エリア -->
