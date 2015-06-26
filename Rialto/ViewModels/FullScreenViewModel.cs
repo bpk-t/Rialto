@@ -94,5 +94,49 @@ namespace Rialto.ViewModels
             }
         }
         #endregion
+
+        #region NextPictureCommand
+        private ListenerCommand<object> _NextPictureCommand;
+
+        public ListenerCommand<object> NextPictureCommand
+        {
+            get
+            {
+                if (_NextPictureCommand == null)
+                {
+                    _NextPictureCommand = new ListenerCommand<object>(NextPicture);
+                }
+                return _NextPictureCommand;
+            }
+        }
+
+        public void NextPicture(object parameter)
+        {
+            Debug.WriteLine("Next Picture");
+        }
+        #endregion
+
+
+        #region PrevPictureCommand
+        private ListenerCommand<object> _PrevPictureCommand;
+
+        public ListenerCommand<object> PrevPictureCommand
+        {
+            get
+            {
+                if (_PrevPictureCommand == null)
+                {
+                    _PrevPictureCommand = new ListenerCommand<object>(PrevPicture);
+                }
+                return _PrevPictureCommand;
+            }
+        }
+
+        public void PrevPicture(object parameter)
+        {
+            Debug.WriteLine("Prev Picture");
+        }
+        #endregion
+
     }
 }

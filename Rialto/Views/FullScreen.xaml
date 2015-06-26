@@ -9,7 +9,8 @@
         Title="FullScreen" Height="300" Width="300"
         WindowStyle="None"
         WindowState="Maximized"
-        Topmost="True">
+        Topmost="True"
+        x:Name="FullScreenWindow">
     
     <Window.DataContext>
         <vm:FullScreenViewModel/>
@@ -36,7 +37,14 @@
     </i:Interaction.Triggers>
 
     <Window.InputBindings>
-        <KeyBinding Gesture="Esc" Command="{Binding ESCKeyDownCommand}" CommandParameter="{Binding ElementName=FullScreenWindow}"/>
+        <KeyBinding Key="Esc" Command="{Binding ESCKeyDownCommand}" CommandParameter="{Binding ElementName=FullScreenWindow}" />
+
+        <KeyBinding Key="Left" Command="{Binding NextPictureCommand}" CommandParameter="{Binding ElementName=FullScreenWindow}" />
+        <KeyBinding Key="Space" Command="{Binding NextPictureCommand}" CommandParameter="{Binding ElementName=FullScreenWindow}" />
+
+        <KeyBinding Key="Right" Command="{Binding PrevPictureCommand}" CommandParameter="{Binding ElementName=FullScreenWindow}" />
+        <KeyBinding Key="Back" Command="{Binding PrevPictureCommand}" CommandParameter="{Binding ElementName=FullScreenWindow}" />
+
     </Window.InputBindings>
     
     <Grid>
