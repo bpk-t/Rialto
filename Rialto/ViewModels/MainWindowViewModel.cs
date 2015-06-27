@@ -50,8 +50,8 @@ namespace Rialto.ViewModels
         /// </summary>
         public void Initialize()
         {
-            ThumbnailItemSizeHeight = 120.0;
-            ThumbnailItemSizeWidth = 120.0;
+            ThumbnailItemSizeHeight = 200.0;
+            ThumbnailItemSizeWidth = 200.0;
 
             ExistsTags.Add(new TagMasterInfo { Name = "AAA" });
             ExistsTags.Add(new TagMasterInfo { Name = "BBB" });

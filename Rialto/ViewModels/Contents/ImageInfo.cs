@@ -32,7 +32,7 @@ namespace Rialto.ViewModels.Contents
                 image.BeginInit();
                 image.UriSource = value;
 
-                image.DecodePixelWidth = 100;
+                image.DecodePixelWidth = 200;
                 //Image.DecodePixelHeight = 200;
 
                 image.EndInit();
