@@ -44,10 +44,11 @@
     -->
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="15px" />
+            <RowDefinition Height="35px" />
+            <RowDefinition Height="38px" />
+            <RowDefinition Height="4*" />
+            <RowDefinition Height="10*" />
+            <RowDefinition Height="20px" />
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
@@ -111,33 +112,37 @@
         </Menu>
 
         <!-- タグツリー -->
+        <!--
         <StackPanel Grid.Row="1" Grid.Column="0" Grid.RowSpan="2" Margin="5" Orientation="Vertical">
-            <TextBox Text="{Binding SearchTagText}" Margin="5">
-                <i:Interaction.Behaviors>
-                    <behaviors:PlaceHolderBehavior PlaceHolderText="検索" />
-                </i:Interaction.Behaviors>
-            </TextBox>
             
-            <TreeView Name="TagTreeList" Margin="5" ItemsSource="{Binding TagTreeItems}">
-                <TreeView.Resources>
-                    <HierarchicalDataTemplate DataType="{x:Type vmc:TagTreeNode}" ItemsSource="{Binding Children}">
-                        <TextBlock Text="{Binding Name}" />
-                    </HierarchicalDataTemplate>
-                </TreeView.Resources>
-
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectedItemChanged">
-                        <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedTagNode" Value="{Binding Path=SelectedItem, ElementName=TagTreeList}"/>
-                        <i:InvokeCommandAction Command="{Binding TagTreeSelectionChangedCommand}" />
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
-            </TreeView>
         </StackPanel>
+-->
+
+        <TextBox Grid.Row="1" Grid.Column="0" Margin="5" Text="{Binding SearchTagText}">
+            <i:Interaction.Behaviors>
+                <behaviors:PlaceHolderBehavior PlaceHolderText="検索" />
+            </i:Interaction.Behaviors>
+        </TextBox>
         
-        <GridSplitter Grid.Row="1" Grid.Column="1" Grid.RowSpan="2"  Width="5" HorizontalAlignment="Center"/>
+        <TreeView Name="TagTreeList" Margin="5" Grid.Row="2" Grid.Column="0" Grid.RowSpan="2" ItemsSource="{Binding TagTreeItems}">
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type vmc:TagTreeNode}" ItemsSource="{Binding Children}">
+                    <TextBlock Text="{Binding Name}" />
+                </HierarchicalDataTemplate>
+            </TreeView.Resources>
+
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectedItemChanged">
+                    <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedTagNode" Value="{Binding Path=SelectedItem, ElementName=TagTreeList}"/>
+                    <i:InvokeCommandAction Command="{Binding TagTreeSelectionChangedCommand}" />
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </TreeView>
+        
+        <GridSplitter Grid.Row="1" Grid.Column="1" Grid.RowSpan="3"  Width="5" HorizontalAlignment="Center"/>
 
         <!-- サムネイルリスト -->
-        <ListView Name="ThumbnailList"  Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" Margin="5" ItemsSource="{Binding ThumbnailImgList}" 
+        <ListView Name="ThumbnailList"  Grid.Row="1" Grid.Column="2" Grid.RowSpan="3" Margin="5" ItemsSource="{Binding ThumbnailImgList}" 
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListView.ItemTemplate>
                 <DataTemplate>
@@ -176,7 +181,7 @@
         </ListView>
 
         <!-- 画像情報エリア -->
-        <StackPanel Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Stretch">
+        <StackPanel Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="2" Grid.RowSpan="2" Orientation="Horizontal" HorizontalAlignment="Stretch">
             <Border BorderThickness="2" BorderBrush="LightBlue">
                 <Button>
                     <Button.Template>
@@ -205,7 +210,7 @@
         </StackPanel>
 
         <!-- タグ設定タブ -->
-        <TabControl x:Name="tabControl" Grid.Row="2" Grid.Column="3" Margin="5" ItemsSource="{Binding TabPanels}">
+        <TabControl x:Name="tabControl" Grid.Row="3" Grid.Column="3" Margin="5" ItemsSource="{Binding TabPanels}">
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Header}" />
