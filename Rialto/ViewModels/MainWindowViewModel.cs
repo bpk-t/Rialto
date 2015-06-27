@@ -66,26 +66,24 @@ namespace Rialto.ViewModels
 
             RaisePropertyChanged("ThumbnailImgList");
 
-            TabPanels.Add(new TabInfo
+            M_TAGADDTAB.GetAll().ToList().ForEach(tabPanel =>
             {
-                Header = "TabPanel1",
-                Buttons = { 
-                    new ButtonInfo{Name="Button1", ClickEvent = (x)=>{Debug.WriteLine(x.Name);}},
-                    new ButtonInfo{Name="Button2", ClickEvent = (x)=>{Debug.WriteLine(x.Name);}},
-                    new ButtonInfo{Name="Button3", ClickEvent = (x)=>{Debug.WriteLine(x.Name);}},
-                    new ButtonInfo{Name="Button4", ClickEvent = (x)=>{Debug.WriteLine(x.Name);}},
-                }
-            });
-
-            TabPanels.Add(new TabInfo
-            {
-                Header = "TabPanel2",
-                Buttons = { 
-                    new ButtonInfo{Name="Button1", ClickEvent = (x)=>{Debug.WriteLine(x.Name);}},
-                    new ButtonInfo{Name="Button2", ClickEvent = (x)=>{Debug.WriteLine(x.Name);}},
-                    new ButtonInfo{Name="Button3", ClickEvent = (x)=>{Debug.WriteLine(x.Name);}},
-                    new ButtonInfo{Name="Button4", ClickEvent = (x)=>{Debug.WriteLine(x.Name);}},
-                }
+                var tabInfo = new TabInfo
+                {
+                    Header = tabPanel.TAB_NAME
+                };
+                M_TAGADDTAB.GetTabSettings(tabPanel).ToList().ForEach(tabSetting =>
+                {
+                    tabInfo.Buttons.Add(new ButtonInfo()
+                    {
+                        Name = tabSetting,
+                        ClickEvent = (ev) =>
+                        {
+                            Debug.WriteLine(ev.Name);
+                        }
+                    });
+                });
+                TabPanels.Add(tabInfo);
             });
 
             ExistsTags.Add(new TagMasterInfo { Name = "AAA" });

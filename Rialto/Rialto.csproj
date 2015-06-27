@@ -89,6 +89,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Models\DataModel\M_TABSETTING.cs" />
+    <Compile Include="Models\DataModel\M_TAGADDTAB.cs" />
     <Compile Include="Models\DataModel\M_TAG_INFO.cs" />
     <Compile Include="ViewModels\TagSettingWindowViewModel.cs" />
     <Compile Include="Views\Behaviors\PlaceHolderBehavior.cs" />
