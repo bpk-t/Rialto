@@ -261,20 +261,6 @@ namespace Rialto.ViewModels
         }
 
         #region Command
-        #region ListViewChengedCommand
-        private ViewModelCommand _ListViewChengedCommand;
-
-        public ViewModelCommand ListViewChengedCommand
-        {
-            get
-            {
-                if (_ListViewChengedCommand == null)
-                {
-                    _ListViewChengedCommand = new ViewModelCommand(ListViewChenged);
-                }
-                return _ListViewChengedCommand;
-            }
-        }
 
         public void ListViewChenged()
         {
@@ -288,43 +274,10 @@ namespace Rialto.ViewModels
             
             Debug.WriteLine("Call ListViewChenged : " + SelectedThumbnailImgList.Count);
         }
-        #endregion
-
-
-        #region TagTreeSelectionChangedCommand
-        private ViewModelCommand _TagTreeSelectionChangedCommand;
-
-        public ViewModelCommand TagTreeSelectionChangedCommand
-        {
-            get
-            {
-                if (_TagTreeSelectionChangedCommand == null)
-                {
-                    _TagTreeSelectionChangedCommand = new ViewModelCommand(TagTreeSelectionChanged);
-                }
-                return _TagTreeSelectionChangedCommand;
-            }
-        }
 
         public void TagTreeSelectionChanged()
         {
             Debug.WriteLine("Selected Tag Name : " + SelectedTagNode.Name);
-        }
-        #endregion
-
-        #region OpenFullScreenViewCommand
-        private ViewModelCommand _OpenFullScreenViewCommand;
-
-        public ViewModelCommand OpenFullScreenViewCommand
-        {
-            get
-            {
-                if (_OpenFullScreenViewCommand == null)
-                {
-                    _OpenFullScreenViewCommand = new ViewModelCommand(OpenFullScreenView);
-                }
-                return _OpenFullScreenViewCommand;
-            }
         }
 
         public void OpenFullScreenView()
@@ -333,32 +286,14 @@ namespace Rialto.ViewModels
             var scr = new Rialto.Views.FullScreen();
             scr.ShowDialog();
         }
-        #endregion
-
 
         #region メニューコマンド
-        #region CreateNewDBCommand
-        private ViewModelCommand _CreateNewDBCommand;
-
-        public ViewModelCommand CreateNewDBCommand
-        {
-            get
-            {
-                if (_CreateNewDBCommand == null)
-                {
-                    _CreateNewDBCommand = new ViewModelCommand(CreateNewDB);
-                }
-                return _CreateNewDBCommand;
-            }
-        }
-
+        
         public void CreateNewDB()
         {
             Debug.WriteLine("Call CreateNewDB");
         }
-        #endregion
-
-
+        
         #region OpenDBCommand
         private ListenerCommand<OpeningFileSelectionMessage> _OpenDBCommand;
 
@@ -383,30 +318,12 @@ namespace Rialto.ViewModels
         }
         #endregion
 
-
-        #region ShowTagSettingWindowCommand
-        private ViewModelCommand _ShowTagSettingWindowCommand;
-
-        public ViewModelCommand ShowTagSettingWindowCommand
-        {
-            get
-            {
-                if (_ShowTagSettingWindowCommand == null)
-                {
-                    _ShowTagSettingWindowCommand = new ViewModelCommand(ShowTagSettingWindow);
-                }
-                return _ShowTagSettingWindowCommand;
-            }
-        }
-
         public void ShowTagSettingWindow()
         {
             //TODO：MVVMに準拠
             var scr = new Rialto.Views.TagSettingWindow();
             scr.ShowDialog();
         }
-        #endregion
-
 
         #endregion
         #endregion

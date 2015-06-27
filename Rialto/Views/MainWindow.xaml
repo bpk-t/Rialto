@@ -64,7 +64,7 @@
                 <MenuItem Header="{x:Static properties:Resources.MenuItemCreateNewDB}" >
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
-                            <i:InvokeCommandAction Command="{Binding CreateNewDBCommand}" />
+                            <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="CreateNewDB"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </MenuItem>
@@ -89,7 +89,7 @@
                 <MenuItem Header="タグ設定画面の表示">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
-                            <i:InvokeCommandAction Command="{Binding ShowTagSettingWindowCommand}" />
+                            <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ShowTagSettingWindow"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </MenuItem>
@@ -128,7 +128,7 @@
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectedItemChanged">
                     <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedTagNode" Value="{Binding Path=SelectedItem, ElementName=TagTreeList}"/>
-                    <i:InvokeCommandAction Command="{Binding TagTreeSelectionChangedCommand}" />
+                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="TagTreeSelectionChanged"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </TreeView>
@@ -165,7 +165,7 @@
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedThumbnailImgList" Value="{Binding Path=SelectedItems, ElementName=ThumbnailList}"/>
-                    <i:InvokeCommandAction Command="{Binding ListViewChengedCommand}" />
+                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ListViewChenged"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
             
@@ -186,7 +186,7 @@
 
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
-                            <i:InvokeCommandAction Command="{Binding OpenFullScreenViewCommand}" />
+                            <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="OpenFullScreenView"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </Button>
