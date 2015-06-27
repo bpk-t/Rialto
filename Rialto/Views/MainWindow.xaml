@@ -127,7 +127,7 @@
         <TreeView Name="TagTreeList" Margin="5" Grid.Row="2" Grid.Column="0" Grid.RowSpan="2" ItemsSource="{Binding TagTreeItems}">
             <TreeView.Resources>
                 <HierarchicalDataTemplate DataType="{x:Type vmc:TagTreeNode}" ItemsSource="{Binding Children}">
-                    <TextBlock Text="{Binding Name}" />
+                    <TextBlock Text="{Binding DispName}" />
                 </HierarchicalDataTemplate>
             </TreeView.Resources>
 

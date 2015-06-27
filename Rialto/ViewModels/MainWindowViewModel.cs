@@ -18,11 +18,25 @@ using System.Collections;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Rialto.ViewModels.Contents;
+using Rialto.Util;
+using Rialto.Models.DataModel;
+using System.Threading.Tasks;
+using System.Windows;
 
 namespace Rialto.ViewModels
 {
     public class MainWindowViewModel : ViewModel
     {
+        /// <summary>
+        /// すべての画像
+        /// </summary>
+        private static readonly long ALL_TAG_ID = 0;
+
+        /// <summary>
+        /// タグ付加されていない画像
+        /// </summary>
+        private static readonly long NOTAG_TAG_ID = -1;
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -38,15 +52,6 @@ namespace Rialto.ViewModels
         {
             ThumbnailItemSizeHeight = 120.0;
             ThumbnailItemSizeWidth = 120.0;
-
-            TagTreeItems_.Add(new TagTreeNode("Test1"));
-            TagTreeItems_.Add(new TagTreeNode("Test2"));
-            TagTreeItems_.Add(new TagTreeNode("Test3"));
-            var node = new TagTreeNode("Test4");
-            node.Children.Add(new TagTreeNode("Test4-1"));
-            node.Children.Add(new TagTreeNode("Test4-2"));
-            node.Children.Add(new TagTreeNode("Test4-3"));
-            TagTreeItems_.Add(node);
 
             var images = new List<ImageInfo>();
 
@@ -86,6 +91,21 @@ namespace Rialto.ViewModels
             ExistsTags.Add(new TagMasterInfo { Name = "AAA" });
             ExistsTags.Add(new TagMasterInfo { Name = "BBB" });
             ExistsTags.Add(new TagMasterInfo { Name = "CCC" });
+
+            Task.Run(() =>
+            {
+                var list = M_TAG_INFO.GetAll().ToList();
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    TagTreeItems.Add(new TagTreeNode() { ID = ALL_TAG_ID, Name = "ALL", ImageCount = M_TAG_INFO.GetAllImgCount() });
+                    TagTreeItems.Add(new TagTreeNode() { ID = NOTAG_TAG_ID, Name = "NoTag", ImageCount = M_TAG_INFO.GetHasNotTagImgCount() });
+                    list.ForEach(x => TagTreeItems.Add(
+                                        new TagTreeNode() {
+                                            ID=x.TAGINF_ID.GetValueOrDefault(0)
+                                          , Name=x.TAG_NAME
+                                          , ImageCount=x.IMG_COUNT}));
+                });
+            });
         }
 
         private double ThumbnailItemSizeHeight_;

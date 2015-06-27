@@ -142,5 +142,18 @@ namespace Rialto.Util
             }
             return 0;
         }
+
+        public SQLiteConnection GetDbConnection()
+        {
+            return new SQLiteConnection(GetConnectionString());
+        }
+
+        private string GetConnectionString()
+        {
+            return (new SQLiteConnectionStringBuilder
+            {
+                DataSource = DB_NAME,
+            }).ToString();
+        }
     }
 }
