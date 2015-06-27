@@ -53,19 +53,39 @@ namespace Rialto.ViewModels
             ThumbnailItemSizeHeight = 120.0;
             ThumbnailItemSizeWidth = 120.0;
 
-            var images = new List<ImageInfo>();
+            ExistsTags.Add(new TagMasterInfo { Name = "AAA" });
+            ExistsTags.Add(new TagMasterInfo { Name = "BBB" });
+            ExistsTags.Add(new TagMasterInfo { Name = "CCC" });
 
-            images.Add(new ImageInfo() { DispImageName = "001.jpg" });
+            InitThumbnailImage();
+            InitTabSettingPanel();
+            InitTagTree();
+        }
 
-            images[0].OpenImage(new Uri(@"C:\Users\kouichi\Pictures\cats\001.jpg"));
-
-            for (int i = 0; i < 100; ++i)
+        private void InitTagTree()
+        {
+            Task.Run(() =>
             {
-                images.ForEach(x => ThumbnailImgList.Add(x));
-            }
+                var list = M_TAG_INFO.GetAll().ToList();
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    TagTreeItems.Add(new TagTreeNode() { ID = ALL_TAG_ID, Name = "ALL", ImageCount = M_TAG_INFO.GetAllImgCount() });
+                    TagTreeItems.Add(new TagTreeNode() { ID = NOTAG_TAG_ID, Name = "NoTag", ImageCount = M_TAG_INFO.GetHasNotTagImgCount() });
+                    list.ForEach(x => TagTreeItems.Add(
+                                        new TagTreeNode()
+                                        {
+                                            ID = x.TAGINF_ID.GetValueOrDefault(0)
+                                            ,
+                                            Name = x.TAG_NAME
+                                            ,
+                                            ImageCount = x.IMG_COUNT
+                                        }));
+                });
+            });
+        }
 
-            RaisePropertyChanged("ThumbnailImgList");
-
+        private void InitTabSettingPanel()
+        {
             M_TAGADDTAB.GetAll().ToList().ForEach(tabPanel =>
             {
                 var tabInfo = new TabInfo
@@ -85,23 +105,20 @@ namespace Rialto.ViewModels
                 });
                 TabPanels.Add(tabInfo);
             });
+        }
 
-            ExistsTags.Add(new TagMasterInfo { Name = "AAA" });
-            ExistsTags.Add(new TagMasterInfo { Name = "BBB" });
-            ExistsTags.Add(new TagMasterInfo { Name = "CCC" });
-
+        private void InitThumbnailImage()
+        {
             Task.Run(() =>
             {
-                var list = M_TAG_INFO.GetAll().ToList();
+                var dispList = M_IMAGE_INFO.GetAll().ToList().GetRange(0, 50).ToList();
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    TagTreeItems.Add(new TagTreeNode() { ID = ALL_TAG_ID, Name = "ALL", ImageCount = M_TAG_INFO.GetAllImgCount() });
-                    TagTreeItems.Add(new TagTreeNode() { ID = NOTAG_TAG_ID, Name = "NoTag", ImageCount = M_TAG_INFO.GetHasNotTagImgCount() });
-                    list.ForEach(x => TagTreeItems.Add(
-                                        new TagTreeNode() {
-                                            ID=x.TAGINF_ID.GetValueOrDefault(0)
-                                          , Name=x.TAG_NAME
-                                          , ImageCount=x.IMG_COUNT}));
+                    dispList.Select(x => new ImageInfo()
+                    {
+                        DispImageName = x.FILE_NAME,
+                        ImageFilePath = new Uri(x.FILE_PATH)
+                    }).ToList().ForEach(x => ThumbnailImgList.Add(x));
                 });
             });
         }

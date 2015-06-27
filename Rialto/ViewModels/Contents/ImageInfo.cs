@@ -23,17 +23,21 @@ namespace Rialto.ViewModels.Contents
         /// </summary>
         public string DispImageName { get; set; }
 
-        public void OpenImage(Uri uri)
+
+        public Uri ImageFilePath
         {
-            var image = new BitmapImage();
-            image.BeginInit();
-            image.UriSource = uri;
+            set
+            {
+                var image = new BitmapImage();
+                image.BeginInit();
+                image.UriSource = value;
 
-            image.DecodePixelWidth = 100;
-            //Image.DecodePixelHeight = 200;
+                image.DecodePixelWidth = 100;
+                //Image.DecodePixelHeight = 200;
 
-            image.EndInit();
-            DispImage = image; // ImageはProperty
+                image.EndInit();
+                DispImage = image; // ImageはProperty
+            }
         }
     }
 }
