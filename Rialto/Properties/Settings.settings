@@ -5,5 +5,8 @@
     <Setting Name="LastOpenDbName" Type="System.String" Scope="User">
       <Value Profile="(Default)">imgdb.db</Value>
     </Setting>
+    <Setting Name="ThumbnailImageDirectory" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

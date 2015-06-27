@@ -23,15 +23,22 @@ namespace Rialto.ViewModels.Contents
         /// </summary>
         public string DispImageName { get; set; }
 
-
-        public Uri ImageFilePath
+        /// <summary>
+        /// サムネイル用画像のファイルパス
+        /// </summary>
+        private Uri ThumbnailImageFilePath_;
+        public Uri ThumbnailImageFilePath
         {
+            get
+            {
+                return ThumbnailImageFilePath_;
+            }
             set
             {
+                ThumbnailImageFilePath_ = value;
                 var image = new BitmapImage();
                 image.BeginInit();
-                image.UriSource = value;
-
+                image.UriSource = ThumbnailImageFilePath_;
                 image.DecodePixelWidth = 200;
                 //Image.DecodePixelHeight = 200;
 
@@ -39,5 +46,10 @@ namespace Rialto.ViewModels.Contents
                 DispImage = image; // ImageはProperty
             }
         }
+
+        /// <summary>
+        /// 元画像のファイルパス
+        /// </summary>
+        public Uri SourceImageFilePath { get; set; }
     }
 }

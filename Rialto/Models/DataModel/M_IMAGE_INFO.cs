@@ -26,12 +26,22 @@ namespace Rialto.Models.DataModel
         public DateTime CREATE_LINE_DATE { get; set; }
         public DateTime UPDATE_LINE_DATE { get; set; }
 
+        public string AVEHASH { get; set; }
+
         public static IEnumerable<M_IMAGE_INFO> GetAll()
         {
             var db = DBHelper.GetInstance();
             using (var con = db.GetDbConnection())
             {
-                return con.Query<M_IMAGE_INFO>("SELECT * FROM M_IMAGE_INFO WHERE DELETE_FLG='0' ORDER BY IMGINF_ID DESC");
+                return con.Query(
+@"SELECT * FROM M_IMAGE_INFO IMGINF, T_AVEHASH AVEH
+ WHERE IMGINF.DELETE_FLG='0'
+ AND IMGINF.IMGINF_ID=AVEH.IMGINF_ID 
+ ORDER BY IMGINF.IMGINF_ID DESC",
+                         (M_IMAGE_INFO img, T_AVEHASH hash) => {
+                             img.AVEHASH = hash.AVEHASH;
+                             return img; 
+                         }, splitOn: "IMGINF_ID,IMGINF_ID");
             }
         }
     }

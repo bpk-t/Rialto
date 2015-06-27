@@ -34,5 +34,17 @@ namespace Rialto.Properties {
                 this["LastOpenDbName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ThumbnailImageDirectory {
+            get {
+                return ((string)(this["ThumbnailImageDirectory"]));
+            }
+            set {
+                this["ThumbnailImageDirectory"] = value;
+            }
+        }
     }
 }

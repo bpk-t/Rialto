@@ -22,20 +22,13 @@ using Rialto.Util;
 using Rialto.Models.DataModel;
 using System.Threading.Tasks;
 using System.Windows;
+using Rialto.Constant;
 
 namespace Rialto.ViewModels
 {
     public class MainWindowViewModel : ViewModel
     {
-        /// <summary>
-        /// すべての画像
-        /// </summary>
-        private static readonly long ALL_TAG_ID = 0;
-
-        /// <summary>
-        /// タグ付加されていない画像
-        /// </summary>
-        private static readonly long NOTAG_TAG_ID = -1;
+        public ThumbnailImage ThumbnailModel = new ThumbnailImage();
 
         /// <summary>
         /// コンストラクタ
@@ -69,8 +62,8 @@ namespace Rialto.ViewModels
                 var list = M_TAG_INFO.GetAll().ToList();
                 Application.Current.Dispatcher.Invoke(() =>
                 {
-                    TagTreeItems.Add(new TagTreeNode() { ID = ALL_TAG_ID, Name = "ALL", ImageCount = M_TAG_INFO.GetAllImgCount() });
-                    TagTreeItems.Add(new TagTreeNode() { ID = NOTAG_TAG_ID, Name = "NoTag", ImageCount = M_TAG_INFO.GetHasNotTagImgCount() });
+                    TagTreeItems.Add(new TagTreeNode() { ID = TagConstant.ALL_TAG_ID, Name = "ALL", ImageCount = M_TAG_INFO.GetAllImgCount() });
+                    TagTreeItems.Add(new TagTreeNode() { ID = TagConstant.NOTAG_TAG_ID, Name = "NoTag", ImageCount = M_TAG_INFO.GetHasNotTagImgCount() });
                     list.ForEach(x => TagTreeItems.Add(
                                         new TagTreeNode()
                                         {
@@ -117,7 +110,8 @@ namespace Rialto.ViewModels
                     dispList.Select(x => new ImageInfo()
                     {
                         DispImageName = x.FILE_NAME,
-                        ImageFilePath = new Uri(x.FILE_PATH)
+                        ThumbnailImageFilePath = ThumbnailModel.GetThumbnailImage(x.FILE_PATH, x.HASH_VALUE),
+                        SourceImageFilePath = new Uri(x.FILE_PATH)
                     }).ToList().ForEach(x => ThumbnailImgList.Add(x));
                 });
             });
@@ -284,6 +278,14 @@ namespace Rialto.ViewModels
 
         public void ListViewChenged()
         {
+            if (SelectedThumbnailImgList.Count > 0) { 
+                var image = new BitmapImage();
+                image.BeginInit();
+                image.UriSource = ((ImageInfo)SelectedThumbnailImgList[0]).SourceImageFilePath;
+                image.EndInit();
+                SideImage = image;
+            }
+            
             Debug.WriteLine("Call ListViewChenged : " + SelectedThumbnailImgList.Count);
         }
         #endregion
