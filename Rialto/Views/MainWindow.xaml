@@ -36,6 +36,9 @@
 
         <!--WindowのCloseキャンセル処理に対応する場合は、WindowCloseCancelBehaviorの使用を検討してください-->
 
+        <l:InteractionMessageTrigger MessageKey="TagSetting" Messenger="{Binding Messenger}">
+            <l:TransitionInteractionMessageAction WindowType="{x:Type v:TagSettingWindow}" Mode="Modal"/>
+        </l:InteractionMessageTrigger>
     </i:Interaction.Triggers>
 
     <!--

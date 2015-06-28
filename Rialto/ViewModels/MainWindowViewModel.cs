@@ -197,7 +197,7 @@ namespace Rialto.ViewModels
             set
             {
                 SelectedTagNode_ = value;
-                RaisePropertyChanged("SelectedTagNode");
+                RaisePropertyChanged(() => SelectedTagNode);
             }
         }
 
@@ -228,7 +228,7 @@ namespace Rialto.ViewModels
             set
             {
                 TabPanels_ = value;
-                RaisePropertyChanged("TabPanels");
+                RaisePropertyChanged(() => TabPanels);
             }
         }
 
@@ -320,9 +320,7 @@ namespace Rialto.ViewModels
 
         public void ShowTagSettingWindow()
         {
-            //TODO：MVVMに準拠
-            var scr = new Rialto.Views.TagSettingWindow();
-            scr.ShowDialog();
+            Messenger.Raise(new TransitionMessage(new TagSettingWindowViewModel(), "TagSetting"));
         }
 
         #endregion
