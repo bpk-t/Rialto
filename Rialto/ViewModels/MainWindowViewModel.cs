@@ -59,7 +59,7 @@ namespace Rialto.ViewModels
         {
             Task.Run(() =>
             {
-                var list = M_TAG_INFO.GetAll().ToList();
+                var list = M_TAG_INFO.GetAll();
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     TagTreeItems.Add(new TagTreeNode() { ID = TagConstant.ALL_TAG_ID, Name = "ALL", ImageCount = M_TAG_INFO.GetAllImgCount() });
@@ -79,13 +79,13 @@ namespace Rialto.ViewModels
 
         private void InitTabSettingPanel()
         {
-            M_TAGADDTAB.GetAll().ToList().ForEach(tabPanel =>
+            M_TAGADDTAB.GetAll().ForEach(tabPanel =>
             {
                 var tabInfo = new TabInfo
                 {
                     Header = tabPanel.TAB_NAME
                 };
-                M_TAGADDTAB.GetTabSettings(tabPanel).ToList().ForEach(tabSetting =>
+                M_TAGADDTAB.GetTabSettings(tabPanel).ForEach(tabSetting =>
                 {
                     tabInfo.Buttons.Add(new ButtonInfo()
                     {
@@ -104,7 +104,7 @@ namespace Rialto.ViewModels
         {
             Task.Run(() =>
             {
-                var dispList = M_IMAGE_INFO.GetAll().ToList().GetRange(0, 50).ToList();
+                var dispList = M_IMAGE_INFO.GetAll().ToList().GetRange(0, 50);
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     dispList.Select(x => new ImageInfo()
@@ -112,7 +112,7 @@ namespace Rialto.ViewModels
                         DispImageName = x.FILE_NAME,
                         ThumbnailImageFilePath = ThumbnailModel.GetThumbnailImage(x.FILE_PATH, x.HASH_VALUE),
                         SourceImageFilePath = new Uri(x.FILE_PATH)
-                    }).ToList().ForEach(x => ThumbnailImgList.Add(x));
+                    }).ForEach(x => ThumbnailImgList.Add(x));
                 });
             });
         }
