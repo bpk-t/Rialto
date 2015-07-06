@@ -35,6 +35,7 @@
     
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="10" />
             <RowDefinition Height="24*" />
             <RowDefinition Height="2*" />
             <RowDefinition Height="2*" />
@@ -43,39 +44,46 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="10px" />
+            <ColumnDefinition Width="10" />
             <ColumnDefinition Width="5*" />
             <ColumnDefinition Width="10" />
             <ColumnDefinition Width="20*" />
-            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="10" />
         </Grid.ColumnDefinitions>
         
-        <ListView  Grid.Row="0"  Grid.Column="1" Grid.ColumnSpan="3" ItemsSource="{Binding AllTags}">
+        <ListView x:Name="TagListView" Grid.Row="1"  Grid.Column="1" Grid.ColumnSpan="3" ItemsSource="{Binding AllTags}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="タグ名" DisplayMemberBinding="{Binding TAG_NAME}"></GridViewColumn>
                     <GridViewColumn Header="タグ定義(説明)" DisplayMemberBinding="{Binding TAG_DEFINE}"></GridViewColumn>
                     <GridViewColumn Header="検索回数" DisplayMemberBinding="{Binding SEARCH_COUNT}"></GridViewColumn>
-                    <GridViewColumn Header="作成日時" DisplayMemberBinding="{Binding CREATE_LINE_DATE}"></GridViewColumn>
-                    <GridViewColumn Header="更新日時" DisplayMemberBinding="{Binding UPDATE_LINE_DATE}"></GridViewColumn>
+                    <GridViewColumn Header="作成日時" DisplayMemberBinding="{Binding CREATE_LINE_DATE, StringFormat='yyyy/MM/dd HH:mm:ss'}"></GridViewColumn>
+                    <GridViewColumn Header="更新日時" DisplayMemberBinding="{Binding UPDATE_LINE_DATE, StringFormat='yyyy/MM/dd HH:mm:ss'}"></GridViewColumn>
                 </GridView>
             </ListView.View>
+
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="SelectionChanged">
+                    <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedTags" Value="{Binding Path=SelectedItems, ElementName=TagListView}"/>
+                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ListViewChenged"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
         </ListView>
         
-        <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">タグ名</TextBlock>
-        <TextBox x:Name="TagNameTextBox" Grid.Row="1" Grid.Column="3" 
-                 MaxLines="1" Width="300px" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBox>
-        <TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">タグ定義(説明)</TextBlock>
-        <TextBox x:Name="TagDefineTextBox" Grid.Row="2" Grid.Column="3" 
-                 MaxLines="1" Width="300px" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBox>
-        <Button Grid.Row="3" Grid.Column="1" Width="100px" HorizontalAlignment="Left" Content="タグを追加">
+        <TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">タグ名</TextBlock>
+        <TextBox x:Name="TagNameTextBox" Grid.Row="2" Grid.Column="3" MaxLines="1" 
+                 Width="300px" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{Binding TagNameText}" />
+        <TextBlock Grid.Row="3" Grid.Column="1" VerticalAlignment="Center">タグ定義(説明)</TextBlock>
+        <TextBox x:Name="TagDefineTextBox" Grid.Row="3" Grid.Column="3" 
+                 MaxLines="1" Width="300px" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{Binding TagDefineText}" />
+        <Button Grid.Row="4" Grid.Column="1" Width="100px" HorizontalAlignment="Right" Content="タグを追加">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="Click">
                     <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="AddTag"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </Button>
-        <Button Grid.Row="3" Grid.Column="3" Width="100px" HorizontalAlignment="Left" Content="クリア">
+        <Button Grid.Row="4" Grid.Column="3" Width="100px" HorizontalAlignment="Left" Content="クリア">
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="Click">
                     <ei:ChangePropertyAction TargetObject="{Binding ElementName=TagNameTextBox}" PropertyName="Text" Value=""/>
