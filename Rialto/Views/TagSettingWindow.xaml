@@ -1,4 +1,4 @@
-﻿<controls:MetroWindow x:Class="Rialto.Views.TagSettingWindow"
+﻿<Window x:Class="Rialto.Views.TagSettingWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
@@ -33,7 +33,7 @@
 
     </i:Interaction.Triggers>
     
-    <Grid ShowGridLines="True">
+    <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="24*" />
             <RowDefinition Height="2*" />
@@ -43,7 +43,7 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="10px" />
             <ColumnDefinition Width="5*" />
             <ColumnDefinition Width="10" />
             <ColumnDefinition Width="20*" />
@@ -53,22 +53,35 @@
         <ListView  Grid.Row="0"  Grid.Column="1" Grid.ColumnSpan="3" ItemsSource="{Binding AllTags}">
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="タグ名" DisplayMemberBinding="{Binding Name}"></GridViewColumn>
-                    <GridViewColumn Header="タグ定義(説明)" DisplayMemberBinding="{Binding Define}"></GridViewColumn>
-                    <GridViewColumn Header="検索回数" DisplayMemberBinding="{Binding SearchCount}"></GridViewColumn>
-                    <GridViewColumn Header="作成日時" DisplayMemberBinding="{Binding CreatedAt}"></GridViewColumn>
-                    <GridViewColumn Header="更新日時" DisplayMemberBinding="{Binding UpdatedAt}"></GridViewColumn>
+                    <GridViewColumn Header="タグ名" DisplayMemberBinding="{Binding TAG_NAME}"></GridViewColumn>
+                    <GridViewColumn Header="タグ定義(説明)" DisplayMemberBinding="{Binding TAG_DEFINE}"></GridViewColumn>
+                    <GridViewColumn Header="検索回数" DisplayMemberBinding="{Binding SEARCH_COUNT}"></GridViewColumn>
+                    <GridViewColumn Header="作成日時" DisplayMemberBinding="{Binding CREATE_LINE_DATE}"></GridViewColumn>
+                    <GridViewColumn Header="更新日時" DisplayMemberBinding="{Binding UPDATE_LINE_DATE}"></GridViewColumn>
                 </GridView>
             </ListView.View>
         </ListView>
         
         <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center">タグ名</TextBlock>
-        <TextBox Grid.Row="1" Grid.Column="3" 
+        <TextBox x:Name="TagNameTextBox" Grid.Row="1" Grid.Column="3" 
                  MaxLines="1" Width="300px" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBox>
         <TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">タグ定義(説明)</TextBlock>
-        <TextBox Grid.Row="2" Grid.Column="3" 
+        <TextBox x:Name="TagDefineTextBox" Grid.Row="2" Grid.Column="3" 
                  MaxLines="1" Width="300px" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Left"></TextBox>
-        <Button Grid.Row="3" Grid.Column="1" Width="100px" HorizontalAlignment="Left">タグを追加</Button>
-        <Button Grid.Row="3" Grid.Column="3" Width="100px" HorizontalAlignment="Left">クリア</Button>
+        <Button Grid.Row="3" Grid.Column="1" Width="100px" HorizontalAlignment="Left" Content="タグを追加">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Click">
+                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="AddTag"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </Button>
+        <Button Grid.Row="3" Grid.Column="3" Width="100px" HorizontalAlignment="Left" Content="クリア">
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="Click">
+                    <ei:ChangePropertyAction TargetObject="{Binding ElementName=TagNameTextBox}" PropertyName="Text" Value=""/>
+                    <ei:ChangePropertyAction TargetObject="{Binding ElementName=TagDefineTextBox}" PropertyName="Text" Value=""/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
+        </Button>
     </Grid>
-</controls:MetroWindow>
+</Window>

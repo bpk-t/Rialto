@@ -27,7 +27,7 @@ namespace Rialto.Views
     /// <summary>
     /// TagSettingWindow.xaml の相互作用ロジック
     /// </summary>
-    public partial class TagSettingWindow : MetroWindow
+    public partial class TagSettingWindow : Window
     {
         public TagSettingWindow()
         {
