@@ -15,16 +15,7 @@
         SaveWindowPosition="True">
 
     <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colors.xaml" />
 
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseDark.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
     </Window.Resources>
     
     <Window.DataContext>
@@ -128,10 +119,20 @@
         </Menu>
 
         <!-- タグツリー -->
-        <TextBox Grid.Row="1" Grid.Column="0" Margin="5" Text="{Binding SearchTagText}">
+        <TextBox Grid.Row="1" Grid.Column="0" Margin="5" Text="{Binding SearchTagText, UpdateSourceTrigger=PropertyChanged}">
             <i:Interaction.Behaviors>
                 <behaviors:PlaceHolderBehavior PlaceHolderText="検索" />
             </i:Interaction.Behaviors>
+            
+            <TextBox.InputBindings>
+                <KeyBinding Key="Enter" Command="{Binding SearchTagCommand}" />
+            </TextBox.InputBindings>
+
+            <i:Interaction.Triggers>
+                <i:EventTrigger EventName="TextChanged">
+                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="SearchTagTextChanged"/>
+                </i:EventTrigger>
+            </i:Interaction.Triggers>
         </TextBox>
         
         <TreeView Name="TagTreeList" Margin="5" Grid.Row="2" Grid.Column="0" Grid.RowSpan="2" ItemsSource="{Binding TagTreeItems}">

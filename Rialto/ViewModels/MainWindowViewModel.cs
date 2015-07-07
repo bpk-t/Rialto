@@ -57,20 +57,24 @@ namespace Rialto.ViewModels
 
         private void InitTagTree()
         {
+            InitTagTree((_) => true);
+        }
+        private void InitTagTree(Func<M_TAG_INFO,bool> predicate)
+        {
             Task.Run(() =>
             {
                 var list = M_TAG_INFO.GetAll();
                 Application.Current.Dispatcher.Invoke(() =>
                 {
+                    TagTreeItems.Clear();
                     TagTreeItems.Add(new TagTreeNode() { ID = TagConstant.ALL_TAG_ID, Name = "ALL", ImageCount = M_TAG_INFO.GetAllImgCount() });
                     TagTreeItems.Add(new TagTreeNode() { ID = TagConstant.NOTAG_TAG_ID, Name = "NoTag", ImageCount = M_TAG_INFO.GetHasNotTagImgCount() });
-                    list.ForEach(x => TagTreeItems.Add(
-                                        new TagTreeNode()
+                    TagTreeItems.AddRange(
+                        list.Where(predicate)
+                            .Select((x) => new TagTreeNode()
                                         {
-                                            ID = x.TAGINF_ID.GetValueOrDefault(0)
-                                            ,
-                                            Name = x.TAG_NAME
-                                            ,
+                                            ID = x.TAGINF_ID.GetValueOrDefault(0),
+                                            Name = x.TAG_NAME,
                                             ImageCount = x.IMG_COUNT
                                         }));
                 });
@@ -145,8 +149,8 @@ namespace Rialto.ViewModels
             }
         }
 
-        private ObservableCollection<TagTreeNode> TagTreeItems_ = new ObservableCollection<TagTreeNode>();
-        public ObservableCollection<TagTreeNode> TagTreeItems
+        private RangeObservableCollection<TagTreeNode> TagTreeItems_ = new RangeObservableCollection<TagTreeNode>();
+        public RangeObservableCollection<TagTreeNode> TagTreeItems
         {
             get
             {
@@ -285,6 +289,40 @@ namespace Rialto.ViewModels
             //TODO：MVVMに準拠
             var scr = new Rialto.Views.FullScreen();
             scr.ShowDialog();
+        }
+
+
+        private ViewModelCommand _SearchTagCommand;
+
+        public ViewModelCommand SearchTagCommand
+        {
+            get
+            {
+                if (_SearchTagCommand == null)
+                {
+                    _SearchTagCommand = new ViewModelCommand(SearchTag);
+                }
+                return _SearchTagCommand;
+            }
+        }
+
+        public void SearchTag()
+        {
+            if (SearchTagText.Count() > 0)
+            {
+                InitTagTree((x) => x.TAG_NAME.IndexOf(SearchTagText) >= 0);
+            }
+        }
+
+        /// <summary>
+        /// タグ検索テキストボックスが空になったら全タグを表示する
+        /// </summary>
+        public void SearchTagTextChanged()
+        {
+            if (SearchTagText.Count() == 0)
+            {
+                InitTagTree();
+            }
         }
 
         #region メニューコマンド
