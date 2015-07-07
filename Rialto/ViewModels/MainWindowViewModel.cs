@@ -286,11 +286,8 @@ namespace Rialto.ViewModels
 
         public void OpenFullScreenView()
         {
-            //TODO：MVVMに準拠
-            var scr = new Rialto.Views.FullScreen();
-            scr.ShowDialog();
+            Messenger.Raise(new TransitionMessage(new FullScreenViewModel(), "ShowFullScreen"));
         }
-
 
         private ViewModelCommand _SearchTagCommand;
 
@@ -358,7 +355,7 @@ namespace Rialto.ViewModels
 
         public void ShowTagSettingWindow()
         {
-            Messenger.Raise(new TransitionMessage(new TagSettingWindowViewModel(), "TagSetting"));
+            Messenger.Raise(new TransitionMessage(new TagSettingWindowViewModel(), "ShowTagSetting"));
         }
 
         #endregion

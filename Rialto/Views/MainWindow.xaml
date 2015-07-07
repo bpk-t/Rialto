@@ -40,8 +40,12 @@
 
         <!--WindowのCloseキャンセル処理に対応する場合は、WindowCloseCancelBehaviorの使用を検討してください-->
 
-        <l:InteractionMessageTrigger MessageKey="TagSetting" Messenger="{Binding Messenger}">
+        <l:InteractionMessageTrigger MessageKey="ShowTagSetting" Messenger="{Binding Messenger}">
             <l:TransitionInteractionMessageAction WindowType="{x:Type v:TagSettingWindow}" Mode="Modal"/>
+        </l:InteractionMessageTrigger>
+
+        <l:InteractionMessageTrigger MessageKey="ShowFullScreen" Messenger="{Binding Messenger}">
+            <l:TransitionInteractionMessageAction WindowType="{x:Type v:FullScreen}" Mode="Modal"/>
         </l:InteractionMessageTrigger>
     </i:Interaction.Triggers>
 
