@@ -29,7 +29,13 @@ namespace Rialto.ViewModels
 {
     public class MainWindowViewModel : ViewModel
     {
-        public ThumbnailImage ThumbnailModel;
+        #region Private Members
+
+        private ThumbnailImage ThumbnailModel;
+
+        private Tagging TaggingModel;
+        
+        #endregion
 
         /// <summary>
         /// コンストラクタ
@@ -37,6 +43,8 @@ namespace Rialto.ViewModels
         public MainWindowViewModel()
         {
             ThumbnailModel = new ThumbnailImage();
+
+            TaggingModel = new Tagging();
         }
 
         /// <summary>
@@ -53,33 +61,7 @@ namespace Rialto.ViewModels
 
             ThumbnailModel.ReadThumbnailImage();
             InitTabSettingPanel();
-            InitTagTree();
-        }
-
-        private void InitTagTree()
-        {
-            InitTagTree((_) => true);
-        }
-        private void InitTagTree(Func<M_TAG_INFO,bool> predicate)
-        {
-            Task.Run(() =>
-            {
-                var list = M_TAG_INFO.GetAll();
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    TagTreeItems.Clear();
-                    TagTreeItems.Add(new TagTreeNode() { ID = TagConstant.ALL_TAG_ID, Name = "ALL", ImageCount = M_TAG_INFO.GetAllImgCount() });
-                    TagTreeItems.Add(new TagTreeNode() { ID = TagConstant.NOTAG_TAG_ID, Name = "NoTag", ImageCount = M_TAG_INFO.GetHasNotTagImgCount() });
-                    TagTreeItems.AddRange(
-                        list.Where(predicate)
-                            .Select((x) => new TagTreeNode()
-                                        {
-                                            ID = x.TAGINF_ID.GetValueOrDefault(0),
-                                            Name = x.TAG_NAME,
-                                            ImageCount = x.IMG_COUNT
-                                        }));
-                });
-            });
+            TaggingModel.InitTagTree();
         }
 
         private void InitTabSettingPanel()
@@ -133,17 +115,20 @@ namespace Rialto.ViewModels
             }
         }
 
-        private RangeObservableCollection<TagTreeNode> TagTreeItems_ = new RangeObservableCollection<TagTreeNode>();
-        public RangeObservableCollection<TagTreeNode> TagTreeItems
+        ReadOnlyDispatcherCollection<TagTreeNode> TagTreeItems_;
+        public ReadOnlyDispatcherCollection<TagTreeNode> TagTreeItems
         {
             get
             {
+                if (TagTreeItems_ == null)
+                {
+                    TagTreeItems_ = ViewModelHelper.CreateReadOnlyDispatcherCollection(
+                        TaggingModel.TagTreeItems
+                        , m => m
+                        , DispatcherHelper.UIDispatcher
+                        );
+                }
                 return TagTreeItems_;
-            }
-            set
-            {
-                TagTreeItems_ = value;
-                RaisePropertyChanged(() => TagTreeItems);
             }
         }
 
@@ -294,7 +279,7 @@ namespace Rialto.ViewModels
         {
             if (SearchTagText.Count() > 0)
             {
-                InitTagTree((x) => x.TAG_NAME.IndexOf(SearchTagText) >= 0);
+                TaggingModel.InitTagTree((x) => x.TAG_NAME.IndexOf(SearchTagText) >= 0);
             }
         }
 
@@ -305,7 +290,7 @@ namespace Rialto.ViewModels
         {
             if (SearchTagText.Count() == 0)
             {
-                InitTagTree();
+                TaggingModel.InitTagTree();
             }
         }
 

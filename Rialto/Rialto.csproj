@@ -99,6 +99,7 @@
     <Compile Include="Models\DBModel\M_TAGADDTAB.cs" />
     <Compile Include="Models\DBModel\M_TAG_INFO.cs" />
     <Compile Include="Models\DBModel\T_AVEHASH.cs" />
+    <Compile Include="Models\Tagging.cs" />
     <Compile Include="Models\ThumbnailImage.cs" />
     <Compile Include="Util\RangeObservableCollection.cs" />
     <Compile Include="ViewModels\TagSettingWindowViewModel.cs" />
