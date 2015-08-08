@@ -6,7 +6,7 @@
         xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
         xmlns:v="clr-namespace:Rialto.Views"
         xmlns:vm="clr-namespace:Rialto.ViewModels"
-        xmlns:vmc="clr-namespace:Rialto.ViewModels.Contents"
+        xmlns:dmodel="clr-namespace:Rialto.Model.DataModel"
         xmlns:model="clr-namespace:Rialto.Models"
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:properties="clr-namespace:Rialto.Properties"
@@ -141,7 +141,7 @@
         
         <TreeView Name="TagTreeList" Margin="5" Grid.Row="2" Grid.Column="0" Grid.RowSpan="2" ItemsSource="{Binding TagTreeItems}">
             <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type vmc:TagTreeNode}" ItemsSource="{Binding Children}">
+                <HierarchicalDataTemplate DataType="{x:Type dmodel:TagTreeNode}" ItemsSource="{Binding Children}">
                     <TextBlock Text="{Binding DispName}" />
                 </HierarchicalDataTemplate>
             </TreeView.Resources>

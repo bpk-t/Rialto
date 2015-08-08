@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 
-namespace Rialto.ViewModels.Contents
+namespace Rialto.Model.DataModel
 {
     public class TagTreeNode
     {

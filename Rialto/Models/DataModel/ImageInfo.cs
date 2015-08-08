@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
 
-namespace Rialto.ViewModels.Contents
+namespace Rialto.Model.DataModel
 {
     public class ImageInfo
     {
@@ -43,6 +43,7 @@ namespace Rialto.ViewModels.Contents
                 //Image.DecodePixelHeight = 200;
 
                 image.EndInit();
+                image.Freeze();
                 DispImage = image; // ImageはProperty
             }
         }

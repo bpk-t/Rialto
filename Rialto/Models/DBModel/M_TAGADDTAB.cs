@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Rialto.Util;
 using Dapper;
 
-namespace Rialto.Models.DataModel
+namespace Rialto.Models.DBModel
 {
     public class M_TAGADDTAB
     {

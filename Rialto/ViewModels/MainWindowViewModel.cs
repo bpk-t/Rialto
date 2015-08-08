@@ -19,23 +19,24 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Rialto.ViewModels.Contents;
 using Rialto.Util;
-using Rialto.Models.DataModel;
+using Rialto.Models.DBModel;
 using System.Threading.Tasks;
 using System.Windows;
 using Rialto.Constant;
+using Rialto.Model.DataModel;
 
 namespace Rialto.ViewModels
 {
     public class MainWindowViewModel : ViewModel
     {
-        public ThumbnailImage ThumbnailModel = new ThumbnailImage();
+        public ThumbnailImage ThumbnailModel;
 
         /// <summary>
         /// コンストラクタ
         /// </summary>
         public MainWindowViewModel()
         {
-
+            ThumbnailModel = new ThumbnailImage();
         }
 
         /// <summary>
@@ -50,7 +51,7 @@ namespace Rialto.ViewModels
             ExistsTags.Add(new TagMasterInfo { Name = "BBB" });
             ExistsTags.Add(new TagMasterInfo { Name = "CCC" });
 
-            InitThumbnailImage();
+            ThumbnailModel.ReadThumbnailImage();
             InitTabSettingPanel();
             InitTagTree();
         }
@@ -101,23 +102,6 @@ namespace Rialto.ViewModels
                     });
                 });
                 TabPanels.Add(tabInfo);
-            });
-        }
-
-        private void InitThumbnailImage()
-        {
-            Task.Run(() =>
-            {
-                var dispList = M_IMAGE_INFO.GetAll().ToList().GetRange(0, 50);
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    dispList.Select(x => new ImageInfo()
-                    {
-                        DispImageName = x.FILE_NAME,
-                        ThumbnailImageFilePath = ThumbnailModel.GetThumbnailImage(x.FILE_PATH, x.HASH_VALUE),
-                        SourceImageFilePath = new Uri(x.FILE_PATH)
-                    }).ForEach(x => ThumbnailImgList.Add(x));
-                });
             });
         }
 
@@ -177,17 +161,20 @@ namespace Rialto.ViewModels
             }
         }
 
-        private ObservableCollection<ImageInfo> ThumbnailImgList_ = new ObservableCollection<ImageInfo>();
-        public ObservableCollection<ImageInfo> ThumbnailImgList
+        ReadOnlyDispatcherCollection<ImageInfo> _ThumbnailImgList;
+        public ReadOnlyDispatcherCollection<ImageInfo> ThumbnailImgList
         {
             get
             {
-                return ThumbnailImgList_;
-            }
-            set
-            {
-                ThumbnailImgList_ = value;
-                RaisePropertyChanged(() => ThumbnailImgList);
+                if (_ThumbnailImgList == null)
+                {
+                    _ThumbnailImgList = ViewModelHelper.CreateReadOnlyDispatcherCollection(
+                        ThumbnailModel.ThumbnailImgList
+                        , m => m
+                        , DispatcherHelper.UIDispatcher
+                        );
+                }
+                return _ThumbnailImgList;
             }
         }
 

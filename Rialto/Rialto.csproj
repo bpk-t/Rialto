@@ -94,11 +94,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Constant\TagConstant.cs" />
-    <Compile Include="Models\DataModel\M_IMAGE_INFO.cs" />
-    <Compile Include="Models\DataModel\M_TABSETTING.cs" />
-    <Compile Include="Models\DataModel\M_TAGADDTAB.cs" />
-    <Compile Include="Models\DataModel\M_TAG_INFO.cs" />
-    <Compile Include="Models\DataModel\T_AVEHASH.cs" />
+    <Compile Include="Models\DBModel\M_IMAGE_INFO.cs" />
+    <Compile Include="Models\DBModel\M_TABSETTING.cs" />
+    <Compile Include="Models\DBModel\M_TAGADDTAB.cs" />
+    <Compile Include="Models\DBModel\M_TAG_INFO.cs" />
+    <Compile Include="Models\DBModel\T_AVEHASH.cs" />
     <Compile Include="Models\ThumbnailImage.cs" />
     <Compile Include="Util\RangeObservableCollection.cs" />
     <Compile Include="ViewModels\TagSettingWindowViewModel.cs" />
@@ -126,10 +126,10 @@
     </Compile>
     <Compile Include="Util\DBHelper.cs" />
     <Compile Include="ViewModels\Contents\ButtonInfo.cs" />
-    <Compile Include="ViewModels\Contents\ImageInfo.cs" />
+    <Compile Include="Models\DataModel\ImageInfo.cs" />
     <Compile Include="ViewModels\Contents\TabInfo.cs" />
     <Compile Include="ViewModels\Contents\TagMasterInfo.cs" />
-    <Compile Include="ViewModels\Contents\TagTreeNode.cs" />
+    <Compile Include="Models\DataModel\TagTreeNode.cs" />
     <Compile Include="ViewModels\FullScreenViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Views\FullScreen.xaml.cs">
