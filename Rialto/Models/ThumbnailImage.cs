@@ -30,12 +30,12 @@ namespace Rialto.Models
         {
             Task.Run(() =>
             {
-                var dispList = M_IMAGE_INFO.GetAll().ToList().Take(50);
+                var dispList = M_IMAGE_INFO.GetAll().Take(50);
                 dispList.Select(x => new ImageInfo()
                 {
                     DispImageName = x.FILE_NAME,
                     ThumbnailImageFilePath = GetThumbnailImage(x.FILE_PATH, x.HASH_VALUE),
-                    SourceImageFilePath = new Uri(x.FILE_PATH)
+                    SourceImageFilePath = new Uri(Path.GetFullPath(x.FILE_PATH))
                 }).ForEach(x => ThumbnailImgList.Add(x));
             });
         }
@@ -53,7 +53,7 @@ namespace Rialto.Models
             {
                 //CreateThumbnailImage(imgPath, imgHash);
             }
-            return new Uri(filePath);
+            return new Uri(Path.GetFullPath(filePath));
         }
 
         private string GetPath(string fileName)
