@@ -1,7 +1,7 @@
 ﻿using Livet;
 using Rialto.Constant;
 using Rialto.Model.DataModel;
-using Rialto.Models.DBModel;
+using Rialto.Models.DAO;
 using Rialto.Util;
 using System;
 using System.Collections.Generic;

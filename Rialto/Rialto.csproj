@@ -94,11 +94,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Constant\TagConstant.cs" />
-    <Compile Include="Models\DBModel\M_IMAGE_INFO.cs" />
-    <Compile Include="Models\DBModel\M_TABSETTING.cs" />
-    <Compile Include="Models\DBModel\M_TAGADDTAB.cs" />
-    <Compile Include="Models\DBModel\M_TAG_INFO.cs" />
-    <Compile Include="Models\DBModel\T_AVEHASH.cs" />
+    <Compile Include="Models\DAO\M_IMAGE_INFO.cs" />
+    <Compile Include="Models\DAO\M_TABSETTING.cs" />
+    <Compile Include="Models\DAO\M_TAGADDTAB.cs" />
+    <Compile Include="Models\DAO\M_TAG_INFO.cs" />
+    <Compile Include="Models\DAO\T_AVEHASH.cs" />
     <Compile Include="Models\Tagging.cs" />
     <Compile Include="Models\ThumbnailImage.cs" />
     <Compile Include="Util\RangeObservableCollection.cs" />

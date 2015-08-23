@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 
-namespace Rialto.Models.DBModel
+namespace Rialto.Models.DAO
 {
     public class M_TAG_INFO
     {

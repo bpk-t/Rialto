@@ -14,7 +14,7 @@ using Livet.Messaging.Windows;
 using Rialto.Models;
 using System.Collections.ObjectModel;
 using Rialto.ViewModels.Contents;
-using Rialto.Models.DBModel;
+using Rialto.Models.DAO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Diagnostics;

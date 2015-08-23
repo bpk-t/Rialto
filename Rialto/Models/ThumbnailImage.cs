@@ -10,7 +10,7 @@ using System.Windows.Media.Imaging;
 using System.Collections.ObjectModel;
 using Livet;
 using Rialto.Model.DataModel;
-using Rialto.Models.DBModel;
+using Rialto.Models.DAO;
 using Rialto.Util;
 
 namespace Rialto.Models

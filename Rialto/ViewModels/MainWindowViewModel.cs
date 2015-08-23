@@ -19,7 +19,7 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Rialto.ViewModels.Contents;
 using Rialto.Util;
-using Rialto.Models.DBModel;
+using Rialto.Models.DAO;
 using System.Threading.Tasks;
 using System.Windows;
 using Rialto.Constant;
