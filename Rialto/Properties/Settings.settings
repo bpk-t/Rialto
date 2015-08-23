@@ -3,9 +3,12 @@
   <Profiles />
   <Settings>
     <Setting Name="LastOpenDbName" Type="System.String" Scope="User">
-      <Value Profile="(Default)">imgdb.db</Value>
+      <Value Profile="(Default)">..\..\..\TestData\testdb1.db</Value>
     </Setting>
     <Setting Name="ThumbnailImageDirectory" Type="System.String" Scope="User">
+      <Value Profile="(Default)">..\..\..\TestData\thumbnail</Value>
+    </Setting>
+    <Setting Name="ImgDataDirectory" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>
