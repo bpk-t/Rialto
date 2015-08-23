@@ -1,23 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.ComponentModel;
+﻿using System.Linq;
 
 using Livet;
-using Livet.Commands;
-using Livet.Messaging;
-using Livet.Messaging.IO;
-using Livet.EventListeners;
-using Livet.Messaging.Windows;
-
-using Rialto.Models;
 using System.Collections.ObjectModel;
-using Rialto.ViewModels.Contents;
 using Rialto.Models.DAO;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Diagnostics;
 using System.Collections;
 
 namespace Rialto.ViewModels
