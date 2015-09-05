@@ -80,6 +80,10 @@ namespace Rialto.ViewModels
                 var list = M_TAG_INFO.GetAll();
                 Application.Current.Dispatcher.Invoke(() =>
                 {
+                    if (!AllTags.IsEmpty())
+                    {
+                        AllTags.Clear();
+                    }
                     list.ForEach(x => AllTags.Add(x));
                 });
             });
@@ -87,7 +91,13 @@ namespace Rialto.ViewModels
 
         public void AddTag()
         {
-
+            var obj = new M_TAG_INFO
+            {
+                TAG_NAME = TagNameText,
+                TAG_DEFINE = TagDefineText
+            };
+            M_TAG_INFO.Upsert(obj, () => true);
+            Initialize();
         }
 
         public void ListViewChenged()

@@ -45,6 +45,10 @@
     <Reference Include="EntityFramework.SqlServer">
       <HintPath>..\packages\EntityFramework.6.0.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
+    <Reference Include="LangExt, Version=2.1.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LangExt.2.1.1.0\lib\portable-net40+win\LangExt.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Livet">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>InfrastructureAssemblies\Livet.dll</HintPath>

@@ -1,7 +1,9 @@
 ﻿using Rialto.Util;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using Dapper;
+using LangExt;
 
 namespace Rialto.Models.DAO
 {
@@ -44,11 +46,84 @@ namespace Rialto.Models.DAO
  WHERE DELETE_FLG='0' AND IMGINF_ID NOT IN (SELECT IMGINF_ID FROM T_ADD_TAG)");
         }
 
-        public static void UpsertTag()
+        /// <summary>
+        /// 引数で指定されたタグ情報を追加する、すでに存在する場合は上書きする
+        /// </summary>
+        /// <param name="upsertObj"></param>
+        /// <param name="existTagAction"></param>
+        public static void Upsert(M_TAG_INFO upsertObj, Func<bool> existTagAction)
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
-                
+                if (upsertObj.TAGINF_ID.HasValue)
+                {
+                    if (existTagAction()) { 
+                        Update(upsertObj);
+                    }
+                }
+                else
+                {
+                    FindByName(upsertObj.TAG_NAME).Match(
+                        (some)=> {
+                            if (existTagAction())
+                            {
+                                some.TAG_DEFINE = upsertObj.TAG_DEFINE;
+                                Update(some);
+                            }
+                        },
+                        ()=> {
+                            Insert(upsertObj);
+                        });
+                }
+            }
+        }
+
+        public static void Update(M_TAG_INFO updateObj)
+        {
+            using (var con = DBHelper.Instance.GetDbConnection())
+            {
+                con.Execute(
+@"UPDATE M_TAG_INFO 
+ SET TAG_NAME = @TAG_NAME
+ ,TAG_DEFINE = @TAG_DEFINE
+ ,UPDATE_LINE_DATE = datetime('now', 'localtime') 
+ WHERE TAGINF_ID = @TAGINF_ID", new {
+                    TAG_NAME = updateObj.TAG_NAME,
+                    TAG_DEFINE = updateObj.TAG_DEFINE,
+                    TAGINF_ID = updateObj.TAGINF_ID
+                });
+            }
+        }
+
+        public static void Insert(M_TAG_INFO insertObj)
+        {
+            using (var con = DBHelper.Instance.GetDbConnection())
+            {
+                con.Execute(
+@"INSERT INTO M_TAG_INFO (TAG_NAME,TAG_RUBY,SEARCH_COUNT,TAG_DEFINE)
+ VALUES(@TAG_NAME,@TAG_RUBY,@SEARCH_COUNT,@TAG_DEFINE)", new
+                {
+                    TAG_NAME = insertObj.TAG_NAME,
+                    TAG_RUBY = " ",
+                    SEARCH_COUNT = 0,
+                    TAG_DEFINE = insertObj.TAG_DEFINE
+                });
+            }
+        }
+
+        /// <summary>
+        /// 指定された名前のタグを取得する
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public static Option<M_TAG_INFO> FindByName(string name)
+        {
+            using (var con = DBHelper.Instance.GetDbConnection())
+            {
+                return Option.Create(
+                    con.Query<M_TAG_INFO>("SELECT * FROM M_TAG_INFO WHERE TAG_NAME=@TAG_NAME"
+                    , new { TAG_NAME = name }).FirstOrDefault()
+                );
             }
         }
     }
