@@ -18,8 +18,7 @@ namespace Rialto.Models.DAO
 
         public static IEnumerable<M_TAG_INFO> GetAll()
         {
-            DBHelper db = DBHelper.GetInstance();
-            using (var con = db.GetDbConnection())
+            using (var con = DBHelper.Instance.GetDbConnection())
             {
                 return con.Query<M_TAG_INFO>("SELECT * FROM M_TAG_INFO");
             }
@@ -31,8 +30,7 @@ namespace Rialto.Models.DAO
         /// <returns></returns>
         public static int GetAllImgCount()
         {
-            DBHelper db = DBHelper.GetInstance();
-            return db.GetItemCount("SELECT COUNT(*) AS ITEM_COUNT FROM M_IMAGE_INFO WHERE DELETE_FLG='0'");
+            return DBHelper.Instance.GetItemCount("SELECT COUNT(*) AS ITEM_COUNT FROM M_IMAGE_INFO WHERE DELETE_FLG='0'");
         }
 
         /// <summary>
@@ -41,10 +39,17 @@ namespace Rialto.Models.DAO
         /// <returns></returns>
         public static int GetHasNotTagImgCount()
         {
-            DBHelper db = DBHelper.GetInstance();
-            return db.GetItemCount(
+            return DBHelper.Instance.GetItemCount(
 @"SELECT COUNT(*) AS ITEM_COUNT FROM M_IMAGE_INFO
  WHERE DELETE_FLG='0' AND IMGINF_ID NOT IN (SELECT IMGINF_ID FROM T_ADD_TAG)");
+        }
+
+        public static void UpsertTag()
+        {
+            using (var con = DBHelper.Instance.GetDbConnection())
+            {
+                
+            }
         }
     }
 }

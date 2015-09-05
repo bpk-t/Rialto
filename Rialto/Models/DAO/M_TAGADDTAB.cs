@@ -15,8 +15,7 @@ namespace Rialto.Models.DAO
 
         public static IEnumerable<M_TAGADDTAB> GetAll()
         {
-            var db = DBHelper.GetInstance();
-            using (var con = db.GetDbConnection())
+            using (var con = DBHelper.Instance.GetDbConnection())
             {
                 return con.Query<M_TAGADDTAB>("SELECT * FROM M_TAGADDTAB ORDER BY TABSET_ID");
             }
@@ -24,8 +23,7 @@ namespace Rialto.Models.DAO
 
         public static IEnumerable<dynamic> GetTabSettings(M_TAGADDTAB tab)
         {
-            var db = DBHelper.GetInstance();
-            using (var con = db.GetDbConnection())
+            using (var con = DBHelper.Instance.GetDbConnection())
             {
                 return con.Query(
 @"SELECT * FROM M_TABSETTING TABSET, M_TAG_INFO TAGM

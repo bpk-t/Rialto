@@ -27,8 +27,7 @@ namespace Rialto.Models.DAO
 
         public static IEnumerable<M_IMAGE_INFO> GetAll()
         {
-            var db = DBHelper.GetInstance();
-            using (var con = db.GetDbConnection())
+            using (var con = DBHelper.Instance.GetDbConnection())
             {
                 return con.Query(
 @"SELECT * FROM M_IMAGE_INFO IMGINF, T_AVEHASH AVEH

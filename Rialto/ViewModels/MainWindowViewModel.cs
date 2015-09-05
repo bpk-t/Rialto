@@ -291,7 +291,9 @@ namespace Rialto.ViewModels
         {
             if (parameter.Response != null)
             {
-                Debug.WriteLine("OpenFile : " + parameter.Response[0]);
+                //Debug.WriteLine("OpenFile : " + parameter.Response[0]);
+                //TODO 再表示処理
+                Properties.Settings.Default.LastOpenDbName = parameter.Response[0];
             }
         }
         #endregion

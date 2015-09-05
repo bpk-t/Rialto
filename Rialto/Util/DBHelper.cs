@@ -23,19 +23,14 @@ namespace Rialto.Util
             DB_NAME = Properties.Settings.Default.LastOpenDbName;
         }
 
-        private static DBHelper helper = null;
+        private static readonly Lazy<DBHelper> helper = new Lazy<DBHelper>(() => new DBHelper());
 
-        /// <summary>
-        /// DBHelperのインスタンスを返す
-        /// </summary>
-        /// <returns></returns>
-        public static DBHelper GetInstance()
+        public static DBHelper Instance
         {
-            if (helper == null)
+            get
             {
-                helper = new DBHelper();
+                return helper.Value;
             }
-            return helper;
         }
 
         /// <summary>

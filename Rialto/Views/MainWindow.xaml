@@ -72,6 +72,8 @@
         <!-- メニューバー -->
         <Menu Grid.Row="0" Grid.ColumnSpan="4">
             <MenuItem Header="{x:Static properties:Resources.MenuItemFile}">
+                
+                <!-- 新しいDBを作成 -->
                 <MenuItem Header="{x:Static properties:Resources.MenuItemCreateNewDB}" >
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
@@ -79,6 +81,8 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </MenuItem>
+                
+                <!-- 既存のDBを開く -->
                 <MenuItem Header="{x:Static properties:Resources.MenuItemOpenDB}">
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">

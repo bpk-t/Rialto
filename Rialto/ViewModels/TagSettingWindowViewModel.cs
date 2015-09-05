@@ -11,6 +11,7 @@ namespace Rialto.ViewModels
 {
     public class TagSettingWindowViewModel : ViewModel
     {
+        #region Properties
         private ObservableCollection<M_TAG_INFO> AllTags_ = new ObservableCollection<M_TAG_INFO>();
         public ObservableCollection<M_TAG_INFO> AllTags
         {
@@ -70,6 +71,7 @@ namespace Rialto.ViewModels
             }
         }
 
+        #endregion
 
         public void Initialize()
         {

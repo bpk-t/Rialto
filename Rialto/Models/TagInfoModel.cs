@@ -6,8 +6,6 @@ namespace Rialto.Models
 {
     public class TagInfoModel
     {
-        private DBHelper db = DBHelper.GetInstance();
-
         /// <summary>
         /// 全てのタグ情報を返す
         /// </summary>
