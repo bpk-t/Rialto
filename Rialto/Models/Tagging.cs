@@ -10,7 +10,6 @@ namespace Rialto.Models
 {
     public class Tagging : NotificationObject
     {
-
         private ObservableSynchronizedCollection<TagTreeNode> TagTreeItems_ = new ObservableSynchronizedCollection<TagTreeNode>();
         public ObservableSynchronizedCollection<TagTreeNode> TagTreeItems
         {

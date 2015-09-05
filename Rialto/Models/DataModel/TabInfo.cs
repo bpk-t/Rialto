@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 
-namespace Rialto.ViewModels.Contents
+namespace Rialto.Model.DataModel
 {
     public class TabInfo
     {
@@ -17,8 +17,8 @@ namespace Rialto.ViewModels.Contents
         /// <summary>
         /// タブに表示するボタン
         /// </summary>
-        private ObservableCollection<ButtonInfo> Buttons_ = new ObservableCollection<ButtonInfo>();
-        public ObservableCollection<ButtonInfo> Buttons
+        private ObservableCollection<TagAddButtonInfo> Buttons_ = new ObservableCollection<TagAddButtonInfo>();
+        public ObservableCollection<TagAddButtonInfo> Buttons
         {
             get
             {

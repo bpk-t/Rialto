@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Rialto</RootNamespace>
     <AssemblyName>Rialto</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -57,6 +57,10 @@
       <HintPath>InfrastructureAssemblies\Microsoft.Expression.Interactions.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="StatefulModel, Version=0.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\StatefulModel.0.2.0\lib\portable-net45+win+wp80+MonoAndroid10+xamarinios10+MonoTouch10\StatefulModel.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
@@ -99,6 +103,7 @@
     <Compile Include="Models\DAO\M_TAGADDTAB.cs" />
     <Compile Include="Models\DAO\M_TAG_INFO.cs" />
     <Compile Include="Models\DAO\T_AVEHASH.cs" />
+    <Compile Include="Models\TagAllocator.cs" />
     <Compile Include="Models\Tagging.cs" />
     <Compile Include="Models\ThumbnailImage.cs" />
     <Compile Include="Util\RangeObservableCollection.cs" />
@@ -126,10 +131,10 @@
       <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="Util\DBHelper.cs" />
-    <Compile Include="ViewModels\Contents\ButtonInfo.cs" />
+    <Compile Include="Models\DataModel\TagAddButtonInfo.cs" />
     <Compile Include="Models\DataModel\ImageInfo.cs" />
-    <Compile Include="ViewModels\Contents\TabInfo.cs" />
-    <Compile Include="ViewModels\Contents\TagMasterInfo.cs" />
+    <Compile Include="Models\DataModel\TabInfo.cs" />
+    <Compile Include="Models\DataModel\TagMasterInfo.cs" />
     <Compile Include="Models\DataModel\TagTreeNode.cs" />
     <Compile Include="ViewModels\FullScreenViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />

@@ -10,9 +10,9 @@ using Rialto.Models;
 using System.Collections.ObjectModel;
 using System.Collections;
 using System.Windows.Media.Imaging;
-using Rialto.ViewModels.Contents;
 using Rialto.Models.DAO;
 using Rialto.Model.DataModel;
+using System;
 
 namespace Rialto.ViewModels
 {
@@ -21,9 +21,11 @@ namespace Rialto.ViewModels
         #region Private Members
 
         private ThumbnailImage ThumbnailModel;
-
-        private Tagging TaggingModel;
         
+        private Tagging TaggingModel;
+
+        private TagAllocator tagAllocator;
+
         #endregion
 
         /// <summary>
@@ -32,8 +34,8 @@ namespace Rialto.ViewModels
         public MainWindowViewModel()
         {
             ThumbnailModel = new ThumbnailImage();
-
             TaggingModel = new Tagging();
+            tagAllocator = new TagAllocator();
         }
 
         /// <summary>
@@ -49,33 +51,10 @@ namespace Rialto.ViewModels
             ExistsTags.Add(new TagMasterInfo { Name = "CCC" });
 
             ThumbnailModel.ReadThumbnailImage();
-            InitTabSettingPanel();
+            tagAllocator.InitTabSettingPanel();
             TaggingModel.InitTagTree();
         }
-
-        private void InitTabSettingPanel()
-        {
-            M_TAGADDTAB.GetAll().ForEach(tabPanel =>
-            {
-                var tabInfo = new TabInfo
-                {
-                    Header = tabPanel.TAB_NAME
-                };
-                M_TAGADDTAB.GetTabSettings(tabPanel).ForEach(tabSetting =>
-                {
-                    tabInfo.Buttons.Add(new ButtonInfo()
-                    {
-                        Name = tabSetting,
-                        ClickEvent = (ev) =>
-                        {
-                            Debug.WriteLine(ev.Name);
-                        }
-                    });
-                });
-                TabPanels.Add(tabInfo);
-            });
-        }
-
+        
         private double ThumbnailItemSizeHeight_;
         public double ThumbnailItemSizeHeight
         {
@@ -104,7 +83,7 @@ namespace Rialto.ViewModels
             }
         }
 
-        ReadOnlyDispatcherCollection<TagTreeNode> TagTreeItems_;
+        private ReadOnlyDispatcherCollection<TagTreeNode> TagTreeItems_;
         public ReadOnlyDispatcherCollection<TagTreeNode> TagTreeItems
         {
             get
@@ -135,7 +114,7 @@ namespace Rialto.ViewModels
             }
         }
 
-        ReadOnlyDispatcherCollection<ImageInfo> _ThumbnailImgList;
+        private ReadOnlyDispatcherCollection<ImageInfo> _ThumbnailImgList;
         public ReadOnlyDispatcherCollection<ImageInfo> ThumbnailImgList
         {
             get
@@ -183,17 +162,20 @@ namespace Rialto.ViewModels
             }
         }
 
-        private ObservableCollection<TabInfo> TabPanels_ = new ObservableCollection<TabInfo>();
-        public ObservableCollection<TabInfo> TabPanels
+        private ReadOnlyDispatcherCollection<TabInfo> TabPanels_;
+        public ReadOnlyDispatcherCollection<TabInfo> TabPanels
         {
             get
             {
+                if (TabPanels_ == null)
+                {
+                    TabPanels_ = ViewModelHelper.CreateReadOnlyDispatcherCollection(
+                        tagAllocator.TabPanels
+                        , m => m
+                        , DispatcherHelper.UIDispatcher
+                        );
+                }
                 return TabPanels_;
-            }
-            set
-            {
-                TabPanels_ = value;
-                RaisePropertyChanged(() => TabPanels);
             }
         }
 

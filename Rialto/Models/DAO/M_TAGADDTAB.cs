@@ -22,7 +22,7 @@ namespace Rialto.Models.DAO
             }
         }
 
-        public static IEnumerable<String> GetTabSettings(M_TAGADDTAB tab)
+        public static IEnumerable<dynamic> GetTabSettings(M_TAGADDTAB tab)
         {
             var db = DBHelper.GetInstance();
             using (var con = db.GetDbConnection())
@@ -32,9 +32,9 @@ namespace Rialto.Models.DAO
  WHERE TABSET.TAGINF_ID=TAGM.TAGINF_ID
  AND TABSET.TABSET_ID=@TABSET_ID
  ORDER BY TABSET.UPDATE_LINE_DATE"
-                    , (M_TABSETTING t, M_TAG_INFO tag) => new { TagName = tag.TAG_NAME }
-                    , new { TABSET_ID = tab.TABSET_ID }, splitOn: "TABSET_ID,TAGINF_ID")
-                        .Select(x => x.TagName);
+                    , (M_TABSETTING t, M_TAG_INFO tag) => new { TagName = tag.TAG_NAME, TagInfID = tag.TAGINF_ID }
+                    , new { TABSET_ID = tab.TABSET_ID }, splitOn: "TABSET_ID,TAGINF_ID");
+                        
             }
         }
     }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Data.SQLite;
 using System.Data.Linq.Mapping;
 
-namespace Rialto.ViewModels.Contents
+namespace Rialto.Model.DataModel
 {
     [Table(Name = "M_TAG_INFO")]
     public class TagMasterInfo

@@ -1,5 +1,5 @@
-﻿using Rialto.Util;
-using Rialto.ViewModels.Contents;
+﻿using Rialto.Model.DataModel;
+using Rialto.Util;
 using System.Collections.Generic;
 
 namespace Rialto.Models
