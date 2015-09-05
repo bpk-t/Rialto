@@ -7,11 +7,15 @@ using Microsoft.VisualBasic;
 using Livet;
 using Rialto.Model.DataModel;
 using Rialto.Models.DAO;
+using System.Collections.Generic;
 
 namespace Rialto.Models
 {
     public class ThumbnailImage : NotificationObject
     {
+        /// <summary>
+        /// サムネイルに表示している画像リスト
+        /// </summary>
         private ObservableSynchronizedCollection<ImageInfo> ThumbnailImgList_ = new ObservableSynchronizedCollection<ImageInfo>();
         public ObservableSynchronizedCollection<ImageInfo> ThumbnailImgList
         {
@@ -26,17 +30,25 @@ namespace Rialto.Models
             }
         }
 
+        /// <summary>
+        /// サムネイルに表示する予定含むすべての画像リスト
+        /// </summary>
+        public List<Uri> CurrentImageFilePathList { get; set; }
+
         public void ReadThumbnailImage()
         {
             Task.Run(() =>
             {
-                var dispList = M_IMAGE_INFO.GetAll().Take(50);
-                dispList.Select(x => new ImageInfo()
+                var allList = M_IMAGE_INFO.GetAll();
+                allList.Take(50).Select(x => new ImageInfo()
                 {
+                    ImgID = x.IMGINF_ID.Value,
                     DispImageName = x.FILE_NAME,
                     ThumbnailImageFilePath = GetThumbnailImage(x.FILE_PATH, x.HASH_VALUE),
                     SourceImageFilePath = new Uri(Path.GetFullPath(x.FILE_PATH))
                 }).ForEach(x => ThumbnailImgList.Add(x));
+
+                CurrentImageFilePathList = allList.Select(x => new Uri(Path.GetFullPath(x.FILE_PATH))).ToList();
             });
         }
 

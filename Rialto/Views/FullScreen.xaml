@@ -11,17 +11,8 @@
         WindowState="Maximized"
         Topmost="True"
         x:Name="FullScreenWindow">
-    
-    <Window.DataContext>
-        <vm:FullScreenViewModel/>
-    </Window.DataContext>
-    
-     <i:Interaction.Triggers>
-     
-     	<!--Viewに特別な要件が存在しない限りは、トリガーやアクションの自作にこだわらず積極的にコードビハインドを使いましょう -->
-    	<!--Viewのコードビハインドは、基本的にView内で完結するロジックとViewModelからのイベントの受信(専用リスナを使用する)に限るとトラブルが少なくなります -->
-    	<!--Livet1.1からはコードビハインドでViewModelのイベントを受信するためのWeakEventLisnterサポートが追加されています --> 
-        
+
+    <i:Interaction.Triggers>
         <!--WindowのContentRenderedイベントのタイミングでViewModelのInitializeメソッドが呼ばれます-->
         <i:EventTrigger EventName="ContentRendered">
             <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Initialize"/>
@@ -48,6 +39,6 @@
     </Window.InputBindings>
     
     <Grid>
-        
+        <Image Source="{Binding CurrentImage}"></Image>
     </Grid>
 </Window>

@@ -13,6 +13,8 @@ namespace Rialto.Model.DataModel
         {
         }
 
+        public long ImgID { get; set; }
+
         /// <summary>
         /// サムネイルに表示する画像
         /// </summary>

@@ -88,15 +88,24 @@ namespace Rialto.ViewModels
                 });
             });
         }
-
+        
         public void AddTag()
         {
-            var obj = new M_TAG_INFO
+            M_TAG_INFO target = null;
+            if (SelectedTags.Count > 0)
             {
-                TAG_NAME = TagNameText,
-                TAG_DEFINE = TagDefineText
-            };
-            M_TAG_INFO.Upsert(obj, () => true);
+                target = SelectedTags[0] as M_TAG_INFO;
+            }
+            else
+            {
+                target = new M_TAG_INFO
+                {
+                    TAG_NAME = TagNameText,
+                    TAG_DEFINE = TagDefineText
+                };
+            }
+            
+            M_TAG_INFO.Upsert(target, () => true);
             Initialize();
         }
 
@@ -106,7 +115,7 @@ namespace Rialto.ViewModels
             {
                 var selectedTag = SelectedTags[0] as M_TAG_INFO;
                 TagNameText = selectedTag.TAG_NAME;
-                TagDefineText = selectedTag.TAG_RUBY;
+                TagDefineText = selectedTag.TAG_DEFINE;
             }
         }
     }

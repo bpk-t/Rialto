@@ -145,19 +145,19 @@ namespace Rialto.ViewModels
             }
         }
 
-        private ObservableCollection<ImageInfo> SelectedThumbnailImgList_ = new ObservableCollection<ImageInfo>();
+        private ObservableCollection<ImageInfo> _SelectedThumbnailImgList = new ObservableCollection<ImageInfo>();
         public IList SelectedThumbnailImgList
         {
             get
             {
-                return SelectedThumbnailImgList_;
+                return _SelectedThumbnailImgList;
             }
             set
             {
-                SelectedThumbnailImgList_.Clear();
+                _SelectedThumbnailImgList.Clear();
                 foreach (ImageInfo elem in value)
                 {
-                    SelectedThumbnailImgList_.Add(elem);
+                    _SelectedThumbnailImgList.Add(elem);
                 }
             }
         }
@@ -227,11 +227,39 @@ namespace Rialto.ViewModels
             Debug.WriteLine("Selected Tag Name : " + SelectedTagNode.Name);
         }
 
-        public void OpenFullScreenView()
+        #region SearchTagCommand
+        private ViewModelCommand _OpenFullScreenViewCommand;
+
+        public ViewModelCommand OpenFullScreenViewCommand
         {
-            Messenger.Raise(new TransitionMessage(new FullScreenViewModel(), "ShowFullScreen"));
+            get
+            {
+                if (_OpenFullScreenViewCommand == null)
+                {
+                    _OpenFullScreenViewCommand = new ViewModelCommand(OpenFullScreenView);
+                }
+                return _OpenFullScreenViewCommand;
+            }
         }
 
+        /// <summary>
+        /// 選択した画像をフルスクリーンで表示する
+        /// </summary>
+        public void OpenFullScreenView()
+        {
+            if (SelectedThumbnailImgList.Count > 0)
+            {
+                var selectedImgId = ((ImageInfo)SelectedThumbnailImgList[0]).ImgID;
+                var currentIndex = Array.FindIndex(ThumbnailModel.ThumbnailImgList.ToArray(), (x) => x.ImgID == selectedImgId);
+
+                Messenger.Raise(new TransitionMessage(
+                    new FullScreenViewModel(currentIndex, ThumbnailModel.CurrentImageFilePathList), "ShowFullScreen"));
+            }   
+        }
+
+        #endregion
+        
+        #region SearchTagCommand
         private ViewModelCommand _SearchTagCommand;
 
         public ViewModelCommand SearchTagCommand
@@ -253,6 +281,7 @@ namespace Rialto.ViewModels
                 TaggingModel.InitTagTree((x) => x.TAG_NAME.IndexOf(SearchTagText) >= 0);
             }
         }
+        #endregion
 
         /// <summary>
         /// タグ検索テキストボックスが空になったら全タグを表示する
@@ -264,9 +293,9 @@ namespace Rialto.ViewModels
                 TaggingModel.InitTagTree();
             }
         }
-
-        #region メニューコマンド
         
+        #region メニューコマンド
+
         public void CreateNewDB()
         {
             Debug.WriteLine("Call CreateNewDB");
