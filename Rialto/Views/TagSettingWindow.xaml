@@ -50,8 +50,8 @@
             <ColumnDefinition Width="20*" />
             <ColumnDefinition Width="10" />
         </Grid.ColumnDefinitions>
-        
-        <ListView x:Name="TagListView" Grid.Row="1"  Grid.Column="1" Grid.ColumnSpan="3" ItemsSource="{Binding AllTags}">
+
+        <ListView x:Name="TagListView" Grid.Row="1"  Grid.Column="1" Grid.ColumnSpan="3" ItemsSource="{Binding AllTags}" >
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="タグ名" DisplayMemberBinding="{Binding TAG_NAME}"></GridViewColumn>

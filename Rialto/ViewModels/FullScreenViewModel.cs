@@ -93,9 +93,12 @@ namespace Rialto.ViewModels
             }
         }
 
+        /// <summary>
+        /// 次の画像を表示する
+        /// </summary>
+        /// <param name="parameter"></param>
         public void NextPicture(object parameter)
         {
-            Debug.WriteLine("Next Picture");
             currentIndex++;
             if (currentIndex >= currentImageFilePathList.Count)
             {
@@ -121,9 +124,12 @@ namespace Rialto.ViewModels
             }
         }
 
+        /// <summary>
+        /// 前の画像を表示する
+        /// </summary>
+        /// <param name="parameter"></param>
         public void PrevPicture(object parameter)
         {
-            Debug.WriteLine("Prev Picture");
             currentIndex--;
             if (currentIndex < 0)
             {
