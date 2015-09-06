@@ -21,9 +21,16 @@ namespace Rialto.ViewModels
 {
     public class FullScreenViewModel : ViewModel
     {
+        #region Fields
         private int currentIndex;
         private List<Uri> currentImageFilePathList;
+        #endregion
 
+        /// <summary>
+        /// コンストラクタ
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="imageFilePathList"></param>
         public FullScreenViewModel(int index, List<Uri> imageFilePathList)
         {
             currentIndex = index;
@@ -35,6 +42,9 @@ namespace Rialto.ViewModels
             CurrentImage = new BitmapImage(currentImageFilePathList[currentIndex]);
         }
 
+        /// <summary>
+        /// 現在表示している画像
+        /// </summary>
         private BitmapImage _CurrentImage;
         public BitmapImage CurrentImage
         {

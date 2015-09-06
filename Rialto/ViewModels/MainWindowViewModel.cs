@@ -10,7 +10,6 @@ using Rialto.Models;
 using System.Collections.ObjectModel;
 using System.Collections;
 using System.Windows.Media.Imaging;
-using Rialto.Models.DAO;
 using Rialto.Model.DataModel;
 using System;
 
@@ -54,7 +53,12 @@ namespace Rialto.ViewModels
             tagAllocator.InitTabSettingPanel();
             TaggingModel.InitTagTree();
         }
-        
+
+        #region Properties
+
+        /// <summary>
+        /// 1つのサムネイル表示アイテムの高さ
+        /// </summary>
         private double ThumbnailItemSizeHeight_;
         public double ThumbnailItemSizeHeight
         {
@@ -69,6 +73,9 @@ namespace Rialto.ViewModels
             }
         }
 
+        /// <summary>
+        /// 1つのサムネイル表示アイテムの幅
+        /// </summary>
         private double ThumbnailItemSizeWidth_;
         public double ThumbnailItemSizeWidth
         {
@@ -83,6 +90,26 @@ namespace Rialto.ViewModels
             }
         }
 
+        /// <summary>
+        /// タグ検索文字列
+        /// </summary>
+        private string SearchTagText_ = string.Empty;
+        public string SearchTagText
+        {
+            get
+            {
+                return SearchTagText_;
+            }
+            set
+            {
+                SearchTagText_ = value;
+                RaisePropertyChanged(() => SearchTagText);
+            }
+        }
+
+        /// <summary>
+        /// タグツリー上に表示するリスト
+        /// </summary>
         private ReadOnlyDispatcherCollection<TagTreeNode> TagTreeItems_;
         public ReadOnlyDispatcherCollection<TagTreeNode> TagTreeItems
         {
@@ -100,20 +127,26 @@ namespace Rialto.ViewModels
             }
         }
 
-        private BitmapImage SideImage_;
-        public BitmapImage SideImage
+        /// <summary>
+        /// タグツリー上で選択したタグ
+        /// </summary>
+        private TagTreeNode SelectedTagNode_;
+        public TagTreeNode SelectedTagNode
         {
             get
             {
-                return SideImage_;
+                return SelectedTagNode_;
             }
             set
             {
-                SideImage_ = value;
-                RaisePropertyChanged(() => SideImage);
+                SelectedTagNode_ = value;
+                RaisePropertyChanged(() => SelectedTagNode);
             }
         }
 
+        /// <summary>
+        /// サムネイルに表示する画像リスト
+        /// </summary>
         private ReadOnlyDispatcherCollection<ImageInfo> _ThumbnailImgList;
         public ReadOnlyDispatcherCollection<ImageInfo> ThumbnailImgList
         {
@@ -131,20 +164,9 @@ namespace Rialto.ViewModels
             }
         }
 
-        private TagTreeNode SelectedTagNode_;
-        public TagTreeNode SelectedTagNode
-        {
-            get
-            {
-                return SelectedTagNode_;
-            }
-            set
-            {
-                SelectedTagNode_ = value;
-                RaisePropertyChanged(() => SelectedTagNode);
-            }
-        }
-
+        /// <summary>
+        /// サムネイル上で選択した画像リスト
+        /// </summary>
         private ObservableCollection<ImageInfo> _SelectedThumbnailImgList = new ObservableCollection<ImageInfo>();
         public IList SelectedThumbnailImgList
         {
@@ -162,6 +184,9 @@ namespace Rialto.ViewModels
             }
         }
 
+        /// <summary>
+        /// タグ付加用パネル情報
+        /// </summary>
         private ReadOnlyDispatcherCollection<TabInfo> TabPanels_;
         public ReadOnlyDispatcherCollection<TabInfo> TabPanels
         {
@@ -179,6 +204,26 @@ namespace Rialto.ViewModels
             }
         }
 
+        /// <summary>
+        /// サイドペインに表示する画像（選択された画像）
+        /// </summary>
+        private BitmapImage SideImage_;
+        public BitmapImage SideImage
+        {
+            get
+            {
+                return SideImage_;
+            }
+            set
+            {
+                SideImage_ = value;
+                RaisePropertyChanged(() => SideImage);
+            }
+        }
+
+        /// <summary>
+        /// 選択された画像に付与されたタグ
+        /// </summary>
         private ObservableCollection<TagMasterInfo> ExistsTags_ = new ObservableCollection<TagMasterInfo>();
         public ObservableCollection<TagMasterInfo> ExistsTags
         {
@@ -193,23 +238,14 @@ namespace Rialto.ViewModels
             }
         }
 
-        private string SearchTagText_ = string.Empty;
-        public string SearchTagText
-        {
-            get
-            {
-                return SearchTagText_;
-            }
-            set
-            {
-                SearchTagText_ = value;
-                RaisePropertyChanged(() => SearchTagText);
-            }
-        }
+        #endregion
 
         #region Command
 
-        public void ListViewChenged()
+        /// <summary>
+        /// サムネイルリストでアイテムを選択した場合に呼び出される
+        /// </summary>
+        public void ThumbnailListSelectionChanged()
         {
             if (SelectedThumbnailImgList.Count > 0) { 
                 var image = new BitmapImage();
@@ -218,10 +254,11 @@ namespace Rialto.ViewModels
                 image.EndInit();
                 SideImage = image;
             }
-            
-            Debug.WriteLine("Call ListViewChenged : " + SelectedThumbnailImgList.Count);
         }
 
+        /// <summary>
+        /// タグツリー情報でアイテムを選択した場合に呼び出される
+        /// </summary>
         public void TagTreeSelectionChanged()
         {
             Debug.WriteLine("Selected Tag Name : " + SelectedTagNode.Name);
@@ -274,6 +311,9 @@ namespace Rialto.ViewModels
             }
         }
 
+        /// <summary>
+        /// タグツリーから検索する
+        /// </summary>
         public void SearchTag()
         {
             if (SearchTagText.Count() > 0)
@@ -316,6 +356,10 @@ namespace Rialto.ViewModels
             }
         }
 
+        /// <summary>
+        /// 既存のDBを開く
+        /// </summary>
+        /// <param name="parameter"></param>
         public void OpenDB(OpeningFileSelectionMessage parameter)
         {
             if (parameter.Response != null)
@@ -327,6 +371,9 @@ namespace Rialto.ViewModels
         }
         #endregion
 
+        /// <summary>
+        /// タグ設定ダイアログを開く
+        /// </summary>
         public void ShowTagSettingWindow()
         {
             Messenger.Raise(new TransitionMessage(new TagSettingWindowViewModel(), "ShowTagSetting"));

@@ -191,7 +191,7 @@
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedThumbnailImgList" Value="{Binding Path=SelectedItems, ElementName=ThumbnailList}"/>
-                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ListViewChenged"/>
+                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ThumbnailListSelectionChanged"/>
                 </i:EventTrigger>
             </i:Interaction.Triggers>
             

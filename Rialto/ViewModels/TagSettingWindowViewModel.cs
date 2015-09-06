@@ -89,6 +89,9 @@ namespace Rialto.ViewModels
             });
         }
         
+        /// <summary>
+        /// 編集エリアのタグ情報を登録する
+        /// </summary>
         public void AddTag()
         {
             M_TAG_INFO target = null;
@@ -109,7 +112,10 @@ namespace Rialto.ViewModels
             Initialize();
         }
 
-        public void ListViewChenged()
+        /// <summary>
+        /// タグリストで選択されたタグ情報を編集エリアに表示する
+        /// </summary>
+        public void TagListSelectionChanged()
         {
             if (SelectedTags.Count > 0)
             {
