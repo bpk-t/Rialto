@@ -112,6 +112,7 @@
     <Compile Include="Models\ThumbnailImage.cs" />
     <Compile Include="Util\RangeObservableCollection.cs" />
     <Compile Include="ViewModels\TagSettingWindowViewModel.cs" />
+    <Compile Include="Views\Behaviors\FileDragAndDropBehavior.cs" />
     <Compile Include="Views\Behaviors\PlaceHolderBehavior.cs" />
     <Compile Include="Views\TagSettingWindow.xaml.cs">
       <DependentUpon>TagSettingWindow.xaml</DependentUpon>

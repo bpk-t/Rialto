@@ -12,6 +12,8 @@ using System.Collections;
 using System.Windows.Media.Imaging;
 using Rialto.Model.DataModel;
 using System;
+using System.Windows.Input;
+using System.Collections.Generic;
 
 namespace Rialto.ViewModels
 {
@@ -333,7 +335,28 @@ namespace Rialto.ViewModels
                 TaggingModel.InitTagTree();
             }
         }
-        
+
+        #region AddItemsCommand
+        private ListenerCommand<IList<Uri>> _AddItemsCommand;
+        public ListenerCommand<IList<Uri>> AddItemsCommand
+        {
+            get
+            {
+                if (_AddItemsCommand == null)
+                {
+                    _AddItemsCommand = new ListenerCommand<IList<Uri>>(AddItems);
+                }
+                return _AddItemsCommand;
+            }
+        }
+
+        private void AddItems(IList<Uri> uriList)
+        {
+            uriList.ForEach(x => Debug.WriteLine(x));
+        }
+
+        #endregion
+
         #region メニューコマンド
 
         public void CreateNewDB()
