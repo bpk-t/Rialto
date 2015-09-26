@@ -11,8 +11,9 @@ namespace Rialto.Util
         /// <summary>
         /// 日付型データの初期値
         /// </summary>
-        public static readonly string DATETIME_DEFAULT_VALUE = "datetime('1900-01-01 00:00:00')";
-
+        //public static readonly string DATETIME_DEFAULT_VALUE = "datetime('1900-01-01 00:00:00')";
+        public static readonly DateTime DATETIME_DEFAULT_VALUE = new DateTime(1900, 1, 1, 0, 0, 0);
+        
         /// <summary>
         /// SQLite 接続DB名
         /// </summary>

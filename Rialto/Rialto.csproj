@@ -78,6 +78,7 @@
     <Reference Include="System.Data.SQLite.Linq">
       <HintPath>..\packages\System.Data.SQLite.Linq.1.0.97.0\lib\net45\System.Data.SQLite.Linq.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Interactive">
       <HintPath>..\packages\Ix-Main.1.2.3\lib\net45\System.Interactive.dll</HintPath>
     </Reference>
@@ -102,14 +103,17 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Constant\TagConstant.cs" />
+    <Compile Include="Models\AverageHashGenerator.cs" />
     <Compile Include="Models\DAO\M_IMAGE_INFO.cs" />
     <Compile Include="Models\DAO\M_TABSETTING.cs" />
     <Compile Include="Models\DAO\M_TAGADDTAB.cs" />
     <Compile Include="Models\DAO\M_TAG_INFO.cs" />
     <Compile Include="Models\DAO\T_AVEHASH.cs" />
+    <Compile Include="Models\ImageRegister.cs" />
     <Compile Include="Models\TagAllocator.cs" />
     <Compile Include="Models\Tagging.cs" />
     <Compile Include="Models\ThumbnailImage.cs" />
+    <Compile Include="Util\MD5Helper.cs" />
     <Compile Include="Util\RangeObservableCollection.cs" />
     <Compile Include="ViewModels\TagSettingWindowViewModel.cs" />
     <Compile Include="Views\Behaviors\FileDragAndDropBehavior.cs" />

@@ -14,6 +14,7 @@ using Rialto.Model.DataModel;
 using System;
 using System.Windows.Input;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Rialto.ViewModels
 {
@@ -352,7 +353,7 @@ namespace Rialto.ViewModels
 
         private void AddItems(IList<Uri> uriList)
         {
-            uriList.ForEach(x => Debug.WriteLine(x));
+            
         }
 
         #endregion
