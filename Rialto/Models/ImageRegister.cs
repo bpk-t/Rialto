@@ -14,79 +14,61 @@ namespace Rialto.Models
         /// 画像ファイルを登録する
         /// </summary>
         /// <param name="fileList">登録する画像ファイル、または画像ファイルが格納されたディレクトリ</param>
-        public Tuple<List<long>,int> RegistImages(string[] fileList)
+        public IEnumerable<long> RegistImages(string[] fileList)
         {
-            var notRegistCount = 0;
-            var registIdList = CopyDataDir(fileList, MakeTodayDir())
-                .Aggregate(new List<long>(), (acc, x) => 
-                {
-                    x.Match(
-                        (success) =>
-                        {
-                            if (File.Exists(success))
-                            {
-                                acc.Add(InsertImageFromFile(new FileInfo(success)));
-                            }
-                            else if (Directory.Exists(success))
-                            {
-                                acc.AddRange(RegistAllImageFromDir(success));
-                            }
-                        },
-                        (failure) => { notRegistCount++; });
-                    return acc;
-                });
-            return Tuple.Create(registIdList, notRegistCount);
+            var destDir = MakeTodayDir();
+            var tasks = Flat(fileList)
+                .Where(f => IsImageExt(f))
+                .Where(f => ExistsFile(f, destDir))
+                .Where(f => ExistsDB(f))
+                .Select(f => CopyFile(f, destDir))
+                .Select(f => (new ImageRegisterTask(f) as IWorkerTask));
+
+            var transaction = WorkerTaskExecutor.Instance.Execute(new Transaction(tasks.ToList())) as Transaction;
+            return transaction.Tasks
+                .Select(t => (t as ImageRegisterTask).IMGINF_ID.Value);
         }
 
-        public IEnumerable<string> Flat(string [] fileList)
+        private List<FileInfo> Flat(string [] fileList)
         {
-            return fileList.Where(x => Directory.Exists(x))
-                .Select(x => Directory.GetFiles(x))
-                .SelectMany(x => Flat(x));
+            return _Flat(fileList, 0, new List<FileInfo>());
         }
 
-        /// <summary>
-        /// データフォルダにコピーする
-        /// </summary>
-        /// <param name="targetFiles"></param>
-        /// <param name="imgDataDir"></param>
-        /// <returns></returns>
-        private IEnumerable<LangExt.Result<string, string>> CopyDataDir(string[] targetFiles, string imgDataDir)
+        private List<FileInfo> _Flat(string[] fileList, int index, List<FileInfo> resultList)
         {
-            return targetFiles.Select(dragFile => 
-                    (File.Exists(dragFile)) ? 
-                        CopyFile(dragFile, imgDataDir) : 
-                        CopyDirectory(dragFile, imgDataDir));
+            if ((fileList.Length - 1) <= index)
+            {
+                return resultList;
+            }
+            var filePath = fileList[index];
+            if (Directory.Exists(filePath))
+            {
+                _Flat(Directory.GetFiles(filePath), 0, resultList);
+            }
+            else if (File.Exists(filePath))
+            {
+                resultList.Add(new FileInfo(filePath));
+            }
+            return _Flat(fileList, index + 1, resultList);
         }
 
-        private LangExt.Result<string, string> CopyFile(string srcFile, string destDir)
+        private bool ExistsFile(FileInfo file, string destDir)
         {
-            var file = new FileInfo(srcFile);
             var destFileName = Path.Combine(destDir, file.Name);
-            if (File.Exists(destFileName))
-            {
-                return LangExt.Result.Failure(srcFile);
-            }
-            else
-            {
-                File.Copy(srcFile, destFileName);
-                return LangExt.Result.Success(destFileName);
-            }
+            return File.Exists(destFileName);
         }
 
-        private LangExt.Result<string, string> CopyDirectory(string srcDir, string destDir)
+        private bool ExistsDB(FileInfo file)
         {
-            var dir = new DirectoryInfo(srcDir);
-            var destDirName = Path.Combine(destDir, dir.Name);
-            if (Directory.Exists(destDirName))
-            {
-                return LangExt.Result.Failure(srcDir);
-            }
-            else
-            {
-                Microsoft.VisualBasic.FileIO.FileSystem.CopyDirectory(srcDir, destDirName);
-                return LangExt.Result.Success(destDirName);
-            }
+            var hashValue = MD5Helper.GenerateMD5HashCodeFromFile(file.FullName);
+            return M_IMAGE_INFO.FindByHash(hashValue).IsSome;
+        }
+
+        private FileInfo CopyFile(FileInfo file, string destDir)
+        {
+            var destFileName = Path.Combine(destDir, file.Name);
+            File.Copy(file.FullName, destFileName);
+            return new FileInfo(destFileName);
         }
 
         /// <summary>
@@ -105,63 +87,17 @@ namespace Rialto.Models
         }
 
         /// <summary>
-        /// 対象のフォルダ配下にある画像をDBに登録する
-        /// </summary>
-        /// <param name="targetDir"></param>
-        private IEnumerable<long> RegistAllImageFromDir(string targetDir)
-        {
-            return (new DirectoryInfo(targetDir)).GetFiles().Select(fi => InsertImageFromFile(fi));
-        }
-
-        /// <summary>
-        /// ファイルをDBに登録する
-        /// </summary>
-        /// <param name="fi">登録するファイル情報</param>
-        /// <returns>登録した画像情報IDを返す、既にDBに存在している場合はその画像情報IDを返す、エラーの場合は-1</returns>
-        private long InsertImageFromFile(FileInfo fi)
-        {
-            //ファイルが画像ファイルではない場合
-            if (!IsImageExt(fi)) { return -1;}
-
-            //ファイルが既にDBに存在する場合は登録しない
-            var hashValue = MD5Helper.GenerateMD5HashCodeFromFile(fi.FullName);
-            return M_IMAGE_INFO.FindByHash(hashValue).GetOrElse(() => {
-                var img = new System.Drawing.Bitmap(fi.FullName);
-                var insertObj = new M_IMAGE_INFO()
-                {
-                    FILE_SIZE = (int)fi.Length,
-                    FILE_NAME = Path.GetFileNameWithoutExtension(fi.Name),
-                    FILE_TYPE = fi.Extension.Substring(1),
-                    FILE_PATH = fi.FullName,
-                    HASH_VALUE = hashValue,
-                    HEIGHT_PIX = img.Height,
-                    WIDTH_PIX = img.Width,
-                    COLOR = 0,
-                    DO_GET = 2,
-                    DELETE_FLG = 0,
-                    DELETE_REASON_ID = 0,
-                    DELETE_DATE = DBHelper.DATETIME_DEFAULT_VALUE
-                };
-
-                var inserted = M_IMAGE_INFO.Insert(insertObj);
-                var registor = new AverageHashGenerator(inserted.IMGINF_ID.Value);
-                registor.Insert();
-                return inserted;
-            }).IMGINF_ID.Value;
-        }
-
-        /// <summary>
         /// 拡張子が画像のファイルの場合、trueを返す
         /// </summary>
-        /// <param name="fi"></param>
+        /// <param name="file"></param>
         /// <returns></returns>
-        private bool IsImageExt(FileInfo fi)
+        private bool IsImageExt(FileInfo file)
         {
-            return fi.Extension == ".jpg"
-                || fi.Extension == ".jpeg"
-                || fi.Extension == ".gif"
-                || fi.Extension == ".png"
-                || fi.Extension == ".bmp";
+            return file.Extension == ".jpg"
+                || file.Extension == ".jpeg"
+                || file.Extension == ".gif"
+                || file.Extension == ".png"
+                || file.Extension == ".bmp";
         }
     }
 }

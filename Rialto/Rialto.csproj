@@ -110,9 +110,13 @@
     <Compile Include="Models\DAO\M_TAG_INFO.cs" />
     <Compile Include="Models\DAO\T_AVEHASH.cs" />
     <Compile Include="Models\ImageRegister.cs" />
+    <Compile Include="Models\ImageRegisterTask.cs" />
+    <Compile Include="Models\IWorkerTask.cs" />
     <Compile Include="Models\TagAllocator.cs" />
     <Compile Include="Models\Tagging.cs" />
     <Compile Include="Models\ThumbnailImage.cs" />
+    <Compile Include="Models\Transaction.cs" />
+    <Compile Include="Models\WorkerTaskExecutor.cs" />
     <Compile Include="Util\MD5Helper.cs" />
     <Compile Include="Util\RangeObservableCollection.cs" />
     <Compile Include="ViewModels\TagSettingWindowViewModel.cs" />
