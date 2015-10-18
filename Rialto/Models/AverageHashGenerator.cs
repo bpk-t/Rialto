@@ -8,33 +8,25 @@ using System.Threading.Tasks;
 
 namespace Rialto.Models
 {
-    public class AverageHashGenerator
+    public static class AverageHashGenerator
     {
-        private readonly int PIC_SIZE = 16;
-        
-        public long IMGINF_ID { get; }
-        public string AVEHASH { get; set; }
+        private static readonly int PIC_SIZE = 16;
 
-        public AverageHashGenerator(long imgInfId)
-        {
-            IMGINF_ID = imgInfId;
-        }
-
-        public void Insert()
+        public static void Insert(long IMGINF_ID)
         {
             M_IMAGE_INFO.FindById(IMGINF_ID).Match(
                 (some) =>
                 {
                     T_AVEHASH.Insert(new T_AVEHASH()
                     {
-                        IMGINF_ID = this.IMGINF_ID,
+                        IMGINF_ID = IMGINF_ID,
                         AVEHASH = ComputeAveHash(some.FILE_PATH)
                     });
                 },
                 () => { });
         }
 
-        public string ComputeAveHash(string imgPath)
+        private static string ComputeAveHash(string imgPath)
         {
             return GetHashStr(
                     GetGlayscaleBitmap(
@@ -47,7 +39,7 @@ namespace Rialto.Models
         /// <param name="bmp"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        private Bitmap ReduceBitmap(Bitmap srcBmp, int size)
+        private static Bitmap ReduceBitmap(Bitmap srcBmp, int size)
         {
             var reduceBmp = new Bitmap(size, size);
             Graphics g = Graphics.FromImage(reduceBmp);
@@ -62,7 +54,7 @@ namespace Rialto.Models
         /// <param name="srcBitmap"></param>
         /// <param name="size"></param>
         /// <returns></returns>
-        private int[] GetGlayscaleBitmap(Bitmap srcBitmap, int size)
+        private static int[] GetGlayscaleBitmap(Bitmap srcBitmap, int size)
         {
             var result = new int[size * size];
             int count = 0;
@@ -83,7 +75,7 @@ namespace Rialto.Models
         /// </summary>
         /// <param name="intArray"></param>
         /// <returns></returns>
-        private string GetHashStr(int[] intArray)
+        private static string GetHashStr(int[] intArray)
         {
             var ave = intArray.Average();
 

@@ -37,15 +37,14 @@ namespace Rialto.Models
         /// <returns>登録した画像情報IDを返す、既にDBに存在している場合はその画像情報IDを返す、エラーの場合は-1</returns>
         private Option<long> InsertImageFromFile(FileInfo file)
         {
-            var hashValue = MD5Helper.GenerateMD5HashCodeFromFile(file.FullName);
             var img = new System.Drawing.Bitmap(file.FullName);
-            var insertObj = new M_IMAGE_INFO()
+            var inserted = M_IMAGE_INFO.Insert(new M_IMAGE_INFO()
             {
                 FILE_SIZE = (int)file.Length,
                 FILE_NAME = Path.GetFileNameWithoutExtension(file.Name),
                 FILE_TYPE = file.Extension.Substring(1),
                 FILE_PATH = file.FullName,
-                HASH_VALUE = hashValue,
+                HASH_VALUE = MD5Helper.GenerateMD5HashCodeFromFile(file.FullName),
                 HEIGHT_PIX = img.Height,
                 WIDTH_PIX = img.Width,
                 COLOR = 0,
@@ -53,11 +52,8 @@ namespace Rialto.Models
                 DELETE_FLG = 0,
                 DELETE_REASON_ID = 0,
                 DELETE_DATE = DBHelper.DATETIME_DEFAULT_VALUE
-            };
-
-            var inserted = M_IMAGE_INFO.Insert(insertObj);
-            var registor = new AverageHashGenerator(inserted.IMGINF_ID.Value);
-            registor.Insert();
+            });
+            AverageHashGenerator.Insert(inserted.IMGINF_ID.Value);
             return Option.Create(inserted.IMGINF_ID);
         }
     }
