@@ -8,33 +8,32 @@ using System.Security.Cryptography;
 
 namespace Rialto.Models
 {
-    public class ImageRegister
+    public static class ImageRegister
     {
         /// <summary>
         /// 画像ファイルを登録する
         /// </summary>
         /// <param name="fileList">登録する画像ファイル、または画像ファイルが格納されたディレクトリ</param>
-        public IEnumerable<long> RegistImages(string[] fileList)
+        public static IEnumerable<LangExt.Option<long>> RegistImages(string[] fileList)
         {
             var destDir = MakeTodayDir();
             var tasks = Flat(fileList)
                 .Where(f => IsImageExt(f))
                 .Where(f => ExistsFile(f, destDir))
                 .Where(f => ExistsDB(f))
-                .Select(f => CopyFile(f, destDir))
-                .Select(f => (new ImageRegisterTask(f) as IWorkerTask));
+                .Do(f => CopyFile(f, destDir))
+                .Select(f => new ImageRegisterTask(f));
 
-            var transaction = WorkerTaskExecutor.Instance.Execute(new Transaction(tasks.ToList())) as Transaction;
-            return transaction.Tasks
-                .Select(t => (t as ImageRegisterTask).IMGINF_ID.Value);
+            return WorkerTaskExecutor.Instance.Execute(new Transaction<ImageRegisterTask>(tasks))
+                .Tasks.Select(t => t.IMGINF_ID);
         }
 
-        private List<FileInfo> Flat(string [] fileList)
+        private static List<FileInfo> Flat(string [] fileList)
         {
             return _Flat(fileList, 0, new List<FileInfo>());
         }
 
-        private List<FileInfo> _Flat(string[] fileList, int index, List<FileInfo> resultList)
+        private static List<FileInfo> _Flat(string[] fileList, int index, List<FileInfo> resultList)
         {
             if ((fileList.Length - 1) <= index)
             {
@@ -52,19 +51,19 @@ namespace Rialto.Models
             return _Flat(fileList, index + 1, resultList);
         }
 
-        private bool ExistsFile(FileInfo file, string destDir)
+        private static bool ExistsFile(FileInfo file, string destDir)
         {
             var destFileName = Path.Combine(destDir, file.Name);
             return File.Exists(destFileName);
         }
 
-        private bool ExistsDB(FileInfo file)
+        private static bool ExistsDB(FileInfo file)
         {
             var hashValue = MD5Helper.GenerateMD5HashCodeFromFile(file.FullName);
             return M_IMAGE_INFO.FindByHash(hashValue).IsSome;
         }
 
-        private FileInfo CopyFile(FileInfo file, string destDir)
+        private static FileInfo CopyFile(FileInfo file, string destDir)
         {
             var destFileName = Path.Combine(destDir, file.Name);
             File.Copy(file.FullName, destFileName);
@@ -75,7 +74,7 @@ namespace Rialto.Models
         /// 今日の日付のディレクトリを作成する
         /// </summary>
         /// <returns></returns>
-        private string MakeTodayDir()
+        private static string MakeTodayDir()
         {
             var imgDataDir = Path.Combine(Properties.Settings.Default.ImgDataDirectory, DateTime.Now.ToString("yyyyMMdd"));
             //今日の日付のフォルダがない場合は作成する
@@ -91,7 +90,7 @@ namespace Rialto.Models
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
-        private bool IsImageExt(FileInfo file)
+        private static bool IsImageExt(FileInfo file)
         {
             return file.Extension == ".jpg"
                 || file.Extension == ".jpeg"

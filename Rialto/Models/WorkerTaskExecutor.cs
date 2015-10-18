@@ -21,7 +21,7 @@ namespace Rialto.Models
 
         private IWorkerTask prevTask = null;
 
-        public IWorkerTask Execute(IWorkerTask task)
+        public T Execute<T>(T task) where T : IWorkerTask
         {
             task.Execute();
             prevTask = task;

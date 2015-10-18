@@ -6,18 +6,13 @@ using System.Threading.Tasks;
 
 namespace Rialto.Models
 {
-    public class Transaction : IWorkerTask
+    public class Transaction<T> : IWorkerTask where T : IWorkerTask
     {
-        public List<IWorkerTask> Tasks { get; set; }
+        public List<T> Tasks { get; set; }
 
-        public Transaction()
+        public Transaction(IEnumerable<T> tasks)
         {
-            Tasks = new List<IWorkerTask>();
-        }
-
-        public Transaction(List<IWorkerTask> tasks)
-        {
-            this.Tasks = tasks;
+            this.Tasks = tasks.ToList();
         }
 
         public void Execute()
@@ -30,7 +25,7 @@ namespace Rialto.Models
             Tasks.ForEach(x => x.Rollback());
         }
 
-        public void AddWorkerTask(IWorkerTask task)
+        public void AddWorkerTask(T task)
         {
             Tasks.Add(task);
         }

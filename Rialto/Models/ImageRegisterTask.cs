@@ -1,4 +1,5 @@
-﻿using Rialto.Models.DAO;
+﻿using LangExt;
+using Rialto.Models.DAO;
 using Rialto.Util;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace Rialto.Models
         }
 
         public FileInfo TargetFile { get; set; }
-        public long? IMGINF_ID { get; set; }
+        public Option<long> IMGINF_ID { get; set; }
 
         public void Execute()
         {
@@ -34,7 +35,7 @@ namespace Rialto.Models
         /// </summary>
         /// <param name="file">登録するファイル情報</param>
         /// <returns>登録した画像情報IDを返す、既にDBに存在している場合はその画像情報IDを返す、エラーの場合は-1</returns>
-        private long? InsertImageFromFile(FileInfo file)
+        private Option<long> InsertImageFromFile(FileInfo file)
         {
             var hashValue = MD5Helper.GenerateMD5HashCodeFromFile(file.FullName);
             var img = new System.Drawing.Bitmap(file.FullName);
@@ -57,7 +58,7 @@ namespace Rialto.Models
             var inserted = M_IMAGE_INFO.Insert(insertObj);
             var registor = new AverageHashGenerator(inserted.IMGINF_ID.Value);
             registor.Insert();
-            return inserted.IMGINF_ID;
+            return Option.Create(inserted.IMGINF_ID);
         }
     }
 }
