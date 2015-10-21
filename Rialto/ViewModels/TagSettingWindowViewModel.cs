@@ -128,7 +128,9 @@ namespace Rialto.ViewModels
 
         public void DeleteTag()
         {
-            Debug.WriteLine("Delete Tag");
+            var selectedTag = SelectedTags[0] as M_TAG_INFO;
+            M_TAG_INFO.DeleteById(selectedTag.TAGINF_ID.Value);
+            Initialize();
         }
     }
 }

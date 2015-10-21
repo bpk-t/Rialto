@@ -126,5 +126,13 @@ namespace Rialto.Models.DAO
                 );
             }
         }
+
+        public static void DeleteById(long id)
+        {
+            using (var con = DBHelper.Instance.GetDbConnection())
+            {
+                con.Execute(@"DELETE FROM M_TAG_INFO WHERE TAGINF_ID=@TAGINF_ID", new { TAGINF_ID = id });
+            }
+        }
     }
 }
