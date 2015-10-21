@@ -57,6 +57,18 @@
                 </GridView>
             </ListView.View>
 
+            <ListView.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="削除する">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="DeleteTag"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                </ContextMenu>
+            </ListView.ContextMenu>
+
             <i:Interaction.Triggers>
                 <i:EventTrigger EventName="SelectionChanged">
                     <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedTags" Value="{Binding Path=SelectedItems, ElementName=TagListView}"/>

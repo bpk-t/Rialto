@@ -6,6 +6,7 @@ using Rialto.Models.DAO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Collections;
+using System.Diagnostics;
 
 namespace Rialto.ViewModels
 {
@@ -123,6 +124,11 @@ namespace Rialto.ViewModels
                 TagNameText = selectedTag.TAG_NAME;
                 TagDefineText = selectedTag.TAG_DEFINE;
             }
+        }
+
+        public void DeleteTag()
+        {
+            Debug.WriteLine("Delete Tag");
         }
     }
 }
