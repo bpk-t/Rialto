@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Rialto.Models.DAO
+namespace Rialto.Models.DAO.Table
 {
     public class M_TABSETTING
     {

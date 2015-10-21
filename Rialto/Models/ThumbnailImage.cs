@@ -6,7 +6,7 @@ using System.IO;
 using Microsoft.VisualBasic;
 using Livet;
 using Rialto.Model.DataModel;
-using Rialto.Models.DAO;
+using Rialto.Models.DAO.Table;
 using System.Collections.Generic;
 
 namespace Rialto.Models

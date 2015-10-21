@@ -3,7 +3,7 @@ using System;
 using System.Data.SQLite;
 using Dapper;
 
-namespace Rialto.Models.DAO
+namespace Rialto.Models.DAO.Table
 {
     public class T_AVEHASH
     {

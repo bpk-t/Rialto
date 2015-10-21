@@ -2,7 +2,7 @@
 
 using Livet;
 using System.Collections.ObjectModel;
-using Rialto.Models.DAO;
+using Rialto.Models.DAO.Table;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Collections;

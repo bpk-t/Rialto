@@ -1,7 +1,7 @@
 ﻿using Livet;
 using Rialto.Constant;
 using Rialto.Model.DataModel;
-using Rialto.Models.DAO;
+using Rialto.Models.DAO.Table;
 using System;
 using System.Linq;
 using System.Threading.Tasks;

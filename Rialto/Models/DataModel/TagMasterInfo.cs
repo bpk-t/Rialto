@@ -16,7 +16,7 @@ namespace Rialto.Model.DataModel
         /// タグ情報ID
         /// </summary>
         [Column(Name = "TAGINF_ID", DbType = "INTEGER", IsPrimaryKey = true)]
-        public int ID { get; set; }
+        public long ID { get; set; }
 
         /// <summary>
         /// タグ名

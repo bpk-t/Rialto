@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Dapper;
 using LangExt;
 
-namespace Rialto.Models.DAO
+namespace Rialto.Models.DAO.Table
 {
     public class M_IMAGE_INFO
     {

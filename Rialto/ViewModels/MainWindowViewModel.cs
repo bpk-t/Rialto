@@ -23,10 +23,9 @@ namespace Rialto.ViewModels
         #region Private Members
 
         private ThumbnailImage ThumbnailModel;
-        
         private Tagging TaggingModel;
-
         private TagAllocator tagAllocator;
+        private AllocatedTags allocatedTags;
 
         #endregion
 
@@ -38,6 +37,7 @@ namespace Rialto.ViewModels
             ThumbnailModel = new ThumbnailImage();
             TaggingModel = new Tagging();
             tagAllocator = new TagAllocator();
+            allocatedTags = new AllocatedTags();
         }
 
         /// <summary>
@@ -47,11 +47,7 @@ namespace Rialto.ViewModels
         {
             ThumbnailItemSizeHeight = 200.0;
             ThumbnailItemSizeWidth = 200.0;
-
-            ExistsTags.Add(new TagMasterInfo { Name = "AAA" });
-            ExistsTags.Add(new TagMasterInfo { Name = "BBB" });
-            ExistsTags.Add(new TagMasterInfo { Name = "CCC" });
-
+            
             ThumbnailModel.ReadThumbnailImage();
             tagAllocator.InitTabSettingPanel();
             TaggingModel.InitTagTree();
@@ -227,17 +223,20 @@ namespace Rialto.ViewModels
         /// <summary>
         /// 選択された画像に付与されたタグ
         /// </summary>
-        private ObservableCollection<TagMasterInfo> ExistsTags_ = new ObservableCollection<TagMasterInfo>();
-        public ObservableCollection<TagMasterInfo> ExistsTags
+        private ReadOnlyDispatcherCollection<TagMasterInfo> ExistsTags_;
+        public ReadOnlyDispatcherCollection<TagMasterInfo> ExistsTags
         {
             get
             {
+                if (ExistsTags_ == null)
+                {
+                    ExistsTags_ = ViewModelHelper.CreateReadOnlyDispatcherCollection(
+                        allocatedTags.ExistsTags
+                        , m => m
+                        , DispatcherHelper.UIDispatcher
+                        );
+                }
                 return ExistsTags_;
-            }
-            set
-            {
-                ExistsTags_ = value;
-                RaisePropertyChanged(() => ExistsTags);
             }
         }
 
@@ -250,12 +249,16 @@ namespace Rialto.ViewModels
         /// </summary>
         public void ThumbnailListSelectionChanged()
         {
-            if (SelectedThumbnailImgList.Count > 0) { 
+            if (SelectedThumbnailImgList.Count > 0) {
+                var selectedImg = (ImageInfo)SelectedThumbnailImgList[0];
                 var image = new BitmapImage();
                 image.BeginInit();
-                image.UriSource = ((ImageInfo)SelectedThumbnailImgList[0]).SourceImageFilePath;
+                image.UriSource = selectedImg.SourceImageFilePath;
                 image.EndInit();
                 SideImage = image;
+
+                allocatedTags.GetAllocatedTags(selectedImg.ImgID);
+
             }
         }
 

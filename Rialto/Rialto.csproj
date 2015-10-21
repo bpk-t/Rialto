@@ -103,12 +103,15 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Constant\TagConstant.cs" />
+    <Compile Include="Models\AllocatedTags.cs" />
     <Compile Include="Models\AverageHashGenerator.cs" />
-    <Compile Include="Models\DAO\M_IMAGE_INFO.cs" />
-    <Compile Include="Models\DAO\M_TABSETTING.cs" />
-    <Compile Include="Models\DAO\M_TAGADDTAB.cs" />
-    <Compile Include="Models\DAO\M_TAG_INFO.cs" />
-    <Compile Include="Models\DAO\T_AVEHASH.cs" />
+    <Compile Include="Models\DAO\Custom\ImageHasTags.cs" />
+    <Compile Include="Models\DAO\Table\M_IMAGE_INFO.cs" />
+    <Compile Include="Models\DAO\Table\M_TABSETTING.cs" />
+    <Compile Include="Models\DAO\Table\M_TAGADDTAB.cs" />
+    <Compile Include="Models\DAO\Table\M_TAG_INFO.cs" />
+    <Compile Include="Models\DAO\Table\T_ADD_TAG.cs" />
+    <Compile Include="Models\DAO\Table\T_AVEHASH.cs" />
     <Compile Include="Models\ImageRegister.cs" />
     <Compile Include="Models\ImageRegisterTask.cs" />
     <Compile Include="Models\IWorkerTask.cs" />
