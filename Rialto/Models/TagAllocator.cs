@@ -2,6 +2,7 @@
 using Rialto.Model.DataModel;
 using Rialto.Models.DAO.Table;
 using StatefulModel;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -9,7 +10,7 @@ namespace Rialto.Models
 {
     public class TagAllocator : NotificationObject
     {
-        private ReadOnlyNotifyChangedCollection<ImageInfo> SelectedThumbnailImgList = null;
+        private IList<ImageInfo> selectedThumbnailImgList;
 
         private Livet.ObservableSynchronizedCollection<TabInfo> TabPanels_ = new Livet.ObservableSynchronizedCollection<TabInfo>();
         public Livet.ObservableSynchronizedCollection<TabInfo> TabPanels
@@ -25,9 +26,9 @@ namespace Rialto.Models
             }
         }
         
-        public TagAllocator()
+        public TagAllocator(IList<ImageInfo> selectedThumbnailImgList)
         {
-
+            this.selectedThumbnailImgList = selectedThumbnailImgList;
         }
 
         public void InitTabSettingPanel()
@@ -46,8 +47,13 @@ namespace Rialto.Models
                         Name = tabSetting.TagName,
                         ClickEvent = (ev) =>
                         {
-                            //TODO タグ割り当て処理
-                            Debug.WriteLine(ev.Name);
+                            selectedThumbnailImgList.ForEach(x => 
+                                T_ADD_TAG.Insert(
+                                    new T_ADD_TAG()
+                                    {
+                                        IMGINF_ID = x.ImgID,
+                                        TAGINF_ID = ev.TagInfId
+                                    }));
                         }
                     });
                 });

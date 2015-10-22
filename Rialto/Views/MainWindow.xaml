@@ -11,14 +11,8 @@
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:properties="clr-namespace:Rialto.Properties"
         xmlns:behaviors="clr-namespace:Rialto.Views.Behaviors"
-        Title="MainWindow" Height="800" Width="1400">
-    <!--
-    SaveWindowPosition="True">
-    -->
-    <Window.Resources>
+        Title="Rialto" Height="800" Width="1400">
 
-    </Window.Resources>
-    
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>

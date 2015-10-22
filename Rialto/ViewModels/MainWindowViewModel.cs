@@ -36,7 +36,7 @@ namespace Rialto.ViewModels
         {
             ThumbnailModel = new ThumbnailImage();
             TaggingModel = new Tagging();
-            tagAllocator = new TagAllocator();
+            tagAllocator = new TagAllocator(_SelectedThumbnailImgList);
             allocatedTags = new AllocatedTags();
         }
 
