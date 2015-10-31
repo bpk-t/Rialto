@@ -57,11 +57,12 @@
             <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="4*" />
+            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="2*" />
         </Grid.ColumnDefinitions>
 
         <!-- メニューバー -->
-        <Menu Grid.Row="0" Grid.ColumnSpan="4">
+        <Menu Grid.Row="0" Grid.ColumnSpan="5">
             <MenuItem Header="{x:Static properties:Resources.MenuItemFile}">
                 
                 <!-- 新しいDBを作成 -->
@@ -194,9 +195,11 @@
             </ListView.InputBindings>
         </ListView>
 
+        <GridSplitter Grid.Row="1" Grid.Column="3" Grid.RowSpan="3"  Width="5" HorizontalAlignment="Center"/>
+        
         <!-- 画像情報エリア -->
-        <StackPanel Grid.Row="1" Grid.Column="3" Grid.ColumnSpan="2" Grid.RowSpan="2" Orientation="Horizontal" HorizontalAlignment="Stretch">
-            <Border BorderThickness="2" BorderBrush="LightBlue">
+        <DockPanel Grid.Row="1" Grid.Column="4" Grid.ColumnSpan="2" Grid.RowSpan="2">
+            <Border DockPanel.Dock="Left" BorderThickness="2" BorderBrush="LightBlue" Margin="5">
                 <Button>
                     <Button.Template>
                         <ControlTemplate TargetType="{x:Type Button}">
@@ -211,20 +214,20 @@
                     </i:Interaction.Triggers>
                 </Button>
             </Border>
-            <StackPanel Orientation="Vertical" Margin="5" HorizontalAlignment="Stretch">
-                <TextBlock HorizontalAlignment="Stretch">既存のタグ</TextBlock>
-                <ListView ItemsSource="{Binding ExistsTags}" HorizontalAlignment="Stretch">
+            <DockPanel DockPanel.Dock="Left" Margin="5">
+                <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Stretch">既存のタグ</TextBlock>
+                <ListView DockPanel.Dock="Top" ItemsSource="{Binding ExistsTags}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Name}" />
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
-            </StackPanel>
-        </StackPanel>
+            </DockPanel>
+        </DockPanel>
 
         <!-- タグ設定タブ -->
-        <TabControl x:Name="tabControl" Grid.Row="3" Grid.Column="3" Margin="5" ItemsSource="{Binding TabPanels}">
+        <TabControl x:Name="tabControl" Grid.Row="3" Grid.Column="4" Margin="5" ItemsSource="{Binding TabPanels}">
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Header}" />
