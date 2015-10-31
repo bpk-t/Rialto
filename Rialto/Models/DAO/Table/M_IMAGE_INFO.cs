@@ -43,6 +43,63 @@ namespace Rialto.Models.DAO.Table
             }
         }
 
+        public static IEnumerable<M_IMAGE_INFO> GetNoTag()
+        {
+            using (var con = DBHelper.Instance.GetDbConnection())
+            {
+                return con.Query(
+@"SELECT * FROM M_IMAGE_INFO IMGINF, T_AVEHASH AVEH
+ WHERE IMGINF.DELETE_FLG='0'
+ AND IMGINF.IMGINF_ID NOT IN(SELECT IMGINF_ID FROM T_ADD_TAG)
+ AND IMGINF.IMGINF_ID=AVEH.IMGINF_ID
+ ORDER BY IMGINF.IMGINF_ID DESC",
+                         (M_IMAGE_INFO img, T_AVEHASH hash) => {
+                             img.AVEHASH = hash.AVEHASH;
+                             return img;
+                         }, splitOn: "IMGINF_ID,IMGINF_ID");
+            }
+        }
+
+        public static IEnumerable<M_IMAGE_INFO> GetByTag(long tagId)
+        {
+            using (var con = DBHelper.Instance.GetDbConnection())
+            {
+                return con.Query(
+@"SELECT * FROM M_IMAGE_INFO IMGINF, T_AVEHASH AVEH, M_TAG_INFO TM, T_ADD_TAG ADDT
+ WHERE IMGINF.DELETE_FLG='0'
+ AND TM.TAGINF_ID=@TAGINF_ID
+ AND TM.TAGINF_ID=ADDT.TAGINF_ID 
+ AND ADDT.IMGINF_ID=IMGINF.IMGINF_ID 
+ AND IMGINF.IMGINF_ID=AVEH.IMGINF_ID 
+ ORDER BY IMGINF.IMGINF_ID DESC",
+                         (M_IMAGE_INFO img, T_AVEHASH hash) => {
+                             img.AVEHASH = hash.AVEHASH;
+                             return img;
+                         }, splitOn: "IMGINF_ID,IMGINF_ID"
+                         , param: new { TAGINF_ID = tagId });
+            }
+        }
+
+        public static Option<M_IMAGE_INFO> FindByHash(string hash)
+        {
+            using (var con = DBHelper.Instance.GetDbConnection())
+            {
+                return Option.Create(
+                con.Query("SELECT * FROM M_IMAGE_INFO WHERE TRIM(HASH_VALUE)=@HASH_VALUE"
+                    , new { HASH_VALUE = hash }).FirstOrDefault());
+            }
+        }
+
+        public static Option<M_IMAGE_INFO> FindById(long id)
+        {
+            using (var con = DBHelper.Instance.GetDbConnection())
+            {
+                return Option.Create(
+                con.Query("SELECT * FROM M_IMAGE_INFO WHERE IMGINF_ID=@IMGINF_ID"
+                    , new { IMGINF_ID = id }).FirstOrDefault());
+            }
+        }
+
         public static M_IMAGE_INFO Insert(M_IMAGE_INFO info)
         {
             using (var con = DBHelper.Instance.GetDbConnection())
@@ -73,26 +130,6 @@ FILE_SIZE,FILE_NAME,FILE_TYPE,HASH_VALUE,FILE_PATH,HEIGHT_PIX,WIDTH_PIX,COLOR,DO
                 tran.Commit();
 
                 return inserted;
-            }
-        }
-
-        public static Option<M_IMAGE_INFO> FindByHash(string hash)
-        {
-            using (var con = DBHelper.Instance.GetDbConnection())
-            {
-                return Option.Create(
-                con.Query("SELECT * FROM M_IMAGE_INFO WHERE TRIM(HASH_VALUE)=@HASH_VALUE"
-                    , new { HASH_VALUE = hash }).FirstOrDefault());
-            }
-        }
-
-        public static Option<M_IMAGE_INFO> FindById(long id)
-        {
-            using (var con = DBHelper.Instance.GetDbConnection())
-            {
-                return Option.Create(
-                con.Query("SELECT * FROM M_IMAGE_INFO WHERE IMGINF_ID=@IMGINF_ID"
-                    , new { IMGINF_ID = id }).FirstOrDefault());
             }
         }
     }

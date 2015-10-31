@@ -15,6 +15,7 @@ using System;
 using System.Windows.Input;
 using System.Collections.Generic;
 using System.IO;
+using Rialto.Constant;
 
 namespace Rialto.ViewModels
 {
@@ -48,7 +49,7 @@ namespace Rialto.ViewModels
             ThumbnailItemSizeHeight = 200.0;
             ThumbnailItemSizeWidth = 200.0;
             
-            ThumbnailModel.ReadThumbnailImage();
+            ThumbnailModel.ShowThumbnailImage(TagConstant.NOTAG_TAG_ID);
             tagAllocator.InitTabSettingPanel();
             TaggingModel.InitTagTree();
         }
@@ -267,6 +268,7 @@ namespace Rialto.ViewModels
         /// </summary>
         public void TagTreeSelectionChanged()
         {
+            ThumbnailModel.ShowThumbnailImage(SelectedTagNode.ID);
             Debug.WriteLine("Selected Tag Name : " + SelectedTagNode.Name);
         }
 
