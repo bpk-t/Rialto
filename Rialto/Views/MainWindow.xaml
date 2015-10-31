@@ -118,7 +118,7 @@
         </Menu>
 
         <!-- タグツリー -->
-        <TextBox Grid.Row="1" Grid.Column="0" Margin="5" Text="{Binding SearchTagText, UpdateSourceTrigger=PropertyChanged}">
+        <TextBox Grid.Row="1" Grid.Column="0" Margin="5" MaxLines="1" Text="{Binding SearchTagText, UpdateSourceTrigger=PropertyChanged}">
             <i:Interaction.Behaviors>
                 <behaviors:PlaceHolderBehavior PlaceHolderText="検索" />
             </i:Interaction.Behaviors>

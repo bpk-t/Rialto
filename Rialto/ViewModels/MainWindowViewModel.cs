@@ -270,7 +270,6 @@ namespace Rialto.ViewModels
         {
             if (SelectedTagNode == null) return;
             ThumbnailModel.ShowThumbnailImage(SelectedTagNode.ID);
-            Debug.WriteLine("Selected Tag Name : " + SelectedTagNode.Name);
         }
 
         #region SearchTagCommand
