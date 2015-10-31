@@ -268,6 +268,7 @@ namespace Rialto.ViewModels
         /// </summary>
         public void TagTreeSelectionChanged()
         {
+            if (SelectedTagNode == null) return;
             ThumbnailModel.ShowThumbnailImage(SelectedTagNode.ID);
             Debug.WriteLine("Selected Tag Name : " + SelectedTagNode.Name);
         }
