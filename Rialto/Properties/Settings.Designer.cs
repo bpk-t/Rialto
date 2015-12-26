@@ -58,5 +58,17 @@ namespace Rialto.Properties {
                 this["ImgDataDirectory"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string MainWindowPlacements {
+            get {
+                return ((string)(this["MainWindowPlacements"]));
+            }
+            set {
+                this["MainWindowPlacements"] = value;
+            }
+        }
     }
 }
