@@ -44,12 +44,12 @@ namespace Rialto.ViewModels
         /// <summary>
         /// 初期化処理
         /// </summary>
-        public void Initialize()
+        public async void Initialize()
         {
             ThumbnailItemSizeHeight = 200.0;
             ThumbnailItemSizeWidth = 200.0;
             
-            ThumbnailModel.ShowThumbnailImage(TagConstant.ALL_TAG_ID);
+            await ThumbnailModel.ShowThumbnailImage(TagConstant.ALL_TAG_ID);
             tagAllocator.InitTabSettingPanel();
             TaggingModel.InitTagTree();
         }
@@ -266,10 +266,10 @@ namespace Rialto.ViewModels
         /// <summary>
         /// タグツリー情報でアイテムを選択した場合に呼び出される
         /// </summary>
-        public void TagTreeSelectionChanged()
+        public async void TagTreeSelectionChanged()
         {
             if (SelectedTagNode == null) return;
-            ThumbnailModel.ShowThumbnailImage(SelectedTagNode.ID);
+            await ThumbnailModel.ShowThumbnailImage(SelectedTagNode.ID);
         }
 
         #region SearchTagCommand
@@ -415,17 +415,17 @@ namespace Rialto.ViewModels
         /// <summary>
         /// サムネイルをシャッフルする
         /// </summary>
-        public void Shuffle()
+        public async void Shuffle()
         {
-            ThumbnailModel.Shuffle();
+            await ThumbnailModel.Shuffle();
         }
 
         /// <summary>
         /// サムネイルをリバースする
         /// </summary>
-        public void Reverse()
+        public async void Reverse()
         {
-            ThumbnailModel.Reverse();
+            await ThumbnailModel.Reverse();
         }
 
         #endregion

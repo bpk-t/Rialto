@@ -36,9 +36,9 @@ namespace Rialto.Models
         /// </summary>
         public List<ImageInfo> CurrentImageFilePathList { get; set; }
 
-        public void ShowThumbnailImage(long tagId)
+        public async Task ShowThumbnailImage(long tagId)
         {
-            Task.Run(() =>
+            await Task.Run(() =>
             {
                 ThumbnailImgList.Clear();
                 if (tagId == TagConstant.ALL_TAG_ID)
@@ -57,18 +57,24 @@ namespace Rialto.Models
             });
         }
 
-        public void Shuffle()
+        public async Task Shuffle()
         {
-            ThumbnailImgList.Clear();
-            CurrentImageFilePathList = CurrentImageFilePathList.OrderBy(_ => Guid.NewGuid()).ToList();
-            ShowFirstPart();
+            await Task.Run(() =>
+            {
+                ThumbnailImgList.Clear();
+                CurrentImageFilePathList = CurrentImageFilePathList.OrderBy(_ => Guid.NewGuid()).ToList();
+                ShowFirstPart();
+            });
         }
 
-        public void Reverse()
+        public async Task Reverse()
         {
-            ThumbnailImgList.Clear();
-            CurrentImageFilePathList.Reverse();
-            ShowFirstPart();
+            await Task.Run(() =>
+            {
+                ThumbnailImgList.Clear();
+                CurrentImageFilePathList.Reverse();
+                ShowFirstPart();
+            });
         }
 
         private void LoadImage(IEnumerable<M_IMAGE_INFO> images)
