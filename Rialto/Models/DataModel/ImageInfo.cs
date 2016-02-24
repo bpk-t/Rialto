@@ -21,11 +21,6 @@ namespace Rialto.Model.DataModel
         public BitmapImage DispImage { get; set; }
 
         /// <summary>
-        /// サムネイルに表示する画像ファイル名
-        /// </summary>
-        public string DispImageName { get; set; }
-
-        /// <summary>
         /// サムネイル用画像のファイルパス
         /// </summary>
         private Uri ThumbnailImageFilePath_;

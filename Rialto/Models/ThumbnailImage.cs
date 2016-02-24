@@ -61,7 +61,6 @@ namespace Rialto.Models
             images.Take(50).Select(x => new ImageInfo()
             {
                 ImgID = x.IMGINF_ID.Value,
-                DispImageName = x.FILE_NAME,
                 ThumbnailImageFilePath = GetThumbnailImage(x.FILE_PATH, x.HASH_VALUE),
                 SourceImageFilePath = new Uri(Path.GetFullPath(x.FILE_PATH))
             }).ForEach(x => ThumbnailImgList.Add(x));

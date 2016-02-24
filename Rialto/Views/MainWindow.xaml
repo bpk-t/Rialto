@@ -158,8 +158,7 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Vertical" Margin="5">
-                        <Image Margin="2" Source="{Binding DispImage, UpdateSourceTrigger=PropertyChanged}" Width="150" Height="150"/>
-                        <TextBlock HorizontalAlignment="Center" Text="{Binding DispImageName}" TextWrapping="Wrap"></TextBlock>
+                        <Image Margin="2" Source="{Binding DispImage, UpdateSourceTrigger=PropertyChanged}" />
                     </StackPanel>
                 </DataTemplate>
             </ListView.ItemTemplate>
