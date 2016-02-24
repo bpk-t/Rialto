@@ -420,6 +420,14 @@ namespace Rialto.ViewModels
             ThumbnailModel.Shuffle();
         }
 
+        /// <summary>
+        /// サムネイルをリバースする
+        /// </summary>
+        public void Reverse()
+        {
+            ThumbnailModel.Reverse();
+        }
+
         #endregion
         #endregion
     }

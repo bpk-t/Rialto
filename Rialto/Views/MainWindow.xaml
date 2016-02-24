@@ -96,7 +96,13 @@
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
                 </MenuItem>
-                <MenuItem Header="リバース(_R)" />
+                <MenuItem Header="リバース(_R)" >
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Reverse"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="タグ(_T)">
                 <MenuItem Header="タグ設定画面の表示">

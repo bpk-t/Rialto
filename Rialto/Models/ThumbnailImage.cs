@@ -60,7 +60,14 @@ namespace Rialto.Models
         public void Shuffle()
         {
             ThumbnailImgList.Clear();
-            CurrentImageFilePathList = CurrentImageFilePathList.OrderBy(_ => Guid.NewGuid()).ToList();
+            CurrentImageFilePathList = CurrentImageFilePathList.OrderBy(_ => Guid.NewGuid());
+            ShowFirstPart();
+        }
+
+        public void Reverse()
+        {
+            ThumbnailImgList.Clear();
+            CurrentImageFilePathList = CurrentImageFilePathList.Reverse();
             ShowFirstPart();
         }
 
