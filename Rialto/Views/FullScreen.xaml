@@ -10,7 +10,8 @@
         WindowStyle="None"
         WindowState="Maximized"
         Topmost="True"
-        x:Name="FullScreenWindow">
+        x:Name="FullScreenWindow"
+        Background="Black">
 
     <i:Interaction.Triggers>
         <!--WindowのContentRenderedイベントのタイミングでViewModelのInitializeメソッドが呼ばれます-->
