@@ -49,7 +49,7 @@ namespace Rialto.ViewModels
             ThumbnailItemSizeHeight = 200.0;
             ThumbnailItemSizeWidth = 200.0;
             
-            ThumbnailModel.ShowThumbnailImage(TagConstant.NOTAG_TAG_ID);
+            ThumbnailModel.ShowThumbnailImage(TagConstant.ALL_TAG_ID);
             tagAllocator.InitTabSettingPanel();
             TaggingModel.InitTagTree();
         }
@@ -298,7 +298,7 @@ namespace Rialto.ViewModels
                 var currentIndex = Array.FindIndex(ThumbnailModel.ThumbnailImgList.ToArray(), (x) => x.ImgID == selectedImgId);
 
                 Messenger.Raise(new TransitionMessage(
-                    new FullScreenViewModel(currentIndex, ThumbnailModel.CurrentImageFilePathList.ToList()), "ShowFullScreen"));
+                    new FullScreenViewModel(currentIndex, ThumbnailModel.CurrentImageFilePathList), "ShowFullScreen"));
             }   
         }
 

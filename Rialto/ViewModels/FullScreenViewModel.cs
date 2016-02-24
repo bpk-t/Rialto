@@ -40,7 +40,7 @@ namespace Rialto.ViewModels
 
         public void Initialize()
         {
-            CurrentImage = new BitmapImage(currentImageFilePathList.ElementAt(currentIndex).SourceImageFilePath);
+            CurrentImage = new BitmapImage(currentImageFilePathList[currentIndex].SourceImageFilePath);
         }
 
         /// <summary>

@@ -34,7 +34,7 @@ namespace Rialto.Models
         /// <summary>
         /// サムネイルに表示する予定含むすべての画像リスト
         /// </summary>
-        public IEnumerable<ImageInfo> CurrentImageFilePathList { get; set; }
+        public List<ImageInfo> CurrentImageFilePathList { get; set; }
 
         public void ShowThumbnailImage(long tagId)
         {
@@ -60,14 +60,14 @@ namespace Rialto.Models
         public void Shuffle()
         {
             ThumbnailImgList.Clear();
-            CurrentImageFilePathList = CurrentImageFilePathList.OrderBy(_ => Guid.NewGuid());
+            CurrentImageFilePathList = CurrentImageFilePathList.OrderBy(_ => Guid.NewGuid()).ToList();
             ShowFirstPart();
         }
 
         public void Reverse()
         {
             ThumbnailImgList.Clear();
-            CurrentImageFilePathList = CurrentImageFilePathList.Reverse();
+            CurrentImageFilePathList.Reverse();
             ShowFirstPart();
         }
 
@@ -78,7 +78,7 @@ namespace Rialto.Models
                 ImgID = x.IMGINF_ID.Value,
                 ThumbnailImageFilePath = GetThumbnailImage(x.FILE_PATH, x.HASH_VALUE),
                 SourceImageFilePath = new Uri(Path.GetFullPath(x.FILE_PATH))
-            });
+            }).ToList();
         }
 
         private void ShowFirstPart()
