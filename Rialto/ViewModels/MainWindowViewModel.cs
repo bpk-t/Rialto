@@ -356,9 +356,13 @@ namespace Rialto.ViewModels
             }
         }
 
+        /// <summary>
+        /// ドラッグアンドドロップ
+        /// </summary>
+        /// <param name="uriList">ファイルリスト</param>
         private void AddItems(IList<Uri> uriList)
         {
-            
+            uriList.ForEach(x => Debug.WriteLine(x));
         }
 
         #endregion

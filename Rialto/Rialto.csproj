@@ -114,6 +114,7 @@
     <Compile Include="Models\DAO\Table\T_AVEHASH.cs" />
     <Compile Include="Models\ImageRegister.cs" />
     <Compile Include="Models\ImageRegisterTask.cs" />
+    <Compile Include="Models\IWorker.cs" />
     <Compile Include="Models\IWorkerTask.cs" />
     <Compile Include="Models\TagAllocator.cs" />
     <Compile Include="Models\Tagging.cs" />
