@@ -34,7 +34,7 @@ namespace Rialto.Models
         /// <summary>
         /// サムネイルに表示する予定含むすべての画像リスト
         /// </summary>
-        public List<Uri> CurrentImageFilePathList { get; set; }
+        public IEnumerable<ImageInfo> CurrentImageFilePathList { get; set; }
 
         public void ShowThumbnailImage(long tagId)
         {
@@ -43,29 +43,40 @@ namespace Rialto.Models
                 ThumbnailImgList.Clear();
                 if (tagId == TagConstant.ALL_TAG_ID)
                 {
-                    ShowFirstPart(M_IMAGE_INFO.GetAll());
+                    LoadImage(M_IMAGE_INFO.GetAll());
                 }
                 else if (tagId == TagConstant.NOTAG_TAG_ID)
                 {
-                    ShowFirstPart(M_IMAGE_INFO.GetNoTag());
+                    LoadImage(M_IMAGE_INFO.GetNoTag());
                 }
                 else
                 {
-                    ShowFirstPart(M_IMAGE_INFO.GetByTag(tagId));
+                    LoadImage(M_IMAGE_INFO.GetByTag(tagId));
                 }
+                ShowFirstPart();
             });
         }
 
-        private void ShowFirstPart(IEnumerable<M_IMAGE_INFO> images)
+        public void Shuffle()
         {
-            images.Take(50).Select(x => new ImageInfo()
+            ThumbnailImgList.Clear();
+            CurrentImageFilePathList = CurrentImageFilePathList.OrderBy(_ => Guid.NewGuid()).ToList();
+            ShowFirstPart();
+        }
+
+        private void LoadImage(IEnumerable<M_IMAGE_INFO> images)
+        {
+            CurrentImageFilePathList = images.Select(x => new ImageInfo()
             {
                 ImgID = x.IMGINF_ID.Value,
                 ThumbnailImageFilePath = GetThumbnailImage(x.FILE_PATH, x.HASH_VALUE),
                 SourceImageFilePath = new Uri(Path.GetFullPath(x.FILE_PATH))
-            }).ForEach(x => ThumbnailImgList.Add(x));
+            });
+        }
 
-            CurrentImageFilePathList = images.Select(x => new Uri(Path.GetFullPath(x.FILE_PATH))).ToList();
+        private void ShowFirstPart()
+        {
+            CurrentImageFilePathList.Take(50).ForEach(x => ThumbnailImgList.Add(x));
         }
 
         /// <summary>

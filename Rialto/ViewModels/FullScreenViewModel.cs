@@ -16,6 +16,7 @@ using Rialto.Models;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media.Imaging;
+using Rialto.Model.DataModel;
 
 namespace Rialto.ViewModels
 {
@@ -23,7 +24,7 @@ namespace Rialto.ViewModels
     {
         #region Fields
         private int currentIndex;
-        private List<Uri> currentImageFilePathList;
+        private List<ImageInfo> currentImageFilePathList;
         #endregion
 
         /// <summary>
@@ -31,7 +32,7 @@ namespace Rialto.ViewModels
         /// </summary>
         /// <param name="index"></param>
         /// <param name="imageFilePathList"></param>
-        public FullScreenViewModel(int index, List<Uri> imageFilePathList)
+        public FullScreenViewModel(int index, List<ImageInfo> imageFilePathList)
         {
             currentIndex = index;
             currentImageFilePathList = imageFilePathList;
@@ -39,7 +40,7 @@ namespace Rialto.ViewModels
 
         public void Initialize()
         {
-            CurrentImage = new BitmapImage(currentImageFilePathList[currentIndex]);
+            CurrentImage = new BitmapImage(currentImageFilePathList.ElementAt(currentIndex).SourceImageFilePath);
         }
 
         /// <summary>
@@ -114,7 +115,7 @@ namespace Rialto.ViewModels
             {
                 currentIndex = 0;
             }
-            CurrentImage = new BitmapImage(currentImageFilePathList[currentIndex]);
+            CurrentImage = new BitmapImage(currentImageFilePathList[currentIndex].SourceImageFilePath);
         }
         #endregion
 
@@ -145,7 +146,7 @@ namespace Rialto.ViewModels
             {
                 currentIndex = currentImageFilePathList.Count - 1;
             }
-            CurrentImage = new BitmapImage(currentImageFilePathList[currentIndex]);
+            CurrentImage = new BitmapImage(currentImageFilePathList[currentIndex].SourceImageFilePath);
         }
         #endregion
 

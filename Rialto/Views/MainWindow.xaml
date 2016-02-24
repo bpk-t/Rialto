@@ -89,7 +89,13 @@
                 <MenuItem Header="エクスポート(_E)" />
             </MenuItem>
             <MenuItem Header="表示(_V)">
-                <MenuItem Header="シャッフル(_S)" />
+                <MenuItem Header="シャッフル(_S)" >
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="Click">
+                            <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Shuffle"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                </MenuItem>
                 <MenuItem Header="リバース(_R)" />
             </MenuItem>
             <MenuItem Header="タグ(_T)">

@@ -298,7 +298,7 @@ namespace Rialto.ViewModels
                 var currentIndex = Array.FindIndex(ThumbnailModel.ThumbnailImgList.ToArray(), (x) => x.ImgID == selectedImgId);
 
                 Messenger.Raise(new TransitionMessage(
-                    new FullScreenViewModel(currentIndex, ThumbnailModel.CurrentImageFilePathList), "ShowFullScreen"));
+                    new FullScreenViewModel(currentIndex, ThumbnailModel.CurrentImageFilePathList.ToList()), "ShowFullScreen"));
             }   
         }
 
@@ -410,6 +410,14 @@ namespace Rialto.ViewModels
         public void ShowTagSettingWindow()
         {
             Messenger.Raise(new TransitionMessage(new TagSettingWindowViewModel(), "ShowTagSetting"));
+        }
+
+        /// <summary>
+        /// サムネイルをシャッフルする
+        /// </summary>
+        public void Shuffle()
+        {
+            ThumbnailModel.Shuffle();
         }
 
         #endregion
