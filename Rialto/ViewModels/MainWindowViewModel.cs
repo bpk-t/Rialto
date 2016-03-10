@@ -12,10 +12,10 @@ using System.Collections;
 using System.Windows.Media.Imaging;
 using Rialto.Model.DataModel;
 using System;
-using System.Windows.Input;
 using System.Collections.Generic;
-using System.IO;
 using Rialto.Constant;
+using NLog;
+using NLog.Fluent;
 
 namespace Rialto.ViewModels
 {
@@ -23,6 +23,7 @@ namespace Rialto.ViewModels
     {
         #region Private Members
 
+        private Logger logger = LogManager.GetLogger("fileLogger");
         private ThumbnailImage ThumbnailModel;
         private Tagging TaggingModel;
         private TagAllocator tagAllocator;
@@ -35,6 +36,7 @@ namespace Rialto.ViewModels
         /// </summary>
         public MainWindowViewModel()
         {
+            logger.Debug().Write();
             ThumbnailModel = new ThumbnailImage();
             TaggingModel = new Tagging();
             tagAllocator = new TagAllocator(_SelectedThumbnailImgList);
