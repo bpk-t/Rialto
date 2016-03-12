@@ -23,7 +23,7 @@ namespace Rialto.ViewModels
     {
         #region Private Members
 
-        private Logger logger = LogManager.GetLogger("fileLogger");
+        private static readonly Logger logger = LogManager.GetLogger("fileLogger");
         private ThumbnailImage ThumbnailModel;
         private Tagging TaggingModel;
         private TagAllocator tagAllocator;

@@ -14,6 +14,7 @@ namespace Rialto.Models.DAO.Table
         public string FILE_NAME { get; set; }
         public string FILE_TYPE { get; set; }
         public string HASH_VALUE { get; set; }
+        public int IMGREPO_ID { get; set; }
         public string FILE_PATH { get; set; }
         public int HEIGHT_PIX { get; set; }
         public int WIDTH_PIX { get; set; }
