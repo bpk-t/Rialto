@@ -11,7 +11,7 @@
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:properties="clr-namespace:Rialto.Properties"
         xmlns:behaviors="clr-namespace:Rialto.Views.Behaviors"
-        Title="Rialto" Height="800" Width="1400">
+        Title="Rialto" Height="1200" Width="1800">
 
     <Window.DataContext>
         <vm:MainWindowViewModel/>
@@ -40,231 +40,238 @@
         </l:InteractionMessageTrigger>
     </i:Interaction.Triggers>
 
-    <!--
-    Debug用
-    <Grid ShowGridLines="True">
-    -->
-    <Grid>
+    <Grid ShowGridLines="False">
         <Grid.RowDefinitions>
             <RowDefinition Height="35px" />
-            <RowDefinition Height="38px" />
-            <RowDefinition Height="4*" />
-            <RowDefinition Height="10*" />
-            <RowDefinition Height="20px" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="35px" />
         </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="4*" />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="2*" />
-        </Grid.ColumnDefinitions>
+        <Grid Grid.Row="0">
+            <!-- メニューバー -->
+            <Menu>
+                <MenuItem Header="ファイル(_F)">
+                    <MenuItem Header="DBを新規作成(_N)" >
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="CreateNewDB"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="既存のDBを開く(_O)">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <l:OpenFileDialogInteractionMessageAction>
+                                    <l:DirectInteractionMessage CallbackMethodTarget="{Binding}" CallbackMethodName="OpenDB">
+                                        <l:OpeningFileSelectionMessage Filter="すべてのファイル(*.*)|*.*" Title="ファイルを開く" MultiSelect="False"/>
+                                    </l:DirectInteractionMessage>
+                                </l:OpenFileDialogInteractionMessageAction>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="エクスポート(_E)" />
+                </MenuItem>
+                <MenuItem Header="表示(_V)">
+                    <MenuItem Header="シャッフル(_S)" >
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Shuffle"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="リバース(_R)" >
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Reverse"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                </MenuItem>
+                <MenuItem Header="タグ(_T)">
+                    <MenuItem Header="タグ設定画面の表示">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ShowTagSettingWindow"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </MenuItem>
+                    <MenuItem Header="タグリストの更新" />
+                </MenuItem>
 
-        <!-- メニューバー -->
-        <Menu Grid.Row="0" Grid.ColumnSpan="5">
-            <MenuItem Header="{x:Static properties:Resources.MenuItemFile}">
-                
-                <!-- 新しいDBを作成 -->
-                <MenuItem Header="{x:Static properties:Resources.MenuItemCreateNewDB}" >
+                <MenuItem Header="検索(_S)">
+                    <MenuItem Header="重複画像検索" />
+                    <MenuItem Header="閲覧時間の長い画像を検索" />
+                    <MenuItem Header="検索ダイアログを表示する" />
+                    <MenuItem Header="スコアの高い画像を検索" />
+                    <MenuItem Header="タグが一つの画像を検索" />
+                </MenuItem>
+
+                <MenuItem Header="ツール(_T)">
+                    <MenuItem Header="設定(_S)" />
+                    <MenuItem Header="スコア決定" />
+                    <MenuItem Header="タグ付加実績を表示" />
+                </MenuItem>
+            </Menu>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="5*" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="2*" />
+            </Grid.ColumnDefinitions>
+
+
+            <Grid Grid.Column="0">
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="35px" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- タグツリー -->
+                <TextBox Grid.Row="0" Margin="5" MaxLines="1" Text="{Binding SearchTagText, UpdateSourceTrigger=PropertyChanged}">
+                    <i:Interaction.Behaviors>
+                        <behaviors:PlaceHolderBehavior PlaceHolderText="検索" />
+                    </i:Interaction.Behaviors>
+
+                    <TextBox.InputBindings>
+                        <KeyBinding Key="Enter" Command="{Binding SearchTagCommand}" />
+                    </TextBox.InputBindings>
+
                     <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Click">
-                            <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="CreateNewDB"/>
+                        <i:EventTrigger EventName="TextChanged">
+                            <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="SearchTagTextChanged"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
-                </MenuItem>
-                
-                <!-- 既存のDBを開く -->
-                <MenuItem Header="{x:Static properties:Resources.MenuItemOpenDB}">
+                </TextBox>
+
+                <TreeView Name="TagTreeList" Grid.Row="1" Margin="5" ItemsSource="{Binding TagTreeItems}">
+                    <TreeView.Resources>
+                        <HierarchicalDataTemplate DataType="{x:Type dmodel:TagTreeNode}" ItemsSource="{Binding Children}">
+                            <TextBlock Text="{Binding DispName}" />
+                        </HierarchicalDataTemplate>
+                    </TreeView.Resources>
+
                     <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Click">
-                            <l:OpenFileDialogInteractionMessageAction>
-                                <!--<l:DirectInteractionMessage CallbackCommand="{Binding OpenDBCommand, Mode=OneWay}">-->
-                                <l:DirectInteractionMessage CallbackMethodTarget="{Binding}" CallbackMethodName="OpenDB">
-                                    <l:OpeningFileSelectionMessage Filter="すべてのファイル(*.*)|*.*" Title="ファイルを開く" MultiSelect="False"/>
-                                </l:DirectInteractionMessage>
-                            </l:OpenFileDialogInteractionMessageAction>
+                        <i:EventTrigger EventName="SelectedItemChanged">
+                            <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedTagNode" Value="{Binding Path=SelectedItem, ElementName=TagTreeList}"/>
+                            <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="TagTreeSelectionChanged"/>
                         </i:EventTrigger>
                     </i:Interaction.Triggers>
-                </MenuItem>
-                <MenuItem Header="エクスポート(_E)" />
-            </MenuItem>
-            <MenuItem Header="表示(_V)">
-                <MenuItem Header="シャッフル(_S)" >
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Click">
-                            <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Shuffle"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </MenuItem>
-                <MenuItem Header="リバース(_R)" >
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Click">
-                            <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Reverse"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </MenuItem>
-            </MenuItem>
-            <MenuItem Header="タグ(_T)">
-                <MenuItem Header="タグ設定画面の表示">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Click">
-                            <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ShowTagSettingWindow"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </MenuItem>
-                <MenuItem Header="タグリストの更新" />
-            </MenuItem>
+                </TreeView>
+            </Grid>
 
-            <MenuItem Header="検索(_S)">
-                <MenuItem Header="重複画像検索" />
-                <MenuItem Header="閲覧時間の長い画像を検索" />
-                <MenuItem Header="検索ダイアログを表示する" />
-                <MenuItem Header="スコアの高い画像を検索" />
-                <MenuItem Header="タグが一つの画像を検索" />
-            </MenuItem>
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center"/>
 
-            <MenuItem Header="ツール(_T)">
-                <MenuItem Header="設定(_S)" />
-                <MenuItem Header="スコア決定" />
-                <MenuItem Header="タグ付加実績を表示" />
-            </MenuItem>
-        </Menu>
-
-        <!-- タグツリー -->
-        <TextBox Grid.Row="1" Grid.Column="0" Margin="5" MaxLines="1" Text="{Binding SearchTagText, UpdateSourceTrigger=PropertyChanged}">
-            <i:Interaction.Behaviors>
-                <behaviors:PlaceHolderBehavior PlaceHolderText="検索" />
-            </i:Interaction.Behaviors>
-            
-            <TextBox.InputBindings>
-                <KeyBinding Key="Enter" Command="{Binding SearchTagCommand}" />
-            </TextBox.InputBindings>
-
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="TextChanged">
-                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="SearchTagTextChanged"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-        </TextBox>
-        
-        <TreeView Name="TagTreeList" Margin="5" Grid.Row="2" Grid.Column="0" Grid.RowSpan="2" ItemsSource="{Binding TagTreeItems}">
-            <TreeView.Resources>
-                <HierarchicalDataTemplate DataType="{x:Type dmodel:TagTreeNode}" ItemsSource="{Binding Children}">
-                    <TextBlock Text="{Binding DispName}" />
-                </HierarchicalDataTemplate>
-            </TreeView.Resources>
-
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectedItemChanged">
-                    <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedTagNode" Value="{Binding Path=SelectedItem, ElementName=TagTreeList}"/>
-                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="TagTreeSelectionChanged"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-        </TreeView>
-        
-        <GridSplitter Grid.Row="1" Grid.Column="1" Grid.RowSpan="3"  Width="5" HorizontalAlignment="Center"/>
-
-        <!-- サムネイルリスト -->
-        <ListView Name="ThumbnailList"  Grid.Row="1" Grid.Column="2" Grid.RowSpan="3" Margin="5" ItemsSource="{Binding ThumbnailImgList}" 
+            <ListView Name="ThumbnailList" Grid.Column="2" Margin="5" ItemsSource="{Binding ThumbnailImgList}" 
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Vertical" Margin="5">
-                        <Image Margin="2" Source="{Binding DispImage, UpdateSourceTrigger=PropertyChanged}" />
-                    </StackPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical" Margin="5">
+                            <Image Margin="2" Source="{Binding DispImage, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
 
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel ItemHeight="{Binding ThumbnailItemSizeHeight}" ItemWidth="{Binding ThumbnailItemSizeWidth}"/>
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel ItemHeight="{Binding ThumbnailItemSizeHeight}" ItemWidth="{Binding ThumbnailItemSizeWidth}"/>
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
 
-            <!-- 右クリックメニュー -->
-            <ListView.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="タグをコピーする"></MenuItem>
-                    <MenuItem Header="タグを貼り付ける"></MenuItem>
-                    <MenuItem Header="削除"></MenuItem>
-                </ContextMenu>
-            </ListView.ContextMenu>
+                <!-- 右クリックメニュー -->
+                <ListView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="タグをコピーする"></MenuItem>
+                        <MenuItem Header="タグを貼り付ける"></MenuItem>
+                        <MenuItem Header="削除"></MenuItem>
+                    </ContextMenu>
+                </ListView.ContextMenu>
 
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectionChanged">
-                    <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedThumbnailImgList" Value="{Binding Path=SelectedItems, ElementName=ThumbnailList}"/>
-                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ThumbnailListSelectionChanged"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-                
-            <i:Interaction.Behaviors>
-                <behaviors:FileDragAndDropBehavior Command="{Binding AddItemsCommand}" />
-            </i:Interaction.Behaviors>
-            
-            <ListView.InputBindings>
-                <KeyBinding Gesture="Enter" Command="{Binding OpenFullScreenViewCommand}" />
-            </ListView.InputBindings>
-        </ListView>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="SelectionChanged">
+                        <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedThumbnailImgList" Value="{Binding Path=SelectedItems, ElementName=ThumbnailList}"/>
+                        <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ThumbnailListSelectionChanged"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
 
-        <GridSplitter Grid.Row="1" Grid.Column="3" Grid.RowSpan="3"  Width="5" HorizontalAlignment="Center"/>
-        
-        <!-- 画像情報エリア -->
-        <DockPanel Grid.Row="1" Grid.Column="4" Grid.ColumnSpan="2" Grid.RowSpan="2">
-            <Border DockPanel.Dock="Left" BorderThickness="2" BorderBrush="LightBlue" Margin="5">
-                <Button>
-                    <Button.Template>
-                        <ControlTemplate TargetType="{x:Type Button}">
-                            <Image Width="300" Height="300" Source="{Binding SideImage}"></Image>
-                        </ControlTemplate>
-                    </Button.Template>
+                <i:Interaction.Behaviors>
+                    <behaviors:FileDragAndDropBehavior Command="{Binding AddItemsCommand}" />
+                </i:Interaction.Behaviors>
 
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="Click">
-                            <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="OpenFullScreenView"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                </Button>
-            </Border>
-            <DockPanel DockPanel.Dock="Left" Margin="5">
-                <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Stretch">既存のタグ</TextBlock>
-                <ListView DockPanel.Dock="Top" ItemsSource="{Binding ExistsTags}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Name}" />
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </DockPanel>
-        </DockPanel>
+                <ListView.InputBindings>
+                    <KeyBinding Gesture="Enter" Command="{Binding OpenFullScreenViewCommand}" />
+                </ListView.InputBindings>
+            </ListView>
 
-        <!-- タグ設定タブ -->
-        <TabControl x:Name="tabControl" Grid.Row="3" Grid.Column="4" Margin="5" ItemsSource="{Binding TabPanels}">
-            <TabControl.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Header}" />
-                </DataTemplate>
-            </TabControl.ItemTemplate>
+            <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Center"/>
 
-            <TabControl.ContentTemplate>
-                <DataTemplate>
-                    <Border  BorderThickness="2" BorderBrush="LightBlue">
-                        <ItemsControl ItemsSource="{Binding Buttons}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Button Content="{Binding Name}" Margin="4" FontSize="16" Command="{Binding ClickCommand}" />
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <WrapPanel ItemHeight="40" ItemWidth="100" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                        </ItemsControl>
+            <Grid Grid.Column="4">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1*" />
+                    <RowDefinition Height="2*" />
+                </Grid.RowDefinitions>
+
+                <!-- 画像情報エリア -->
+                <DockPanel Grid.Row="0">
+                    <Border DockPanel.Dock="Left" BorderThickness="2" BorderBrush="LightBlue" Margin="5">
+                        <Button>
+                            <Button.Template>
+                                <ControlTemplate TargetType="{x:Type Button}">
+                                    <Image Width="300" Height="300" Source="{Binding SideImage}"></Image>
+                                </ControlTemplate>
+                            </Button.Template>
+
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="OpenFullScreenView"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Button>
                     </Border>
-                </DataTemplate>
-            </TabControl.ContentTemplate>
+                    <DockPanel DockPanel.Dock="Left" Margin="5">
+                        <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Stretch">既存のタグ</TextBlock>
+                        <ListView DockPanel.Dock="Top" ItemsSource="{Binding ExistsTags}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" />
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </DockPanel>
+                </DockPanel>
 
-        </TabControl>
+                <!-- タグ設定タブ -->
+                <TabControl x:Name="tabControl" Grid.Row="1" Margin="5" ItemsSource="{Binding TabPanels}">
+                    <TabControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Header}" />
+                        </DataTemplate>
+                    </TabControl.ItemTemplate>
+
+                    <TabControl.ContentTemplate>
+                        <DataTemplate>
+                            <Border  BorderThickness="2" BorderBrush="LightBlue">
+                                <ItemsControl ItemsSource="{Binding Buttons}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Button Content="{Binding Name}" Margin="4" FontSize="16" Command="{Binding ClickCommand}" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <WrapPanel ItemHeight="40" ItemWidth="100" />
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                </ItemsControl>
+                            </Border>
+                        </DataTemplate>
+                    </TabControl.ContentTemplate>
+                </TabControl>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>
