@@ -17,11 +17,17 @@ namespace Rialto.Util
         /// <summary>
         /// SQLite 接続DB名
         /// </summary>
-        public string DB_NAME { get; set; }
+        public string DB_NAME
+        {
+            get
+            {
+                return Properties.Settings.Default.LastOpenDbName;
+            }
+        }
 
         private DBHelper()
         {
-            DB_NAME = Properties.Settings.Default.LastOpenDbName;
+            //DB_NAME = Properties.Settings.Default.LastOpenDbName;
         }
 
         private static readonly Lazy<DBHelper> helper = new Lazy<DBHelper>(() => new DBHelper());

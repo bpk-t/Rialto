@@ -9,6 +9,7 @@ using Rialto.Model.DataModel;
 using Rialto.Models.DAO.Table;
 using System.Collections.Generic;
 using Rialto.Constant;
+using System.Drawing;
 
 namespace Rialto.Models
 {
@@ -83,7 +84,7 @@ namespace Rialto.Models
             {
                 ImgID = x.IMGINF_ID.Value,
                 ThumbnailImageFilePath = GetThumbnailImage(x.FILE_PATH, x.HASH_VALUE),
-                SourceImageFilePath = new Uri(Path.GetFullPath(x.FILE_PATH))
+                SourceImageFilePath = new Uri(Path.Combine(Properties.Settings.Default.ImgDataDirectory, x.FILE_PATH))
             }).ToList();
         }
 
@@ -103,7 +104,7 @@ namespace Rialto.Models
             var filePath = GetPath(imgHash);
             if (!File.Exists(filePath))
             {
-                //CreateThumbnailImage(imgPath, imgHash);
+                CreateThumbnailImage(imgPath, imgHash);
             }
             return new Uri(Path.GetFullPath(filePath));
         }
@@ -121,6 +122,38 @@ namespace Rialto.Models
             if (!Directory.Exists(Properties.Settings.Default.ThumbnailImageDirectory))
             {
                 FileSystem.MkDir(Properties.Settings.Default.ThumbnailImageDirectory);
+            }
+        }
+
+        /// <summary>
+        /// サムネイル画像を作成する
+        /// </summary>
+        /// <param name="imgPath">元画像のファイルパス</param>
+        /// <param name="imgHash">元画像のハッシュ</param>
+        private void CreateThumbnailImage(string imgPath, string imgHash)
+        {
+            using (var image = Image.FromFile(imgPath))
+            {
+                var resizeH = image.Height;
+                var resizeW = image.Width;
+
+                // リサイズ後の縦横を計算
+                if (image.Height > 220)
+                {
+                    resizeH = 220;
+                    resizeW = (int)((double)resizeW * ((double)220 / (double)image.Height));
+                }
+
+                using (var canvas = new Bitmap(resizeW, resizeH))
+                {
+                    using (var g = Graphics.FromImage(canvas))
+                    {
+                        g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                        g.DrawImage(image, new Rectangle(0, 0, resizeW, resizeH));
+                        // サムネイル画像の保存
+                        canvas.Save(Properties.Settings.Default.ThumbnailImageDirectory + "\\" + imgHash, System.Drawing.Imaging.ImageFormat.Png);
+                    }
+                }
             }
         }
     }

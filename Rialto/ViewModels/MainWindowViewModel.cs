@@ -16,6 +16,7 @@ using System.Collections.Generic;
 using Rialto.Constant;
 using NLog;
 using NLog.Fluent;
+using System.Threading.Tasks;
 
 namespace Rialto.ViewModels
 {
@@ -43,17 +44,23 @@ namespace Rialto.ViewModels
             allocatedTags = new AllocatedTags();
         }
 
+        private async Task Refresh()
+        {
+            ThumbnailItemSizeHeight = 200.0;
+            ThumbnailItemSizeWidth = 200.0;
+
+            await ThumbnailModel.ShowThumbnailImage(TagConstant.ALL_TAG_ID);
+            tagAllocator.InitTabSettingPanel();
+            await TaggingModel.InitTagTree();
+        }
+
         /// <summary>
         /// 初期化処理
         /// </summary>
         public async void Initialize()
         {
-            ThumbnailItemSizeHeight = 200.0;
-            ThumbnailItemSizeWidth = 200.0;
-            
-            await ThumbnailModel.ShowThumbnailImage(TagConstant.ALL_TAG_ID);
-            tagAllocator.InitTabSettingPanel();
-            TaggingModel.InitTagTree();
+            Properties.Settings.Default.Reset();
+            await Refresh();
         }
 
         #region Properties
@@ -253,7 +260,7 @@ namespace Rialto.ViewModels
         public void ThumbnailListSelectionChanged()
         {
             if (SelectedThumbnailImgList.Count > 0) {
-                var selectedImg = (ImageInfo)SelectedThumbnailImgList[0];
+                var selectedImg = SelectedThumbnailImgList[0] as ImageInfo;
                 var image = new BitmapImage();
                 image.BeginInit();
                 image.UriSource = selectedImg.SourceImageFilePath;
@@ -375,36 +382,20 @@ namespace Rialto.ViewModels
         {
             Debug.WriteLine("Call CreateNewDB");
         }
-        
-        #region OpenDBCommand
-        private ListenerCommand<OpeningFileSelectionMessage> _OpenDBCommand;
-
-        public ListenerCommand<OpeningFileSelectionMessage> OpenDBCommand
-        {
-            get
-            {
-                if (_OpenDBCommand == null)
-                {
-                    _OpenDBCommand = new ListenerCommand<OpeningFileSelectionMessage>(OpenDB);
-                }
-                return _OpenDBCommand;
-            }
-        }
 
         /// <summary>
         /// 既存のDBを開く
         /// </summary>
         /// <param name="parameter"></param>
-        public void OpenDB(OpeningFileSelectionMessage parameter)
+        public async void OpenDB(OpeningFileSelectionMessage parameter)
         {
             if (parameter.Response != null)
             {
-                //Debug.WriteLine("OpenFile : " + parameter.Response[0]);
-                //TODO 再表示処理
                 Properties.Settings.Default.LastOpenDbName = parameter.Response[0];
+                Properties.Settings.Default.Save();
+                await Refresh();
             }
         }
-        #endregion
 
         /// <summary>
         /// タグ設定ダイアログを開く

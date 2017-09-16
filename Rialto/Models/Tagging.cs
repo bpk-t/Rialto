@@ -24,19 +24,29 @@ namespace Rialto.Models
             }
         }
 
-        public void InitTagTree()
+        public async Task InitTagTree()
         {
-            InitTagTree((_) => true);
+            await InitTagTree((_) => true);
         }
 
-        public void InitTagTree(Func<M_TAG_INFO, bool> predicate)
+        public Task InitTagTree(Func<M_TAG_INFO, bool> predicate)
         {
-            Task.Run(() =>
+            return Task.Run(() =>
             {
                 var list = M_TAG_INFO.GetAll();
                 TagTreeItems.Clear();
-                TagTreeItems.Add(new TagTreeNode() { ID = TagConstant.ALL_TAG_ID, Name = "ALL", ImageCount = M_TAG_INFO.GetAllImgCount() });
-                TagTreeItems.Add(new TagTreeNode() { ID = TagConstant.NOTAG_TAG_ID, Name = "NoTag", ImageCount = M_TAG_INFO.GetHasNotTagImgCount() });
+                TagTreeItems.Add(new TagTreeNode() {
+                    ID = TagConstant.ALL_TAG_ID,
+                    Name = "ALL",
+                    ImageCount = 0
+                    //ImageCount = M_TAG_INFO.GetAllImgCount()
+                });
+                TagTreeItems.Add(new TagTreeNode() {
+                    ID = TagConstant.NOTAG_TAG_ID,
+                    Name = "NoTag",
+                    ImageCount = 0
+                    //ImageCount = M_TAG_INFO.GetHasNotTagImgCount()
+                });
                 list.Where(predicate)
                     .Select((x) => new TagTreeNode()
                     {

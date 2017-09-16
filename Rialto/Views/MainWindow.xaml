@@ -79,7 +79,8 @@
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="Click">
                             <l:OpenFileDialogInteractionMessageAction>
-                                <l:DirectInteractionMessage CallbackCommand="{Binding OpenDBCommand, Mode=OneWay}">
+                                <!--<l:DirectInteractionMessage CallbackCommand="{Binding OpenDBCommand, Mode=OneWay}">-->
+                                <l:DirectInteractionMessage CallbackMethodTarget="{Binding}" CallbackMethodName="OpenDB">
                                     <l:OpeningFileSelectionMessage Filter="すべてのファイル(*.*)|*.*" Title="ファイルを開く" MultiSelect="False"/>
                                 </l:DirectInteractionMessage>
                             </l:OpenFileDialogInteractionMessageAction>

@@ -36,7 +36,7 @@ namespace Rialto.Models.DAO.Table
 @"SELECT * FROM M_IMAGE_INFO IMGINF, T_AVEHASH AVEH
  WHERE IMGINF.DELETE_FLG='0'
  AND IMGINF.IMGINF_ID=AVEH.IMGINF_ID 
- ORDER BY IMGINF.IMGINF_ID DESC",
+ ORDER BY IMGINF.IMGINF_ID DESC LIMIT 50",
                          (M_IMAGE_INFO img, T_AVEHASH hash) => {
                              img.AVEHASH = hash.AVEHASH;
                              return img; 
