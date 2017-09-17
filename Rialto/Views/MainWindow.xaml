@@ -166,46 +166,76 @@
 
             <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center"/>
 
-            <ListView Name="ThumbnailList" Grid.Column="2" Margin="5" ItemsSource="{Binding ThumbnailImgList}" 
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="50px" />
+                </Grid.RowDefinitions>
+                
+                <ListView Name="ThumbnailList" Grid.Row="0" Margin="5" ItemsSource="{Binding ThumbnailImgList}" 
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Vertical" Margin="5">
-                            <Image Margin="2" Source="{Binding DispImage, UpdateSourceTrigger=PropertyChanged}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Vertical" Margin="5">
+                                <Image Margin="2" Source="{Binding DispImage, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
 
-                <ListView.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel ItemHeight="{Binding ThumbnailItemSizeHeight}" ItemWidth="{Binding ThumbnailItemSizeWidth}"/>
-                    </ItemsPanelTemplate>
-                </ListView.ItemsPanel>
+                    <ListView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel ItemHeight="{Binding ThumbnailItemSizeHeight}" ItemWidth="{Binding ThumbnailItemSizeWidth}"/>
+                        </ItemsPanelTemplate>
+                    </ListView.ItemsPanel>
 
-                <!-- 右クリックメニュー -->
-                <ListView.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="タグをコピーする"></MenuItem>
-                        <MenuItem Header="タグを貼り付ける"></MenuItem>
-                        <MenuItem Header="削除"></MenuItem>
-                    </ContextMenu>
-                </ListView.ContextMenu>
+                    <!-- 右クリックメニュー -->
+                    <ListView.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="タグをコピーする"></MenuItem>
+                            <MenuItem Header="タグを貼り付ける"></MenuItem>
+                            <MenuItem Header="削除"></MenuItem>
+                        </ContextMenu>
+                    </ListView.ContextMenu>
 
-                <i:Interaction.Triggers>
-                    <i:EventTrigger EventName="SelectionChanged">
-                        <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedThumbnailImgList" Value="{Binding Path=SelectedItems, ElementName=ThumbnailList}"/>
-                        <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ThumbnailListSelectionChanged"/>
-                    </i:EventTrigger>
-                </i:Interaction.Triggers>
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedThumbnailImgList" Value="{Binding Path=SelectedItems, ElementName=ThumbnailList}"/>
+                            <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ThumbnailListSelectionChanged"/>
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
 
-                <i:Interaction.Behaviors>
-                    <behaviors:FileDragAndDropBehavior Command="{Binding AddItemsCommand}" />
-                </i:Interaction.Behaviors>
+                    <i:Interaction.Behaviors>
+                        <behaviors:FileDragAndDropBehavior Command="{Binding AddItemsCommand}" />
+                    </i:Interaction.Behaviors>
 
-                <ListView.InputBindings>
-                    <KeyBinding Gesture="Enter" Command="{Binding OpenFullScreenViewCommand}" />
-                </ListView.InputBindings>
-            </ListView>
+                    <ListView.InputBindings>
+                        <KeyBinding Gesture="Enter" Command="{Binding OpenFullScreenViewCommand}" />
+                    </ListView.InputBindings>
+                </ListView>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Margin="5" Content="前のページ" IsEnabled="{Binding PrevPageButtonIsEnable}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ShowPrevPage"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Button>
+                    <Button Grid.Column="2" Margin="5" Content="次のページ" IsEnabled="{Binding NextPageButtoIsEnable}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="Click">
+                                <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ShowNextPage"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </Button>
+                </Grid>
+            </Grid>
 
             <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Center"/>
 

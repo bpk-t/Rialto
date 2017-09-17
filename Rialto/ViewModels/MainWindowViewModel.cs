@@ -424,5 +424,49 @@ namespace Rialto.ViewModels
 
         #endregion
         #endregion
+
+        /// <summary>
+        /// 前のページボタン有効
+        /// </summary>
+        private bool PrevPageButtonIsEnable_ = true;
+        public bool PrevPageButtonIsEnable
+        {
+            get
+            {
+                return PrevPageButtonIsEnable_;
+            }
+            set
+            {
+                PrevPageButtonIsEnable_ = value;
+                RaisePropertyChanged(() => PrevPageButtonIsEnable);
+            }
+        }
+
+        /// <summary>
+        /// 次のページボタン有効
+        /// </summary>
+        private bool NextPageButtoIsEnable_ = true;
+        public bool NextPageButtoIsEnable
+        {
+            get
+            {
+                return NextPageButtoIsEnable_;
+            }
+            set
+            {
+                NextPageButtoIsEnable_ = value;
+                RaisePropertyChanged(() => NextPageButtoIsEnable);
+            }
+        }
+
+        public void ShowPrevPage()
+        {
+
+        }
+
+        public void ShowNextPage()
+        {
+
+        }
     }
 }
