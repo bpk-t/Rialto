@@ -11,7 +11,6 @@ namespace Rialto.Models.DAO.Entity
 {
     public class M_IMAGE_INFO
     {
-
         public long? IMGINF_ID { get; set; }
         public int FILE_SIZE { get; set; }
         public string FILE_NAME { get; set; }
@@ -31,21 +30,20 @@ namespace Rialto.Models.DAO.Entity
 
         public string AVEHASH { get; set; }
 
-        public static long GetAllCount(Option<long> offset, Option<long> limit)
+        public static long GetAllCount()
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
                 var query = QueryBuilder.Select(SQLFunctionBuilder.Count("*").ToSqlString())
                     .From(M_IMAGE_INFO_DEF.ThisTable)
                     .InnerJoin(T_AVEHASH_DEF.ThisTable, M_IMAGE_INFO_DEF.IMGINF_ID.Eq(T_AVEHASH_DEF.IMGINF_ID))
-                    .Where(M_IMAGE_INFO_DEF.DELETE_FLG.Eq("'0'"))
-                    .OrderBy(M_IMAGE_INFO_DEF.IMGINF_ID, Order.Desc);
+                    .Where(M_IMAGE_INFO_DEF.DELETE_FLG.Eq("'0'"));
 
                 return con.ExecuteScalar<long>(query.ToSqlString());
             }
         }
 
-        public static IEnumerable<M_IMAGE_INFO> GetAll()
+        public static IEnumerable<M_IMAGE_INFO> GetAll(long offset, long limit)
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
@@ -54,14 +52,29 @@ namespace Rialto.Models.DAO.Entity
                     .InnerJoin(T_AVEHASH_DEF.ThisTable, M_IMAGE_INFO_DEF.IMGINF_ID.Eq(T_AVEHASH_DEF.IMGINF_ID))
                     .Where(M_IMAGE_INFO_DEF.DELETE_FLG.Eq("'0'"))
                     .OrderBy(M_IMAGE_INFO_DEF.IMGINF_ID, Order.Desc)
-                    .Limit(30)
-                    .Offset(0);
+                    .Limit(limit)
+                    .Offset(offset);
 
                 return con.Query(query.ToSqlString(), (M_IMAGE_INFO img, T_AVEHASH hash) => { img.AVEHASH = hash.AVEHASH; return img;}, splitOn: "IMGINF_ID,IMGINF_ID");
             }
         }
 
-        public static IEnumerable<M_IMAGE_INFO> GetNoTag()
+        public static long GetNoTagCount()
+        {
+            using (var con = DBHelper.Instance.GetDbConnection())
+            {
+                var query = QueryBuilder.Select(SQLFunctionBuilder.Count("*").ToSqlString())
+                    .From(M_IMAGE_INFO_DEF.ThisTable)
+                    .InnerJoin(T_AVEHASH_DEF.ThisTable, M_IMAGE_INFO_DEF.IMGINF_ID.Eq(T_AVEHASH_DEF.IMGINF_ID))
+                    .Where(M_IMAGE_INFO_DEF.DELETE_FLG.Eq("'0'"))
+                    .Where(ConditionBuilder.NotExists(
+                        QueryBuilder.Select().From("T_ADD_TAG").Where(M_IMAGE_INFO_DEF.IMGINF_ID.Eq("T_ADD_TAG.IMGINF_ID"))));
+
+                return con.ExecuteScalar<long>(query.ToSqlString());
+            }
+        }
+
+        public static IEnumerable<M_IMAGE_INFO> GetNoTag(long offset, long limit)
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
@@ -73,19 +86,33 @@ namespace Rialto.Models.DAO.Entity
                         QueryBuilder.Select().From("T_ADD_TAG").Where(M_IMAGE_INFO_DEF.IMGINF_ID.Eq("T_ADD_TAG.IMGINF_ID"))
                         ))
                     .OrderBy(M_IMAGE_INFO_DEF.IMGINF_ID, Order.Desc)
-                    .Limit(30)
-                    .Offset(0);
+                    .Limit(limit)
+                    .Offset(offset);
 
-                var queryStr = query.ToSqlString();
-                return con.Query(queryStr,
-         (M_IMAGE_INFO img, T_AVEHASH hash) => {
-             img.AVEHASH = hash.AVEHASH;
-             return img;
-         }, splitOn: "IMGINF_ID,IMGINF_ID");
+                return con.Query(query.ToSqlString(), (M_IMAGE_INFO img, T_AVEHASH hash) => {
+                    img.AVEHASH = hash.AVEHASH;
+                    return img;
+                }, splitOn: "IMGINF_ID,IMGINF_ID");
             }
         }
 
-        public static IEnumerable<M_IMAGE_INFO> GetByTag(long tagId)
+        public static long GetByTagCount(long tagId)
+        {
+            using (var con = DBHelper.Instance.GetDbConnection())
+            {
+                var query = QueryBuilder.Select(SQLFunctionBuilder.Count("*").ToSqlString())
+                    .From(M_IMAGE_INFO_DEF.ThisTable)
+                    .InnerJoin(T_AVEHASH_DEF.ThisTable, M_IMAGE_INFO_DEF.IMGINF_ID.Eq(T_AVEHASH_DEF.IMGINF_ID))
+                    .InnerJoin(T_ADD_TAG_DEF.ThisTable, M_IMAGE_INFO_DEF.IMGINF_ID.Eq(T_ADD_TAG_DEF.IMGINF_ID))
+                    .InnerJoin(M_TAG_INFO_DEF.ThisTable, T_ADD_TAG_DEF.TAGINF_ID.Eq(M_TAG_INFO_DEF.TAGINF_ID))
+                    .Where(M_IMAGE_INFO_DEF.DELETE_FLG.Eq("'0'"))
+                    .Where(M_TAG_INFO_DEF.TAGINF_ID.Eq("@TAGINF_ID"));
+
+                return con.ExecuteScalar<long>(query.ToSqlString(), param: new { TAGINF_ID = tagId });
+            }
+        }
+
+        public static IEnumerable<M_IMAGE_INFO> GetByTag(long tagId, long offset, long limit)
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
@@ -97,8 +124,8 @@ namespace Rialto.Models.DAO.Entity
                     .Where(M_IMAGE_INFO_DEF.DELETE_FLG.Eq("'0'"))
                     .Where(M_TAG_INFO_DEF.TAGINF_ID.Eq("@TAGINF_ID"))
                     .OrderBy(M_IMAGE_INFO_DEF.IMGINF_ID, Order.Desc)
-                    .Limit(30)
-                    .Offset(0);
+                    .Limit(limit)
+                    .Offset(offset);
 
                 return con.Query(query.ToSqlString(),
          (M_IMAGE_INFO img, T_AVEHASH hash) => {

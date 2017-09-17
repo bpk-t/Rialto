@@ -459,14 +459,16 @@ namespace Rialto.ViewModels
             }
         }
 
-        public void ShowPrevPage()
+        public async void ShowPrevPage()
         {
-
+            var tagId = SelectedTagNode == null ? TagConstant.ALL_TAG_ID : SelectedTagNode.ID;
+            await ThumbnailModel.PrevPage(tagId);
         }
 
-        public void ShowNextPage()
+        public async void ShowNextPage()
         {
-
+            var tagId = SelectedTagNode == null ? TagConstant.ALL_TAG_ID : SelectedTagNode.ID;
+            await ThumbnailModel.NextPage(tagId);
         }
     }
 }

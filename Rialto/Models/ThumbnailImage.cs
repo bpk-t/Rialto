@@ -32,6 +32,44 @@ namespace Rialto.Models
             }
         }
 
+        private int CurrentPage = 0;
+        private int ImgCount = 0;
+        public int PageCount { get; } = 30;
+
+        public bool ExistsPrevPage()
+        {
+            return CurrentPage > 1;
+        }
+
+        public bool ExistsNextPage()
+        {
+            return (CurrentPage + 1) * PageCount >= ImgCount;
+        }
+
+        public async Task NextPage(long tagId)
+        {
+            if (ExistsNextPage())
+            {
+                CurrentPage++;
+                await Task.Run(() =>
+                {
+                    ShowThumbnailImage_(tagId);
+                });
+            }
+        }
+
+        public async Task PrevPage(long tagId)
+        {
+            if (ExistsPrevPage())
+            {
+                CurrentPage--;
+                await Task.Run(() =>
+                {
+                    ShowThumbnailImage_(tagId);
+                });
+            }
+        }
+
         /// <summary>
         /// サムネイルに表示する予定含むすべての画像リスト
         /// </summary>
@@ -39,22 +77,10 @@ namespace Rialto.Models
 
         public async Task ShowThumbnailImage(long tagId)
         {
+            CurrentPage = 0;
             await Task.Run(() =>
             {
-                ThumbnailImgList.Clear();
-                if (tagId == TagConstant.ALL_TAG_ID)
-                {
-                    LoadImage(M_IMAGE_INFO.GetAll());
-                }
-                else if (tagId == TagConstant.NOTAG_TAG_ID)
-                {
-                    LoadImage(M_IMAGE_INFO.GetNoTag());
-                }
-                else
-                {
-                    LoadImage(M_IMAGE_INFO.GetByTag(tagId));
-                }
-                ShowFirstPart();
+                ShowThumbnailImage_(tagId);
             });
         }
 
@@ -64,7 +90,8 @@ namespace Rialto.Models
             {
                 ThumbnailImgList.Clear();
                 CurrentImageFilePathList = CurrentImageFilePathList.OrderBy(_ => Guid.NewGuid()).ToList();
-                ShowFirstPart();
+
+                CurrentImageFilePathList.ForEach(x => ThumbnailImgList.Add(x));
             });
         }
 
@@ -74,8 +101,28 @@ namespace Rialto.Models
             {
                 ThumbnailImgList.Clear();
                 CurrentImageFilePathList.Reverse();
-                ShowFirstPart();
+
+                CurrentImageFilePathList.ForEach(x => ThumbnailImgList.Add(x));
             });
+        }
+
+        private void ShowThumbnailImage_(long tagId)
+        {
+            ThumbnailImgList.Clear();
+            if (tagId == TagConstant.ALL_TAG_ID)
+            {
+                LoadImage(M_IMAGE_INFO.GetAll(CurrentPage * PageCount, PageCount));
+            }
+            else if (tagId == TagConstant.NOTAG_TAG_ID)
+            {
+                LoadImage(M_IMAGE_INFO.GetNoTag(CurrentPage * PageCount, PageCount));
+            }
+            else
+            {
+                LoadImage(M_IMAGE_INFO.GetByTag(tagId, CurrentPage * PageCount, PageCount));
+            }
+
+            CurrentImageFilePathList.ForEach(x => ThumbnailImgList.Add(x));
         }
 
         private void LoadImage(IEnumerable<M_IMAGE_INFO> images)
@@ -88,10 +135,6 @@ namespace Rialto.Models
             }).ToList();
         }
 
-        private void ShowFirstPart()
-        {
-            CurrentImageFilePathList.Take(50).ForEach(x => ThumbnailImgList.Add(x));
-        }
 
         /// <summary>
         /// サムネイル画像を返す
@@ -150,8 +193,10 @@ namespace Rialto.Models
                     {
                         g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                         g.DrawImage(image, new Rectangle(0, 0, resizeW, resizeH));
+
+                        var savePath = Path.Combine(Properties.Settings.Default.ThumbnailImageDirectory, imgHash);
                         // サムネイル画像の保存
-                        canvas.Save(Properties.Settings.Default.ThumbnailImageDirectory + "\\" + imgHash, System.Drawing.Imaging.ImageFormat.Png);
+                        canvas.Save(savePath , System.Drawing.Imaging.ImageFormat.Png);
                     }
                 }
             }
