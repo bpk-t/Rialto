@@ -261,6 +261,8 @@ namespace Rialto.ViewModels
         {
             if (SelectedThumbnailImgList.Count > 0) {
                 var selectedImg = SelectedThumbnailImgList[0] as ImageInfo;
+
+                // TODO 読み込み処理
                 var image = new BitmapImage();
                 image.BeginInit();
                 image.UriSource = selectedImg.SourceImageFilePath;
@@ -268,7 +270,6 @@ namespace Rialto.ViewModels
                 SideImage = image;
 
                 allocatedTags.GetAllocatedTags(selectedImg.ImgID);
-
             }
         }
 
@@ -343,11 +344,11 @@ namespace Rialto.ViewModels
         /// <summary>
         /// タグ検索テキストボックスが空になったら全タグを表示する
         /// </summary>
-        public void SearchTagTextChanged()
+        public async void SearchTagTextChanged()
         {
             if (SearchTagText.Count() == 0)
             {
-                TaggingModel.InitTagTree();
+                await TaggingModel.InitTagTree();
             }
         }
 

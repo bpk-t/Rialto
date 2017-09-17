@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Dapper;
 using LangExt;
 
-namespace Rialto.Models.DAO.Table
+namespace Rialto.Models.DAO.Entity
 {
     public class M_TAG_INFO
     {

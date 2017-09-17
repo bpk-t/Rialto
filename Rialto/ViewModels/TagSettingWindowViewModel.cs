@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Collections;
 using System.Diagnostics;
+using Rialto.Models.DAO.Entity;
 
 namespace Rialto.ViewModels
 {

@@ -15,10 +15,27 @@ namespace Rialto.Model.DataModel
 
         public long ImgID { get; set; }
 
+        private BitmapImage _DispImage = null;
+
         /// <summary>
         /// サムネイルに表示する画像
         /// </summary>
-        public BitmapImage DispImage { get; set; }
+        public BitmapImage DispImage
+        {
+            get
+            {
+                if (_DispImage == null)
+                {
+                    _DispImage = new BitmapImage();
+                    _DispImage.BeginInit();
+                    _DispImage.UriSource = ThumbnailImageFilePath;
+                    _DispImage.DecodePixelWidth = 200;
+                    _DispImage.EndInit();
+                    _DispImage.Freeze();
+                }
+                return _DispImage;
+            }
+        }
 
         /// <summary>
         /// サムネイル用画像のファイルパス
@@ -33,6 +50,8 @@ namespace Rialto.Model.DataModel
             set
             {
                 ThumbnailImageFilePath_ = value;
+
+                /*
                 var image = new BitmapImage();
                 image.BeginInit();
                 image.UriSource = ThumbnailImageFilePath_;
@@ -42,6 +61,7 @@ namespace Rialto.Model.DataModel
                 image.EndInit();
                 image.Freeze();
                 DispImage = image; // ImageはProperty
+                */
             }
         }
 

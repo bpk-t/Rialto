@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rialto.Models.DAO.Table
+namespace Rialto.Models.DAO.Entity
 {
     public class T_ADD_TAG
     {

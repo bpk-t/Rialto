@@ -1,6 +1,6 @@
 ﻿using Livet;
 using Rialto.Model.DataModel;
-using Rialto.Models.DAO.Table;
+using Rialto.Models.DAO.Entity;
 using StatefulModel;
 using System.Collections.Generic;
 using System.Diagnostics;

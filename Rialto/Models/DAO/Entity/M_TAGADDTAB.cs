@@ -4,7 +4,7 @@ using System.Linq;
 using Rialto.Util;
 using Dapper;
 
-namespace Rialto.Models.DAO.Table
+namespace Rialto.Models.DAO.Entity
 {
     public class M_TAGADDTAB
     {

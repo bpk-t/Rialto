@@ -114,12 +114,22 @@
     <Compile Include="Models\AllocatedTags.cs" />
     <Compile Include="Models\AverageHashGenerator.cs" />
     <Compile Include="Models\DAO\Custom\ImageHasTags.cs" />
-    <Compile Include="Models\DAO\Table\M_IMAGE_INFO.cs" />
-    <Compile Include="Models\DAO\Table\M_TABSETTING.cs" />
-    <Compile Include="Models\DAO\Table\M_TAGADDTAB.cs" />
-    <Compile Include="Models\DAO\Table\M_TAG_INFO.cs" />
-    <Compile Include="Models\DAO\Table\T_ADD_TAG.cs" />
-    <Compile Include="Models\DAO\Table\T_AVEHASH.cs" />
+    <Compile Include="Models\DAO\Table\ColumnDefinition.cs" />
+    <Compile Include="Models\DAO\Table\M_IMAGE_INFO_DEF.cs" />
+    <Compile Include="Models\DAO\Table\M_TAG_INFO_DEF.cs" />
+    <Compile Include="Models\DAO\Table\TableDefinition.cs" />
+    <Compile Include="Models\DAO\Table\T_ADD_TAG_DEF.cs" />
+    <Compile Include="Models\DAO\Table\T_AVEHASH_DEF.cs" />
+    <Compile Include="Models\DAO\Util\ConditionBuilder.cs" />
+    <Compile Include="Models\DAO\Util\Literal.cs" />
+    <Compile Include="Models\DAO\Util\QueryBuilder.cs" />
+    <Compile Include="Models\DAO\Entity\M_IMAGE_INFO.cs" />
+    <Compile Include="Models\DAO\Entity\M_TABSETTING.cs" />
+    <Compile Include="Models\DAO\Entity\M_TAGADDTAB.cs" />
+    <Compile Include="Models\DAO\Entity\M_TAG_INFO.cs" />
+    <Compile Include="Models\DAO\Entity\T_ADD_TAG.cs" />
+    <Compile Include="Models\DAO\Entity\T_AVEHASH.cs" />
+    <Compile Include="Models\DAO\Util\SQLFunction.cs" />
     <Compile Include="Models\ImageRegister.cs" />
     <Compile Include="Models\ImageRegisterTask.cs" />
     <Compile Include="Models\IWorker.cs" />
@@ -224,10 +234,6 @@
     <ProjectReference Include="..\Rialto.Components\Rialto.Components.csproj">
       <Project>{48604784-6532-48ad-82c8-cdaae5468e7b}</Project>
       <Name>Rialto.Components</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Rialto.DB\Rialto.DB.csproj">
-      <Project>{53173907-1bcc-4453-ad4c-0c22083fdf6c}</Project>
-      <Name>Rialto.DB</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
