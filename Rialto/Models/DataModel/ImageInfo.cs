@@ -50,18 +50,6 @@ namespace Rialto.Model.DataModel
             set
             {
                 ThumbnailImageFilePath_ = value;
-
-                /*
-                var image = new BitmapImage();
-                image.BeginInit();
-                image.UriSource = ThumbnailImageFilePath_;
-                image.DecodePixelWidth = 200;
-                //Image.DecodePixelHeight = 200;
-
-                image.EndInit();
-                image.Freeze();
-                DispImage = image; // ImageはProperty
-                */
             }
         }
 

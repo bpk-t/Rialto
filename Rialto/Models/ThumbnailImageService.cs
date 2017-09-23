@@ -121,7 +121,7 @@ namespace Rialto.Models
 
         private void LoadImage(IEnumerable<M_IMAGE_INFO> images)
         {
-            images.Select(x => new ImageInfo()
+            images.AsParallel().Select(x => new ImageInfo()
             {
                 ImgID = x.IMGINF_ID.Value,
                 ThumbnailImageFilePath = GetThumbnailImage(x.FILE_PATH, x.HASH_VALUE),
