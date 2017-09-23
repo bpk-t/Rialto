@@ -3,13 +3,13 @@
   <Profiles />
   <Settings>
     <Setting Name="LastOpenDbName" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">imgdb.db</Value>
     </Setting>
     <Setting Name="ThumbnailImageDirectory" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">Z:\rialto\imgs\Thumbnail</Value>
     </Setting>
     <Setting Name="ImgDataDirectory" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">Z:\rialto\imgs</Value>
     </Setting>
     <Setting Name="MainWindowPlacements" Type="Rialto.Components.Views.WINDOWPLACEMENT" Scope="User">
       <Value Profile="(Default)">

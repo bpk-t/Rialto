@@ -32,8 +32,9 @@ namespace Rialto.Models
             }
         }
 
+        private long CurrentTagId = TagConstant.ALL_TAG_ID;
         private int CurrentPage = 0;
-        private int ImgCount = 0;
+        private long ImgCount = 0;
         public int PageCount { get; } = 30;
 
         public bool ExistsPrevPage()
@@ -43,29 +44,29 @@ namespace Rialto.Models
 
         public bool ExistsNextPage()
         {
-            return (CurrentPage + 1) * PageCount >= ImgCount;
+            return (CurrentPage + 1) * PageCount <= ImgCount;
         }
 
-        public async Task NextPage(long tagId)
+        public async Task NextPage()
         {
             if (ExistsNextPage())
             {
                 CurrentPage++;
                 await Task.Run(() =>
                 {
-                    ShowThumbnailImage_(tagId);
+                    ShowThumbnailImage_(CurrentTagId);
                 });
             }
         }
 
-        public async Task PrevPage(long tagId)
+        public async Task PrevPage()
         {
             if (ExistsPrevPage())
             {
                 CurrentPage--;
                 await Task.Run(() =>
                 {
-                    ShowThumbnailImage_(tagId);
+                    ShowThumbnailImage_(CurrentTagId);
                 });
             }
         }
@@ -78,6 +79,7 @@ namespace Rialto.Models
         public async Task ShowThumbnailImage(long tagId)
         {
             CurrentPage = 0;
+            CurrentTagId = tagId;
             await Task.Run(() =>
             {
                 ShowThumbnailImage_(tagId);
@@ -111,14 +113,17 @@ namespace Rialto.Models
             ThumbnailImgList.Clear();
             if (tagId == TagConstant.ALL_TAG_ID)
             {
+                ImgCount = M_IMAGE_INFO.GetAllCount();
                 LoadImage(M_IMAGE_INFO.GetAll(CurrentPage * PageCount, PageCount));
             }
             else if (tagId == TagConstant.NOTAG_TAG_ID)
             {
+                ImgCount = M_IMAGE_INFO.GetNoTagCount();
                 LoadImage(M_IMAGE_INFO.GetNoTag(CurrentPage * PageCount, PageCount));
             }
             else
             {
+                ImgCount = M_IMAGE_INFO.GetByTagCount(tagId);
                 LoadImage(M_IMAGE_INFO.GetByTag(tagId, CurrentPage * PageCount, PageCount));
             }
 

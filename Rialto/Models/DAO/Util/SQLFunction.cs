@@ -35,10 +35,20 @@ namespace Rialto.Models.DAO.Util
 
         public override string ToSqlString() => $"TRIM({operand})";
     }
+
+    public class LastInsertLowId : SQLFunction
+    {
+        public override string ToSqlString() => "last_insert_rowid()";
+    }
+
     public class SQLFunctionBuilder
     {
         public static CountFunction Count(string operand) => new CountFunction(operand);
         public static TrimFunction Trim(string operand) => new TrimFunction(operand);
         public static TrimFunction Trim(ColumnDefinition operand) => new TrimFunction(operand.ToSqlString());
+
+        public static LastInsertLowId LastInsertLowId() => new LastInsertLowId();
     }
+
+
 }

@@ -266,6 +266,7 @@ namespace Rialto.ViewModels
                 var image = new BitmapImage();
                 image.BeginInit();
                 image.UriSource = selectedImg.SourceImageFilePath;
+                image.CacheOption = BitmapCacheOption.OnLoad;
                 image.EndInit();
                 SideImage = image;
 
@@ -308,7 +309,8 @@ namespace Rialto.ViewModels
                 var currentIndex = Array.FindIndex(ThumbnailModel.ThumbnailImgList.ToArray(), (x) => x.ImgID == selectedImgId);
 
                 Messenger.Raise(new TransitionMessage(
-                    new FullScreenViewModel(currentIndex, ThumbnailModel.CurrentImageFilePathList), "ShowFullScreen"));
+                    new FullScreenViewModel(currentIndex, ThumbnailModel), "ShowFullScreen"));
+                //new FullScreenViewModel(currentIndex, ThumbnailModel.CurrentImageFilePathList), "ShowFullScreen"));
             }   
         }
 
@@ -461,14 +463,12 @@ namespace Rialto.ViewModels
 
         public async void ShowPrevPage()
         {
-            var tagId = SelectedTagNode == null ? TagConstant.ALL_TAG_ID : SelectedTagNode.ID;
-            await ThumbnailModel.PrevPage(tagId);
+            await ThumbnailModel.PrevPage();
         }
 
         public async void ShowNextPage()
         {
-            var tagId = SelectedTagNode == null ? TagConstant.ALL_TAG_ID : SelectedTagNode.ID;
-            await ThumbnailModel.NextPage(tagId);
+            await ThumbnailModel.NextPage();
         }
     }
 }

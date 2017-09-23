@@ -25,7 +25,7 @@ namespace Rialto.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("imgdb.db")]
         public string LastOpenDbName {
             get {
                 return ((string)(this["LastOpenDbName"]));
@@ -37,7 +37,7 @@ namespace Rialto.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Z:\\rialto\\imgs\\Thumbnail")]
         public string ThumbnailImageDirectory {
             get {
                 return ((string)(this["ThumbnailImageDirectory"]));
@@ -49,7 +49,7 @@ namespace Rialto.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Z:\\rialto\\imgs")]
         public string ImgDataDirectory {
             get {
                 return ((string)(this["ImgDataDirectory"]));

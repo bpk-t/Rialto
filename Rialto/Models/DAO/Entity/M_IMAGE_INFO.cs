@@ -152,9 +152,11 @@ namespace Rialto.Models.DAO.Entity
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
-                return Option.Create(
-                con.Query("SELECT * FROM M_IMAGE_INFO WHERE IMGINF_ID=@IMGINF_ID"
-                    , new { IMGINF_ID = id }).FirstOrDefault());
+                var query = QueryBuilder.Select()
+                    .From(M_IMAGE_INFO_DEF.ThisTable)
+                    .Where(M_IMAGE_INFO_DEF.IMGINF_ID.Eq("@IMGINF_ID"));
+
+                return Option.Create(con.Query(query.ToSqlString(), new { IMGINF_ID = id }).FirstOrDefault());
             }
         }
 
@@ -183,7 +185,10 @@ FILE_SIZE,FILE_NAME,FILE_TYPE,HASH_VALUE,FILE_PATH,HEIGHT_PIX,WIDTH_PIX,COLOR,DO
                        DELETE_DATE = info.DELETE_DATE
                    });
 
-                var inserted = con.Query<M_IMAGE_INFO>("SELECT * FROM M_IMAGE_INFO WHERE ROWID = last_insert_rowid()").First();
+                var selectQuery = QueryBuilder.Select()
+                    .From(M_IMAGE_INFO_DEF.ThisTable)
+                    .Where(ConditionBuilder.Eq("ROWID", SQLFunctionBuilder.LastInsertLowId().ToSqlString()));
+                var inserted = con.Query<M_IMAGE_INFO>(selectQuery.ToSqlString()).First();
 
                 tran.Commit();
 
