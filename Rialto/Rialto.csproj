@@ -139,7 +139,7 @@
     <Compile Include="Models\IWorkerTask.cs" />
     <Compile Include="Models\TagAllocator.cs" />
     <Compile Include="Models\Tagging.cs" />
-    <Compile Include="Models\ThumbnailImage.cs" />
+    <Compile Include="Models\ThumbnailImageService.cs" />
     <Compile Include="Models\Transaction.cs" />
     <Compile Include="Models\WorkerTaskExecutor.cs" />
     <Compile Include="Util\MD5Helper.cs" />

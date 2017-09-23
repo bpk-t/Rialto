@@ -29,7 +29,7 @@ namespace Rialto.ViewModels
         #region Fields
         private int currentIndex;
 
-        private ThumbnailImage thumbnailImageService;
+        private ThumbnailImageService thumbnailImageService;
 
         private LangExt.Option<Task<BitmapImage>> nextImageTask = LangExt.Option.None;
 
@@ -41,7 +41,7 @@ namespace Rialto.ViewModels
         /// </summary>
         /// <param name="index"></param>
         /// <param name="imageFilePathList"></param>
-        public FullScreenViewModel(int index, ThumbnailImage thumbnailImage)
+        public FullScreenViewModel(int index, ThumbnailImageService thumbnailImage)
         {
             currentIndex = index;
             thumbnailImageService = thumbnailImage;
@@ -49,7 +49,7 @@ namespace Rialto.ViewModels
 
         public void Initialize()
         {
-            var path = thumbnailImageService.CurrentImageFilePathList[currentIndex].SourceImageFilePath;
+            var path = thumbnailImageService.ThumbnailImgList[currentIndex].SourceImageFilePath;
             CurrentImage = new BitmapImage(path);
         }
 
@@ -121,12 +121,12 @@ namespace Rialto.ViewModels
         public async void NextPicture(object parameter)
         {
             currentIndex++;
-            if (currentIndex >= thumbnailImageService.CurrentImageFilePathList.Count)
+            if (currentIndex >= thumbnailImageService.ThumbnailImgList.Count)
             {
                 currentIndex = 0;
                 await thumbnailImageService.NextPage();
             }
-            var path = thumbnailImageService.CurrentImageFilePathList[currentIndex].SourceImageFilePath;
+            var path = thumbnailImageService.ThumbnailImgList[currentIndex].SourceImageFilePath;
             CurrentImage = new BitmapImage(path);
 
             /*
@@ -190,10 +190,10 @@ namespace Rialto.ViewModels
                 if (thumbnailImageService.ExistsPrevPage())
                 {
                     await thumbnailImageService.PrevPage();
-                    currentIndex = thumbnailImageService.CurrentImageFilePathList.Count - 1;
+                    currentIndex = thumbnailImageService.ThumbnailImgList.Count - 1;
                 }
             }
-            var path = thumbnailImageService.CurrentImageFilePathList[currentIndex].SourceImageFilePath;
+            var path = thumbnailImageService.ThumbnailImgList[currentIndex].SourceImageFilePath;
             CurrentImage = new BitmapImage(path);
         }
         #endregion

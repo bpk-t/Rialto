@@ -25,7 +25,7 @@ namespace Rialto.ViewModels
         #region Private Members
 
         private static readonly Logger logger = LogManager.GetLogger("fileLogger");
-        private ThumbnailImage ThumbnailModel;
+        private ThumbnailImageService ThumbnailModel;
         private Tagging TaggingModel;
         private TagAllocator tagAllocator;
         private AllocatedTags allocatedTags;
@@ -38,7 +38,7 @@ namespace Rialto.ViewModels
         public MainWindowViewModel()
         {
             logger.Debug().Write();
-            ThumbnailModel = new ThumbnailImage();
+            ThumbnailModel = new ThumbnailImageService();
             TaggingModel = new Tagging();
             tagAllocator = new TagAllocator(_SelectedThumbnailImgList);
             allocatedTags = new AllocatedTags();

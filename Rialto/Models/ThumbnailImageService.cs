@@ -13,7 +13,7 @@ using System.Drawing;
 
 namespace Rialto.Models
 {
-    public class ThumbnailImage : NotificationObject
+    public class ThumbnailImageService : NotificationObject
     {
         /// <summary>
         /// サムネイルに表示している画像リスト
@@ -35,7 +35,7 @@ namespace Rialto.Models
         private long CurrentTagId = TagConstant.ALL_TAG_ID;
         private int CurrentPage = 0;
         private long ImgCount = 0;
-        public int PageCount { get; } = 30;
+        public int OnePageItemCount { get; } = 30;
 
         public bool ExistsPrevPage()
         {
@@ -44,7 +44,7 @@ namespace Rialto.Models
 
         public bool ExistsNextPage()
         {
-            return (CurrentPage + 1) * PageCount <= ImgCount;
+            return (CurrentPage + 1) * OnePageItemCount <= ImgCount;
         }
 
         public async Task NextPage()
@@ -71,11 +71,6 @@ namespace Rialto.Models
             }
         }
 
-        /// <summary>
-        /// サムネイルに表示する予定含むすべての画像リスト
-        /// </summary>
-        public List<ImageInfo> CurrentImageFilePathList { get; set; }
-
         public async Task ShowThumbnailImage(long tagId)
         {
             CurrentPage = 0;
@@ -91,9 +86,7 @@ namespace Rialto.Models
             await Task.Run(() =>
             {
                 ThumbnailImgList.Clear();
-                CurrentImageFilePathList = CurrentImageFilePathList.OrderBy(_ => Guid.NewGuid()).ToList();
-
-                CurrentImageFilePathList.ForEach(x => ThumbnailImgList.Add(x));
+                ThumbnailImgList.OrderBy(_ => Guid.NewGuid()).ForEach(x => ThumbnailImgList.Add(x));
             });
         }
 
@@ -102,9 +95,7 @@ namespace Rialto.Models
             await Task.Run(() =>
             {
                 ThumbnailImgList.Clear();
-                CurrentImageFilePathList.Reverse();
-
-                CurrentImageFilePathList.ForEach(x => ThumbnailImgList.Add(x));
+                ThumbnailImgList.Reverse();
             });
         }
 
@@ -114,30 +105,28 @@ namespace Rialto.Models
             if (tagId == TagConstant.ALL_TAG_ID)
             {
                 ImgCount = M_IMAGE_INFO.GetAllCount();
-                LoadImage(M_IMAGE_INFO.GetAll(CurrentPage * PageCount, PageCount));
+                LoadImage(M_IMAGE_INFO.GetAll(CurrentPage * OnePageItemCount, OnePageItemCount));
             }
             else if (tagId == TagConstant.NOTAG_TAG_ID)
             {
                 ImgCount = M_IMAGE_INFO.GetNoTagCount();
-                LoadImage(M_IMAGE_INFO.GetNoTag(CurrentPage * PageCount, PageCount));
+                LoadImage(M_IMAGE_INFO.GetNoTag(CurrentPage * OnePageItemCount, OnePageItemCount));
             }
             else
             {
                 ImgCount = M_IMAGE_INFO.GetByTagCount(tagId);
-                LoadImage(M_IMAGE_INFO.GetByTag(tagId, CurrentPage * PageCount, PageCount));
+                LoadImage(M_IMAGE_INFO.GetByTag(tagId, CurrentPage * OnePageItemCount, OnePageItemCount));
             }
-
-            CurrentImageFilePathList.ForEach(x => ThumbnailImgList.Add(x));
         }
 
         private void LoadImage(IEnumerable<M_IMAGE_INFO> images)
         {
-            CurrentImageFilePathList = images.Select(x => new ImageInfo()
+            images.Select(x => new ImageInfo()
             {
                 ImgID = x.IMGINF_ID.Value,
                 ThumbnailImageFilePath = GetThumbnailImage(x.FILE_PATH, x.HASH_VALUE),
                 SourceImageFilePath = new Uri(Path.Combine(Properties.Settings.Default.ImgDataDirectory, x.FILE_PATH))
-            }).ToList();
+            }).ForEach(x => ThumbnailImgList.Add(x));
         }
 
 
