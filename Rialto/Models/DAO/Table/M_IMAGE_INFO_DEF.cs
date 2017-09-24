@@ -1,4 +1,4 @@
-﻿using Rialto.Models.DAO.Util;
+﻿using Rialto.Models.DAO.Builder;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -16,10 +16,8 @@ using Rialto.Models;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media.Imaging;
-using Rialto.Model.DataModel;
 using System.Threading.Tasks;
-using System.Windows.Threading;
-using System.IO;
+using Rialto.Models.Service;
 
 namespace Rialto.ViewModels
 {

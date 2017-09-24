@@ -2,13 +2,14 @@
 using Rialto.Constant;
 using Rialto.Model.DataModel;
 using Rialto.Models.DAO.Entity;
+using Rialto.Models.Repository;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Rialto.Models
+namespace Rialto.Models.Service
 {
-    public class Tagging : NotificationObject
+    public class TagMasterService : NotificationObject
     {
         private ObservableSynchronizedCollection<TagTreeNode> TagTreeItems_ = new ObservableSynchronizedCollection<TagTreeNode>();
         public ObservableSynchronizedCollection<TagTreeNode> TagTreeItems
@@ -33,7 +34,7 @@ namespace Rialto.Models
         {
             return Task.Run(() =>
             {
-                var list = M_TAG_INFO.GetAll();
+                var list = M_TAG_INFORepository.GetAll();
                 TagTreeItems.Clear();
                 TagTreeItems.Add(new TagTreeNode() {
                     ID = TagConstant.ALL_TAG_ID,

@@ -1,4 +1,5 @@
 ﻿using Rialto.Models.DAO.Entity;
+using Rialto.Models.Repository;
 using Rialto.Util;
 using System;
 using System.Collections.Generic;
@@ -60,7 +61,7 @@ namespace Rialto.Models
         private static bool ExistsDB(FileInfo file)
         {
             var hashValue = MD5Helper.GenerateMD5HashCodeFromFile(file.FullName);
-            return M_IMAGE_INFO.FindByHash(hashValue).IsSome;
+            return M_IMAGE_INFORepository.FindByHash(hashValue).IsSome;
         }
 
         private static FileInfo CopyFile(FileInfo file, string destDir)

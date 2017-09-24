@@ -264,7 +264,7 @@
                     </Border>
                     <DockPanel DockPanel.Dock="Left" Margin="5">
                         <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Stretch">既存のタグ</TextBlock>
-                        <ListView DockPanel.Dock="Top" ItemsSource="{Binding ExistsTags}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                        <ListView DockPanel.Dock="Top" ItemsSource="{Binding SelectedItemHaveTags}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding Name}" />

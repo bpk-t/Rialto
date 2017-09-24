@@ -17,6 +17,7 @@ using Rialto.Constant;
 using NLog;
 using NLog.Fluent;
 using System.Threading.Tasks;
+using Rialto.Models.Service;
 
 namespace Rialto.ViewModels
 {
@@ -26,9 +27,9 @@ namespace Rialto.ViewModels
 
         private static readonly Logger logger = LogManager.GetLogger("fileLogger");
         private ThumbnailImageService ThumbnailModel;
-        private Tagging TaggingModel;
-        private TagAllocator tagAllocator;
-        private AllocatedTags allocatedTags;
+        private TagMasterService TaggingModel;
+        private TagAllocateService tagAllocator;
+        private AllocatedTagsService allocatedTags;
 
         #endregion
 
@@ -39,9 +40,9 @@ namespace Rialto.ViewModels
         {
             logger.Debug().Write();
             ThumbnailModel = new ThumbnailImageService();
-            TaggingModel = new Tagging();
-            tagAllocator = new TagAllocator(_SelectedThumbnailImgList);
-            allocatedTags = new AllocatedTags();
+            TaggingModel = new TagMasterService();
+            tagAllocator = new TagAllocateService(_SelectedThumbnailImgList);
+            allocatedTags = new AllocatedTagsService();
         }
 
         private async Task Refresh()
@@ -233,20 +234,20 @@ namespace Rialto.ViewModels
         /// <summary>
         /// 選択された画像に付与されたタグ
         /// </summary>
-        private ReadOnlyDispatcherCollection<TagMasterInfo> ExistsTags_;
-        public ReadOnlyDispatcherCollection<TagMasterInfo> ExistsTags
+        private ReadOnlyDispatcherCollection<TagMasterInfo> SelectedItemHaveTags_;
+        public ReadOnlyDispatcherCollection<TagMasterInfo> SelectedItemHaveTags
         {
             get
             {
-                if (ExistsTags_ == null)
+                if (SelectedItemHaveTags_ == null)
                 {
-                    ExistsTags_ = ViewModelHelper.CreateReadOnlyDispatcherCollection(
-                        allocatedTags.ExistsTags
+                    SelectedItemHaveTags_ = ViewModelHelper.CreateReadOnlyDispatcherCollection(
+                        allocatedTags.ItemHaveTags
                         , m => m
                         , DispatcherHelper.UIDispatcher
                         );
                 }
-                return ExistsTags_;
+                return SelectedItemHaveTags_;
             }
         }
 

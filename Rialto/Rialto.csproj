@@ -111,7 +111,12 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Constant\TagConstant.cs" />
-    <Compile Include="Models\AllocatedTags.cs" />
+    <Compile Include="Models\Repository\M_IMAGE_INFORepository.cs" />
+    <Compile Include="Models\Repository\M_TAGADDTABRepository.cs" />
+    <Compile Include="Models\Repository\M_TAG_INFORepository.cs" />
+    <Compile Include="Models\Repository\T_ADD_TAGRepository.cs" />
+    <Compile Include="Models\Repository\T_AVEHASHRepository.cs" />
+    <Compile Include="Models\Service\AllocatedTagsService.cs" />
     <Compile Include="Models\AverageHashGenerator.cs" />
     <Compile Include="Models\DAO\Custom\ImageHasTags.cs" />
     <Compile Include="Models\DAO\Table\ColumnDefinition.cs" />
@@ -120,26 +125,26 @@
     <Compile Include="Models\DAO\Table\TableDefinition.cs" />
     <Compile Include="Models\DAO\Table\T_ADD_TAG_DEF.cs" />
     <Compile Include="Models\DAO\Table\T_AVEHASH_DEF.cs" />
-    <Compile Include="Models\DAO\Util\ConditionBuilder.cs" />
-    <Compile Include="Models\DAO\Util\JoinTable.cs" />
-    <Compile Include="Models\DAO\Util\Literal.cs" />
-    <Compile Include="Models\DAO\Util\Order.cs" />
-    <Compile Include="Models\DAO\Util\QueryBuilder.cs" />
+    <Compile Include="Models\DAO\Builder\ConditionBuilder.cs" />
+    <Compile Include="Models\DAO\Builder\JoinTable.cs" />
+    <Compile Include="Models\DAO\Builder\Literal.cs" />
+    <Compile Include="Models\DAO\Builder\Order.cs" />
+    <Compile Include="Models\DAO\Builder\QueryBuilder.cs" />
     <Compile Include="Models\DAO\Entity\M_IMAGE_INFO.cs" />
     <Compile Include="Models\DAO\Entity\M_TABSETTING.cs" />
     <Compile Include="Models\DAO\Entity\M_TAGADDTAB.cs" />
     <Compile Include="Models\DAO\Entity\M_TAG_INFO.cs" />
     <Compile Include="Models\DAO\Entity\T_ADD_TAG.cs" />
     <Compile Include="Models\DAO\Entity\T_AVEHASH.cs" />
-    <Compile Include="Models\DAO\Util\SelectQuery.cs" />
-    <Compile Include="Models\DAO\Util\SQLFunction.cs" />
+    <Compile Include="Models\DAO\Builder\SelectQuery.cs" />
+    <Compile Include="Models\DAO\Builder\SQLFunction.cs" />
     <Compile Include="Models\ImageRegister.cs" />
     <Compile Include="Models\ImageRegisterTask.cs" />
     <Compile Include="Models\IWorker.cs" />
     <Compile Include="Models\IWorkerTask.cs" />
-    <Compile Include="Models\TagAllocator.cs" />
-    <Compile Include="Models\Tagging.cs" />
-    <Compile Include="Models\ThumbnailImageService.cs" />
+    <Compile Include="Models\Service\TagAllocateService.cs" />
+    <Compile Include="Models\Service\TagMasterService.cs" />
+    <Compile Include="Models\Service\ThumbnailImageService.cs" />
     <Compile Include="Models\Transaction.cs" />
     <Compile Include="Models\WorkerTaskExecutor.cs" />
     <Compile Include="Util\MD5Helper.cs" />
@@ -162,7 +167,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Models\TagInfoModel.cs" />
     <Compile Include="Properties\Resources.ja-JP.Designer.cs">
       <DependentUpon>Resources.ja-JP.resx</DependentUpon>
       <AutoGen>True</AutoGen>

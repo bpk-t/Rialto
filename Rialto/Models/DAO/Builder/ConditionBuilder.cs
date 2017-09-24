@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Rialto.Models.DAO.Util.QueryBuilder;
+using static Rialto.Models.DAO.Builder.QueryBuilder;
 
-namespace Rialto.Models.DAO.Util
+namespace Rialto.Models.DAO.Builder
 {
     public class ConditionBuilder
     {

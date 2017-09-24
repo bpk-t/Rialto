@@ -10,8 +10,9 @@ using Rialto.Models.DAO.Entity;
 using System.Collections.Generic;
 using Rialto.Constant;
 using System.Drawing;
+using Rialto.Models.Repository;
 
-namespace Rialto.Models
+namespace Rialto.Models.Service
 {
     public class ThumbnailImageService : NotificationObject
     {
@@ -104,24 +105,24 @@ namespace Rialto.Models
             ThumbnailImgList.Clear();
             if (tagId == TagConstant.ALL_TAG_ID)
             {
-                ImgCount = M_IMAGE_INFO.GetAllCount();
-                LoadImage(M_IMAGE_INFO.GetAll(CurrentPage * OnePageItemCount, OnePageItemCount));
+                ImgCount = M_IMAGE_INFORepository.GetAllCount();
+                LoadImage(M_IMAGE_INFORepository.GetAll(CurrentPage * OnePageItemCount, OnePageItemCount));
             }
             else if (tagId == TagConstant.NOTAG_TAG_ID)
             {
-                ImgCount = M_IMAGE_INFO.GetNoTagCount();
-                LoadImage(M_IMAGE_INFO.GetNoTag(CurrentPage * OnePageItemCount, OnePageItemCount));
+                ImgCount = M_IMAGE_INFORepository.GetNoTagCount();
+                LoadImage(M_IMAGE_INFORepository.GetNoTag(CurrentPage * OnePageItemCount, OnePageItemCount));
             }
             else
             {
-                ImgCount = M_IMAGE_INFO.GetByTagCount(tagId);
-                LoadImage(M_IMAGE_INFO.GetByTag(tagId, CurrentPage * OnePageItemCount, OnePageItemCount));
+                ImgCount = M_IMAGE_INFORepository.GetByTagCount(tagId);
+                LoadImage(M_IMAGE_INFORepository.GetByTag(tagId, CurrentPage * OnePageItemCount, OnePageItemCount));
             }
         }
 
         private void LoadImage(IEnumerable<M_IMAGE_INFO> images)
         {
-            images.AsParallel().Select(x => new ImageInfo()
+            images.Select(x => new ImageInfo()
             {
                 ImgID = x.IMGINF_ID.Value,
                 ThumbnailImageFilePath = GetThumbnailImage(x.FILE_PATH, x.HASH_VALUE),

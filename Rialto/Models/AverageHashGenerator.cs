@@ -1,4 +1,5 @@
 ﻿using Rialto.Models.DAO.Entity;
+using Rialto.Models.Repository;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -14,10 +15,10 @@ namespace Rialto.Models
 
         public static void Insert(long IMGINF_ID)
         {
-            M_IMAGE_INFO.FindById(IMGINF_ID).Match(
+            M_IMAGE_INFORepository.FindById(IMGINF_ID).Match(
                 (some) =>
                 {
-                    T_AVEHASH.Insert(new T_AVEHASH()
+                    T_AVEHASHRepository.Insert(new T_AVEHASH()
                     {
                         IMGINF_ID = IMGINF_ID,
                         AVEHASH = ComputeAveHash(some.FILE_PATH)

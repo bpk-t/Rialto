@@ -7,30 +7,30 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rialto.Models
+namespace Rialto.Models.Service
 {
-    public class AllocatedTags : NotificationObject
+    public class AllocatedTagsService : NotificationObject
     {
-        private ObservableSynchronizedCollection<TagMasterInfo> ExistsTags_ = new ObservableSynchronizedCollection<TagMasterInfo>();
-        public ObservableSynchronizedCollection<TagMasterInfo> ExistsTags
+        private ObservableSynchronizedCollection<TagMasterInfo> ItemHaveTags_ = new ObservableSynchronizedCollection<TagMasterInfo>();
+        public ObservableSynchronizedCollection<TagMasterInfo> ItemHaveTags
         {
             get
             {
-                return ExistsTags_;
+                return ItemHaveTags_;
             }
             set
             {
-                ExistsTags_ = value;
-                RaisePropertyChanged(() => ExistsTags);
+                ItemHaveTags_ = value;
+                RaisePropertyChanged(() => ItemHaveTags);
             }
         }
 
         public void GetAllocatedTags(long IMGINF_ID)
         {
-            if (ExistsTags.Count > 0) { ExistsTags.Clear(); }
+            if (ItemHaveTags.Count > 0) { ItemHaveTags.Clear(); }
             
             ImageHasTags.FindByImgId(IMGINF_ID).ForEach(x =>
-                ExistsTags.Add(new TagMasterInfo()
+                ItemHaveTags.Add(new TagMasterInfo()
                 {
                     ID = x.TAGINF_ID.Value,
                     Name = x.TAG_NAME,

@@ -8,6 +8,7 @@ using System.Windows;
 using System.Collections;
 using System.Diagnostics;
 using Rialto.Models.DAO.Entity;
+using Rialto.Models.Repository;
 
 namespace Rialto.ViewModels
 {
@@ -79,7 +80,7 @@ namespace Rialto.ViewModels
         {
             Task.Run(() =>
             {
-                var list = M_TAG_INFO.GetAll();
+                var list = M_TAG_INFORepository.GetAll();
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     if (!AllTags.IsEmpty())
@@ -109,8 +110,8 @@ namespace Rialto.ViewModels
                     TAG_DEFINE = TagDefineText
                 };
             }
-            
-            M_TAG_INFO.Upsert(target, () => true);
+
+            M_TAG_INFORepository.Upsert(target, () => true);
             Initialize();
         }
 
@@ -130,7 +131,7 @@ namespace Rialto.ViewModels
         public void DeleteTag()
         {
             var selectedTag = SelectedTags[0] as M_TAG_INFO;
-            M_TAG_INFO.DeleteById(selectedTag.TAGINF_ID.Value);
+            M_TAG_INFORepository.DeleteById(selectedTag.TAGINF_ID.Value);
             Initialize();
         }
     }

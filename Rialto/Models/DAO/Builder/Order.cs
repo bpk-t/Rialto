@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rialto.Models.DAO.Util
+namespace Rialto.Models.DAO.Builder
 {
     public enum Order
     {

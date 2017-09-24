@@ -1,5 +1,6 @@
 ﻿using LangExt;
 using Rialto.Models.DAO.Entity;
+using Rialto.Models.Repository;
 using Rialto.Util;
 using System;
 using System.Collections.Generic;
@@ -38,7 +39,7 @@ namespace Rialto.Models
         private Option<long> InsertImageFromFile(FileInfo file)
         {
             var img = new System.Drawing.Bitmap(file.FullName);
-            var inserted = M_IMAGE_INFO.Insert(new M_IMAGE_INFO()
+            var inserted = M_IMAGE_INFORepository.Insert(new M_IMAGE_INFO()
             {
                 FILE_SIZE = (int)file.Length,
                 FILE_NAME = Path.GetFileNameWithoutExtension(file.Name),
