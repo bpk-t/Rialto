@@ -53,7 +53,7 @@ namespace Rialto.Models.Repository
                     .InnerJoin(T_AVEHASH_DEF.ThisTable, M_IMAGE_INFO_DEF.IMGINF_ID.Eq(T_AVEHASH_DEF.IMGINF_ID))
                     .Where(M_IMAGE_INFO_DEF.DELETE_FLG.Eq("'0'"))
                     .Where(ConditionBuilder.NotExists(
-                        QueryBuilder.Select().From("T_ADD_TAG").Where(M_IMAGE_INFO_DEF.IMGINF_ID.Eq("T_ADD_TAG.IMGINF_ID"))));
+                        QueryBuilder.Select().From(T_ADD_TAG_DEF.ThisTable).Where(M_IMAGE_INFO_DEF.IMGINF_ID.Eq(T_ADD_TAG_DEF.IMGINF_ID))));
 
                 return con.ExecuteScalar<long>(query.ToSqlString());
             }
@@ -68,7 +68,7 @@ namespace Rialto.Models.Repository
                     .InnerJoin(T_AVEHASH_DEF.ThisTable, M_IMAGE_INFO_DEF.IMGINF_ID.Eq(T_AVEHASH_DEF.IMGINF_ID))
                     .Where(M_IMAGE_INFO_DEF.DELETE_FLG.Eq("'0'"))
                     .Where(ConditionBuilder.NotExists(
-                        QueryBuilder.Select().From("T_ADD_TAG").Where(M_IMAGE_INFO_DEF.IMGINF_ID.Eq("T_ADD_TAG.IMGINF_ID"))
+                        QueryBuilder.Select().From(T_ADD_TAG_DEF.ThisTable).Where(M_IMAGE_INFO_DEF.IMGINF_ID.Eq(T_ADD_TAG_DEF.IMGINF_ID))
                         ))
                     .OrderBy(M_IMAGE_INFO_DEF.IMGINF_ID, Order.Desc)
                     .Limit(limit)

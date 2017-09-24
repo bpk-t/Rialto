@@ -122,7 +122,13 @@ namespace Rialto.ViewModels
             if (currentIndex >= thumbnailImageService.ThumbnailImgList.Count)
             {
                 currentIndex = 0;
-                await thumbnailImageService.NextPage();
+                if (await thumbnailImageService.ExistsNextPage())
+                {
+                    await thumbnailImageService.GoToNextPage();
+                } else
+                {
+                    await thumbnailImageService.GoToFirstPage();
+                }
             }
             var path = thumbnailImageService.ThumbnailImgList[currentIndex].SourceImageFilePath;
             CurrentImage = new BitmapImage(path);
@@ -185,9 +191,9 @@ namespace Rialto.ViewModels
             currentIndex--;
             if (currentIndex < 0)
             {
-                if (thumbnailImageService.ExistsPrevPage())
+                if (await thumbnailImageService.ExistsPrevPage())
                 {
-                    await thumbnailImageService.PrevPage();
+                    await thumbnailImageService.GoToPrevPage();
                     currentIndex = thumbnailImageService.ThumbnailImgList.Count - 1;
                 }
             }

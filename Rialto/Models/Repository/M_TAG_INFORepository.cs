@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using LangExt;
+using Rialto.Models.DAO.Builder;
+using Rialto.Models.DAO.Table;
 
 namespace Rialto.Models.Repository
 {
@@ -16,7 +18,10 @@ namespace Rialto.Models.Repository
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
-                return con.Query<M_TAG_INFO>("SELECT * FROM M_TAG_INFO");
+                var query = QueryBuilder.Select()
+                    .From(M_TAG_INFO_DEF.ThisTable)
+                    .OrderBy(M_TAG_INFO_DEF.TAGINF_ID, Order.Asc);
+                return con.Query<M_TAG_INFO>(query.ToSqlString());
             }
         }
 

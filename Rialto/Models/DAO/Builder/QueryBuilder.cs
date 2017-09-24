@@ -48,12 +48,12 @@ namespace Rialto.Models.DAO.Builder
             return this;
         }
 
-        public InsertQuery Column(string column, string value)
+        public InsertQuery Set(string column, string value)
         {
             return this;
         }
 
-        public InsertQuery Column(ColumnDefinition column, string value)
+        public InsertQuery Set(ColumnDefinition column, string value)
         {
             return this;
         }

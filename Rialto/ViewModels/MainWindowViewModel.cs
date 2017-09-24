@@ -464,12 +464,12 @@ namespace Rialto.ViewModels
 
         public async void ShowPrevPage()
         {
-            await ThumbnailModel.PrevPage();
+            await ThumbnailModel.GoToPrevPage();
         }
 
         public async void ShowNextPage()
         {
-            await ThumbnailModel.NextPage();
+            await ThumbnailModel.GoToNextPage();
         }
     }
 }

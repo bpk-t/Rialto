@@ -109,7 +109,7 @@ namespace Rialto.Models.DAO.Builder
                 + " FROM " + tableName
                 + (innerJoinTables.IsEmpty() ? string.Empty : innerJoinTables.Select(x => $" INNER {x.ToSqlString()}").Aggregate((acc, x) => acc + " " + x))
                 + (leftOuterJoinTables.IsEmpty() ? string.Empty : leftOuterJoinTables.Select(x => $" LEFT OUTER {x.ToSqlString()}").Aggregate((acc, x) => acc + " " + x))
-                + " WHERE " + (new And(whereConditions.ToArray())).ToSqlString()
+                + (whereConditions.IsEmpty() ? string.Empty : (" WHERE " + (new And(whereConditions.ToArray())).ToSqlString()))
                 + (orderByItems.IsEmpty() ? string.Empty : " ORDER BY " + orderByItems.Select(x => x.ToSqlString()).Aggregate((acc, x) => acc + ", " + x))
                 + limit.Match((x) => $" LIMIT {x}", () => string.Empty)
                 + offset.Match((x) => $" OFFSET {x}", () => string.Empty);
