@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Rialto.Models.DAO.Table
 {
+    // TODO クラス名変更
     public class M_TAG_INFO_DEF : TableDefinition
     {
         private M_TAG_INFO_DEF() : base("M_TAG_INFO")
