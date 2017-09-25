@@ -9,7 +9,7 @@ namespace Rialto.Models.DAO.Builder
     public enum Order
     {
         /// <summary>
-        /// 照準
+        /// 昇順
         /// </summary>
         Asc,
 

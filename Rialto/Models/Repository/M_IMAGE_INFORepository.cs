@@ -28,7 +28,7 @@ namespace Rialto.Models.Repository
             }
         }
 
-        public static IEnumerable<M_IMAGE_INFO> GetAll(long offset, long limit)
+        public static IEnumerable<M_IMAGE_INFO> GetAll(long offset, long limit, Order order)
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
@@ -36,7 +36,7 @@ namespace Rialto.Models.Repository
                     .From(M_IMAGE_INFO_DEF.ThisTable)
                     .InnerJoin(T_AVEHASH_DEF.ThisTable, M_IMAGE_INFO_DEF.IMGINF_ID.Eq(T_AVEHASH_DEF.IMGINF_ID))
                     .Where(M_IMAGE_INFO_DEF.DELETE_FLG.Eq("'0'"))
-                    .OrderBy(M_IMAGE_INFO_DEF.IMGINF_ID, Order.Desc)
+                    .OrderBy(M_IMAGE_INFO_DEF.IMGINF_ID, order)
                     .Limit(limit)
                     .Offset(offset);
 
@@ -59,7 +59,7 @@ namespace Rialto.Models.Repository
             }
         }
 
-        public static IEnumerable<M_IMAGE_INFO> GetNoTag(long offset, long limit)
+        public static IEnumerable<M_IMAGE_INFO> GetNoTag(long offset, long limit, Order order)
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
@@ -70,7 +70,7 @@ namespace Rialto.Models.Repository
                     .Where(ConditionBuilder.NotExists(
                         QueryBuilder.Select().From(T_ADD_TAG_DEF.ThisTable).Where(M_IMAGE_INFO_DEF.IMGINF_ID.Eq(T_ADD_TAG_DEF.IMGINF_ID))
                         ))
-                    .OrderBy(M_IMAGE_INFO_DEF.IMGINF_ID, Order.Desc)
+                    .OrderBy(M_IMAGE_INFO_DEF.IMGINF_ID, order)
                     .Limit(limit)
                     .Offset(offset);
 
@@ -97,7 +97,7 @@ namespace Rialto.Models.Repository
             }
         }
 
-        public static IEnumerable<M_IMAGE_INFO> GetByTag(long tagId, long offset, long limit)
+        public static IEnumerable<M_IMAGE_INFO> GetByTag(long tagId, long offset, long limit, Order order)
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
@@ -108,7 +108,7 @@ namespace Rialto.Models.Repository
                     .InnerJoin(M_TAG_INFO_DEF.ThisTable, T_ADD_TAG_DEF.TAGINF_ID.Eq(M_TAG_INFO_DEF.TAGINF_ID))
                     .Where(M_IMAGE_INFO_DEF.DELETE_FLG.Eq("'0'"))
                     .Where(M_TAG_INFO_DEF.TAGINF_ID.Eq("@TAGINF_ID"))
-                    .OrderBy(M_IMAGE_INFO_DEF.IMGINF_ID, Order.Desc)
+                    .OrderBy(M_IMAGE_INFO_DEF.IMGINF_ID, order)
                     .Limit(limit)
                     .Offset(offset);
 
