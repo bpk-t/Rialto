@@ -11,12 +11,24 @@ namespace Rialto.Models
 {
     public static class ImageRegister
     {
+        public class FailureInfo
+        {
+            public string Path { get; }
+            public string Result { get; }
+            public FailureInfo(string path, string result)
+            {
+                Path = path;
+                Result = result;
+            }
+        }
+
         /// <summary>
         /// 画像ファイルを登録する
         /// </summary>
         /// <param name="fileList">登録する画像ファイル、または画像ファイルが格納されたディレクトリ</param>
         public static IEnumerable<LangExt.Option<long>> RegistImages(string[] fileList)
         {
+            //LangExt.Result<long, FailureInfo>
             var destDir = MakeTodayDir();
             var tasks = Flat(fileList)
                 .Where(f => IsImageExt(f))
@@ -29,27 +41,49 @@ namespace Rialto.Models
                 .Tasks.Select(t => t.IMGINF_ID);
         }
 
-        private static List<FileInfo> Flat(string [] fileList)
+        private static IEnumerable<LangExt.Result<FileInfo, FailureInfo>> TreeToList(string[] fileList)
         {
-            return _Flat(fileList, 0, new List<FileInfo>());
-        }
-
-        private static List<FileInfo> _Flat(string[] fileList, int index, List<FileInfo> resultList)
-        {
-            if ((fileList.Length - 1) <= index)
+            List<LangExt.Result<FileInfo, FailureInfo>> _TreeToList(string[] filePathList, List<LangExt.Result<FileInfo, FailureInfo>> resultList)
             {
+                foreach (var filePath in filePathList) {
+                    if (Directory.Exists(filePath))
+                    {
+                        _TreeToList(Directory.GetFiles(filePath), resultList);
+                    }
+                    else if (File.Exists(filePath))
+                    {
+                        resultList.Add(LangExt.Result.Success(new FileInfo(filePath)));
+                    } else
+                    {
+                        resultList.Add(LangExt.Result.Failure(new FailureInfo(path: filePath, result: "存在しないファイル")));
+                    }
+                }
                 return resultList;
             }
-            var filePath = fileList[index];
-            if (Directory.Exists(filePath))
+            return _TreeToList(fileList, new List<LangExt.Result<FileInfo, FailureInfo>>());
+        }
+
+        // TODO deprecated
+        private static List<FileInfo> Flat(string [] fileList)
+        {
+            List<FileInfo> _Flat(string[] filePathList, int index, List<FileInfo> resultList)
             {
-                _Flat(Directory.GetFiles(filePath), 0, resultList);
+                if ((filePathList.Length - 1) <= index)
+                {
+                    return resultList;
+                }
+                var filePath = filePathList[index];
+                if (Directory.Exists(filePath))
+                {
+                    _Flat(Directory.GetFiles(filePath), 0, resultList);
+                }
+                else if (File.Exists(filePath))
+                {
+                    resultList.Add(new FileInfo(filePath));
+                }
+                return _Flat(filePathList, index + 1, resultList);
             }
-            else if (File.Exists(filePath))
-            {
-                resultList.Add(new FileInfo(filePath));
-            }
-            return _Flat(fileList, index + 1, resultList);
+            return _Flat(fileList, 0, new List<FileInfo>());
         }
 
         private static bool ExistsFile(FileInfo file, string destDir)

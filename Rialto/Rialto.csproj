@@ -154,6 +154,7 @@
     <Compile Include="Models\ImageRegisterTask.cs" />
     <Compile Include="Models\IWorker.cs" />
     <Compile Include="Models\IWorkerTask.cs" />
+    <Compile Include="Models\Service\ImageRegisterService.cs" />
     <Compile Include="Models\Service\TagAllocateService.cs" />
     <Compile Include="Models\Service\TagMasterService.cs" />
     <Compile Include="Models\Service\ThumbnailImageService.cs" />
