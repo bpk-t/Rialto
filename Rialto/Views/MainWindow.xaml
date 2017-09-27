@@ -176,6 +176,7 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*" />
                         <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
                         <ColumnDefinition Width="4*" />
                     </Grid.ColumnDefinitions>
 
@@ -189,6 +190,14 @@
                     <ComboBox Grid.Column="1" Margin="5">
                         <ComboBoxItem>昇順</ComboBoxItem>
                         <ComboBoxItem>降順</ComboBoxItem>
+                    </ComboBox>
+
+                    <!-- 1ページの表示画像枚数 -->
+                    <ComboBox Grid.Column="2" Margin="5">
+                        <ComboBoxItem>10</ComboBoxItem>
+                        <ComboBoxItem>20</ComboBoxItem>
+                        <ComboBoxItem>30</ComboBoxItem>
+                        <ComboBoxItem>50</ComboBoxItem>
                     </ComboBox>
                 </Grid>
                 
