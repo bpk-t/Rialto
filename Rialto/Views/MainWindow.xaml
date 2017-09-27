@@ -125,7 +125,6 @@
 
 
             <Grid Grid.Column="0">
-
                 <Grid.RowDefinitions>
                     <RowDefinition Height="35px" />
                     <RowDefinition Height="*" />
@@ -168,11 +167,32 @@
 
             <Grid Grid.Column="2">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="40px" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="50px" />
                 </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="4*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!-- 表示順序 -->
+                    <ComboBox Grid.Column="0" Margin="5">
+                        <ComboBoxItem>登録順</ComboBoxItem>
+                        <ComboBoxItem>閲覧数順</ComboBoxItem>
+                        <ComboBoxItem>タグ割り当て数順</ComboBoxItem>
+                    </ComboBox>
+
+                    <ComboBox Grid.Column="1" Margin="5">
+                        <ComboBoxItem>昇順</ComboBoxItem>
+                        <ComboBoxItem>降順</ComboBoxItem>
+                    </ComboBox>
+                </Grid>
                 
-                <ListView Name="ThumbnailList" Grid.Row="0" Margin="5" ItemsSource="{Binding ThumbnailImgList}" 
+                <ListView Name="ThumbnailList" Grid.Row="1" Margin="5" ItemsSource="{Binding ThumbnailImgList}" 
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                     <ListView.ItemTemplate>
                         <DataTemplate>
@@ -213,7 +233,7 @@
                     </ListView.InputBindings>
                 </ListView>
 
-                <Grid Grid.Row="1">
+                <Grid Grid.Row="2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*" />
                         <ColumnDefinition Width="1*" />
