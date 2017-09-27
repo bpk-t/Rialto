@@ -43,6 +43,7 @@ namespace Rialto.ViewModels
             TaggingModel = new TagMasterService();
             tagAllocator = new TagAllocateService(_SelectedThumbnailImgList);
             allocatedTags = new AllocatedTagsService();
+            ThumbnailModel.OnChangePage += (value) => CurrentPageAllPage = value;
         }
 
         private async Task Refresh()
@@ -60,11 +61,27 @@ namespace Rialto.ViewModels
         /// </summary>
         public async void Initialize()
         {
-            Properties.Settings.Default.Reset();
             await Refresh();
         }
 
         #region Properties
+
+        /// <summary>
+        /// ページ番号表示（現在のページ/すべてのページ数）
+        /// </summary>
+        private string CurrentPageAllPage_ = string.Empty;
+        public string CurrentPageAllPage
+        {
+            get
+            {
+                return CurrentPageAllPage_;
+            }
+            set
+            {
+                CurrentPageAllPage_ = value;
+                RaisePropertyChanged(() => CurrentPageAllPage);
+            }
+        }
 
         /// <summary>
         /// 1つのサムネイル表示アイテムの高さ

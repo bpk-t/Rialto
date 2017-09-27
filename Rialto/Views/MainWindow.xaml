@@ -240,6 +240,7 @@
                         <ColumnDefinition Width="1*" />
                     </Grid.ColumnDefinitions>
 
+                    <!-- 前のページ -->
                     <Button Grid.Column="0" Margin="5" Content="前のページ" IsEnabled="{Binding PrevPageButtonIsEnable}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="Click">
@@ -247,6 +248,11 @@
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
                     </Button>
+
+                    <!-- ページ番号表示 -->
+                    <TextBlock  Grid.Column="1" Text="{Binding CurrentPageAllPage}" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" />
+
+                    <!-- 次のページ -->
                     <Button Grid.Column="2" Margin="5" Content="次のページ" IsEnabled="{Binding NextPageButtoIsEnable}">
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="Click">

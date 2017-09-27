@@ -39,6 +39,8 @@ namespace Rialto.Models.Service
         {
             system = ActorSystem.Create("ThumbnailImageServiceSystem");
             thumbnailImageActor = system.ActorOf<ThumbnailImageActor>("ThumbnailImageActor");
+
+            OnChangePage += (v) => { }; // null check不要にするための空実装
         }
 
         private ActorSystem system;
@@ -48,6 +50,8 @@ namespace Rialto.Models.Service
         private Order currentImageOrder = Order.Desc;
         private int currentPage = 0;
         public int OnePageItemCount { get; } = 30;
+
+        public event Action<string> OnChangePage;
 
         public Task<bool> ExistsPrevPage()
         {
@@ -67,11 +71,13 @@ namespace Rialto.Models.Service
             {
                 currentPage++;
                 var message = new ThumbnailImageActor.GotToPage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
-                var images = await thumbnailImageActor.Ask<List<ImageInfo>>(message);
+                (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
 
                 ThumbnailImgList.Clear();
                 images.ForEach(x => ThumbnailImgList.Add(x));
+                OnChangePage($"{currentPage}/{allCount/OnePageItemCount}");
             }
+            // TODO 行き詰まり処理
         }
 
         public async Task GoToPrevPage()
@@ -80,20 +86,23 @@ namespace Rialto.Models.Service
             {
                 currentPage--;
                 var message = new ThumbnailImageActor.GotToPage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
-                var images = await thumbnailImageActor.Ask<List<ImageInfo>>(message);
+                (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
 
                 ThumbnailImgList.Clear();
                 images.ForEach(x => ThumbnailImgList.Add(x));
+                OnChangePage($"{currentPage}/{allCount / OnePageItemCount}");
             }
+            // TODO 行き詰まり処理
         }
 
         public async Task GoToFirstPage()
         {
             currentPage = 0;
             var message = new ThumbnailImageActor.GotToPage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
-            var images = await thumbnailImageActor.Ask<List<ImageInfo>>(message);
+            (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
             ThumbnailImgList.Clear();
             images.ForEach(x => ThumbnailImgList.Add(x));
+            OnChangePage($"{currentPage}/{allCount / OnePageItemCount}");
         }
 
         public async Task ShowThumbnailImage(long tagId)
@@ -103,9 +112,10 @@ namespace Rialto.Models.Service
             currentImageOrder = Order.Desc;
 
             var message = new ThumbnailImageActor.GotToPage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
-            var images = await thumbnailImageActor.Ask<List<ImageInfo>>(message);
+            (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
             ThumbnailImgList.Clear();
             images.ForEach(x => ThumbnailImgList.Add(x));
+            OnChangePage($"{currentPage}/{allCount / OnePageItemCount}");
         }
 
         public async Task Shuffle()
@@ -124,7 +134,7 @@ namespace Rialto.Models.Service
             currentPage = 0;
 
             var message = new ThumbnailImageActor.GotToPage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
-            var images = await thumbnailImageActor.Ask<List<ImageInfo>>(message);
+            (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
             ThumbnailImgList.Clear();
             images.ForEach(x => ThumbnailImgList.Add(x));
         }
@@ -202,7 +212,7 @@ namespace Rialto.Models.Service
                 }
             }
 
-            private List<ImageInfo> GetThumbnailImage(long tagId, long offset, long limit, Order imageOrder)
+            private (long allCount, List<ImageInfo> imgList) GetThumbnailImage(long tagId, long offset, long limit, Order imageOrder)
             {
                 ImageInfo ToImageInfo(M_IMAGE_INFO image) => new ImageInfo()
                 {
@@ -213,15 +223,21 @@ namespace Rialto.Models.Service
                 
                 if (tagId == TagConstant.ALL_TAG_ID)
                 {
-                    return M_IMAGE_INFORepository.GetAll(offset, limit, imageOrder).Select(x => ToImageInfo(x)).ToList();
+                    var list = M_IMAGE_INFORepository.GetAll(offset, limit, imageOrder).Select(x => ToImageInfo(x)).ToList();
+                    var count = M_IMAGE_INFORepository.GetAllCount();
+                    return (count, list);
                 }
                 else if (tagId == TagConstant.NOTAG_TAG_ID)
                 {
-                    return M_IMAGE_INFORepository.GetNoTag(offset, limit, imageOrder).Select(x => ToImageInfo(x)).ToList();
+                    var list = M_IMAGE_INFORepository.GetNoTag(offset, limit, imageOrder).Select(x => ToImageInfo(x)).ToList();
+                    var count = M_IMAGE_INFORepository.GetNoTagCount();
+                    return (count, list);
                 }
                 else
                 {
-                    return M_IMAGE_INFORepository.GetByTag(tagId, offset, limit, imageOrder).Select(x => ToImageInfo(x)).ToList();
+                    var list = M_IMAGE_INFORepository.GetByTag(tagId, offset, limit, imageOrder).Select(x => ToImageInfo(x)).ToList();
+                    var count = M_IMAGE_INFORepository.GetByTagCount(tagId);
+                    return (count, list);
                 }
             }
 
