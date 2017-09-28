@@ -126,6 +126,7 @@
     <Compile Include="Constant\TagConstant.cs" />
     <Compile Include="Models\DAO\Table\M_TABSETTING_DEF.cs" />
     <Compile Include="Models\DAO\Table\M_TAGADDTAB_DEF.cs" />
+    <Compile Include="Models\DataModel\PageViewImageCount.cs" />
     <Compile Include="Models\Repository\M_IMAGE_INFORepository.cs" />
     <Compile Include="Models\Repository\M_TAGADDTABRepository.cs" />
     <Compile Include="Models\Repository\M_TAG_INFORepository.cs" />

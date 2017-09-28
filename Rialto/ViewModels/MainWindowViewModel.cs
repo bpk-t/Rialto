@@ -18,6 +18,7 @@ using NLog;
 using NLog.Fluent;
 using System.Threading.Tasks;
 using Rialto.Models.Service;
+using Rialto.Models.DataModel;
 
 namespace Rialto.ViewModels
 {
@@ -61,6 +62,18 @@ namespace Rialto.ViewModels
         /// </summary>
         public async void Initialize()
         {
+            PageViewImageCountList = new ObservableCollection<PageViewImageCount>
+            {
+                new PageViewImageCount { DispImageCount = "10" },
+                new PageViewImageCount { DispImageCount = "20" },
+                new PageViewImageCount { DispImageCount = "30" },
+                new PageViewImageCount { DispImageCount = "50" },
+                new PageViewImageCount { DispImageCount = "100" }
+            };
+
+            SelectedPageViewImageCount = PageViewImageCountList[2];
+            ThumbnailModel.OnePageItemCount = SelectedPageViewImageCount.ImageCount;
+
             await Refresh();
         }
 
@@ -352,25 +365,18 @@ namespace Rialto.ViewModels
         /// <summary>
         /// タグツリーから検索する
         /// </summary>
-        public void SearchTag()
+        public async void SearchTag()
         {
             if (SearchTagText.Count() > 0)
             {
-                TaggingModel.InitTagTree((x) => x.TAG_NAME.IndexOf(SearchTagText) >= 0);
+                await TaggingModel.InitTagTree((x) => x.TAG_NAME.IndexOf(SearchTagText) >= 0);
             }
-        }
-        #endregion
-
-        /// <summary>
-        /// タグ検索テキストボックスが空になったら全タグを表示する
-        /// </summary>
-        public async void SearchTagTextChanged()
-        {
-            if (SearchTagText.Count() == 0)
+            else
             {
                 await TaggingModel.InitTagTree();
             }
         }
+        #endregion
 
         #region AddItemsCommand
         private ListenerCommand<IList<Uri>> _AddItemsCommand;
@@ -487,6 +493,44 @@ namespace Rialto.ViewModels
         public async void ShowNextPage()
         {
             await ThumbnailModel.GoToNextPage();
+        }
+
+
+        /// <summary>
+        /// サムネイル上で選択した画像リスト
+        /// </summary>
+        private ObservableCollection<PageViewImageCount> PageViewImageCountList_ = new ObservableCollection<PageViewImageCount>();
+        public ObservableCollection<PageViewImageCount> PageViewImageCountList
+        {
+            get
+            {
+                return PageViewImageCountList_;
+            }
+            set
+            {
+                PageViewImageCountList_ = value;
+                RaisePropertyChanged(() => PageViewImageCountList);
+            }
+        }
+
+        private PageViewImageCount SelectedPageViewImageCount_;
+        public PageViewImageCount SelectedPageViewImageCount
+        {
+            get
+            {
+                return SelectedPageViewImageCount_;
+            }
+            set
+            {
+                SelectedPageViewImageCount_ = value;
+                RaisePropertyChanged(() => SelectedPageViewImageCount);
+            }
+        }
+
+        public async void PageViewImageCountSelectionChanged()
+        {
+            ThumbnailModel.OnePageItemCount = SelectedPageViewImageCount.ImageCount;
+            await ThumbnailModel.Refresh();
         }
     }
 }

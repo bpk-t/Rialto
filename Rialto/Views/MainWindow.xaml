@@ -139,12 +139,6 @@
                     <TextBox.InputBindings>
                         <KeyBinding Key="Enter" Command="{Binding SearchTagCommand}" />
                     </TextBox.InputBindings>
-
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="TextChanged">
-                            <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="SearchTagTextChanged"/>
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
                 </TextBox>
 
                 <TreeView Name="TagTreeList" Grid.Row="1" Margin="5" ItemsSource="{Binding TagTreeItems}">
@@ -193,11 +187,18 @@
                     </ComboBox>
 
                     <!-- 1ページの表示画像枚数 -->
-                    <ComboBox Grid.Column="2" Margin="5">
-                        <ComboBoxItem>10</ComboBoxItem>
-                        <ComboBoxItem>20</ComboBoxItem>
-                        <ComboBoxItem>30</ComboBoxItem>
-                        <ComboBoxItem>50</ComboBoxItem>
+                    <ComboBox Grid.Column="2" Margin="5" ItemsSource="{Binding PageViewImageCountList}" SelectedItem="{Binding SelectedPageViewImageCount}" SelectedValuePath="DispImageCount">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding DispImageCount}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="PageViewImageCountSelectionChanged"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
                     </ComboBox>
                 </Grid>
                 
@@ -286,7 +287,7 @@
                         <Button>
                             <Button.Template>
                                 <ControlTemplate TargetType="{x:Type Button}">
-                                    <Image Width="300" Height="300" Source="{Binding SideImage}"></Image>
+                                    <Image MinWidth="300" MinHeight="300" Source="{Binding SideImage}"></Image>
                                 </ControlTemplate>
                             </Button.Template>
 
@@ -297,7 +298,7 @@
                             </i:Interaction.Triggers>
                         </Button>
                     </Border>
-                    <DockPanel DockPanel.Dock="Left" Margin="5">
+                    <DockPanel DockPanel.Dock="Left" Margin="5" MinWidth="100">
                         <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Stretch">既存のタグ</TextBlock>
                         <ListView DockPanel.Dock="Top" ItemsSource="{Binding SelectedItemHaveTags}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                             <ListView.ItemTemplate>
@@ -308,6 +309,7 @@
                         </ListView>
                     </DockPanel>
                 </DockPanel>
+                
 
                 <!-- タグ設定タブ -->
                 <TabControl x:Name="tabControl" Grid.Row="1" Margin="5" ItemsSource="{Binding TabPanels}">

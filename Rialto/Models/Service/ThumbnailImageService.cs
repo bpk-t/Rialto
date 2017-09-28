@@ -49,7 +49,7 @@ namespace Rialto.Models.Service
         private long currentTagId = TagConstant.ALL_TAG_ID;
         private Order currentImageOrder = Order.Desc;
         private int currentPage = 0;
-        public int OnePageItemCount { get; } = 30;
+        public int OnePageItemCount { get; set; }
 
         public event Action<string> OnChangePage;
 
@@ -65,6 +65,13 @@ namespace Rialto.Models.Service
             return thumbnailImageActor.Ask<bool>(message);
         }
 
+        public async Task Refresh()
+        {
+            var message = new ThumbnailImageActor.GotToPage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
+            (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
+            SetThumbnailImages(allCount, images);
+        }
+
         public async Task GoToNextPage()
         {
             if (await ExistsNextPage())
@@ -72,10 +79,7 @@ namespace Rialto.Models.Service
                 currentPage++;
                 var message = new ThumbnailImageActor.GotToPage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
                 (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
-
-                ThumbnailImgList.Clear();
-                images.ForEach(x => ThumbnailImgList.Add(x));
-                OnChangePage($"{currentPage}/{allCount/OnePageItemCount}");
+                SetThumbnailImages(allCount, images);
             }
             // TODO 行き詰まり処理
         }
@@ -87,10 +91,7 @@ namespace Rialto.Models.Service
                 currentPage--;
                 var message = new ThumbnailImageActor.GotToPage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
                 (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
-
-                ThumbnailImgList.Clear();
-                images.ForEach(x => ThumbnailImgList.Add(x));
-                OnChangePage($"{currentPage}/{allCount / OnePageItemCount}");
+                SetThumbnailImages(allCount, images);
             }
             // TODO 行き詰まり処理
         }
@@ -100,9 +101,7 @@ namespace Rialto.Models.Service
             currentPage = 0;
             var message = new ThumbnailImageActor.GotToPage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
             (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
-            ThumbnailImgList.Clear();
-            images.ForEach(x => ThumbnailImgList.Add(x));
-            OnChangePage($"{currentPage}/{allCount / OnePageItemCount}");
+            SetThumbnailImages(allCount, images);
         }
 
         public async Task ShowThumbnailImage(long tagId)
@@ -113,9 +112,7 @@ namespace Rialto.Models.Service
 
             var message = new ThumbnailImageActor.GotToPage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
             (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
-            ThumbnailImgList.Clear();
-            images.ForEach(x => ThumbnailImgList.Add(x));
-            OnChangePage($"{currentPage}/{allCount / OnePageItemCount}");
+            SetThumbnailImages(allCount, images);
         }
 
         public async Task Shuffle()
@@ -137,6 +134,13 @@ namespace Rialto.Models.Service
             (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
             ThumbnailImgList.Clear();
             images.ForEach(x => ThumbnailImgList.Add(x));
+        }
+
+        private void SetThumbnailImages(long allCount, List<ImageInfo> images)
+        {
+            ThumbnailImgList.Clear();
+            images.ForEach(x => ThumbnailImgList.Add(x));
+            OnChangePage($"{currentPage}/{allCount / OnePageItemCount}");
         }
 
         class ThumbnailImageActor : ReceiveActor
