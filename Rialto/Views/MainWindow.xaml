@@ -282,8 +282,14 @@
                 </Grid.RowDefinitions>
 
                 <!-- 画像情報エリア -->
-                <DockPanel Grid.Row="0">
-                    <Border DockPanel.Dock="Left" BorderThickness="2" BorderBrush="LightBlue" Margin="5">
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="1*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" BorderThickness="2" BorderBrush="LightBlue" Margin="5">
                         <Button>
                             <Button.Template>
                                 <ControlTemplate TargetType="{x:Type Button}">
@@ -298,7 +304,10 @@
                             </i:Interaction.Triggers>
                         </Button>
                     </Border>
-                    <DockPanel DockPanel.Dock="Left" Margin="5" MinWidth="100">
+
+                    <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center"/>
+
+                    <DockPanel Grid.Column="2" Margin="5" MinWidth="100">
                         <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Stretch">既存のタグ</TextBlock>
                         <ListView DockPanel.Dock="Top" ItemsSource="{Binding SelectedItemHaveTags}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                             <ListView.ItemTemplate>
@@ -308,8 +317,7 @@
                             </ListView.ItemTemplate>
                         </ListView>
                     </DockPanel>
-                </DockPanel>
-                
+                </Grid>
 
                 <!-- タグ設定タブ -->
                 <TabControl x:Name="tabControl" Grid.Row="1" Margin="5" ItemsSource="{Binding TabPanels}">
