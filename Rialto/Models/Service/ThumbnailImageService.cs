@@ -80,8 +80,10 @@ namespace Rialto.Models.Service
                 var message = new ThumbnailImageActor.GotToPage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
                 (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
                 SetThumbnailImages(allCount, images);
+            } else
+            {
+                await GoToFirstPage();
             }
-            // TODO 行き詰まり処理
         }
 
         public async Task GoToPrevPage()
@@ -93,7 +95,6 @@ namespace Rialto.Models.Service
                 (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
                 SetThumbnailImages(allCount, images);
             }
-            // TODO 行き詰まり処理
         }
 
         public async Task GoToFirstPage()
