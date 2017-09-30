@@ -9,7 +9,7 @@ namespace Rialto.Models.DAO.Table
 {
     public class TAG : TableDefinition
     {
-        public TAG() : base(nameof(TAG))
+        private TAG() : base(nameof(TAG))
         {
         }
 

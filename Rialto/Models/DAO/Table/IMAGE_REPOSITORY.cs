@@ -9,7 +9,7 @@ namespace Rialto.Models.DAO.Table
 {
     public class IMAGE_REPOSITORY : TableDefinition
     {
-        public IMAGE_REPOSITORY() : base(nameof(IMAGE_REPOSITORY))
+        private IMAGE_REPOSITORY() : base(nameof(IMAGE_REPOSITORY))
         {
         }
 

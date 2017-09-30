@@ -9,7 +9,7 @@ namespace Rialto.Models.DAO.Table
 {
     public class REGISTER_IMAGE : TableDefinition
     {
-        public REGISTER_IMAGE() : base(nameof(REGISTER_IMAGE))
+        private REGISTER_IMAGE() : base(nameof(REGISTER_IMAGE))
         {
         }
 
@@ -31,5 +31,25 @@ namespace Rialto.Models.DAO.Table
         public static readonly ColumnDefinition CREATED_AT = new ColumnDefinition(ThisTable, nameof(CREATED_AT));
         public static readonly ColumnDefinition UPDATED_AT = new ColumnDefinition(ThisTable, nameof(UPDATED_AT));
 
+        public static string[] Columns()
+        {
+            return new string[]
+            {
+                ID.ToSqlString(),
+                FILE_SIZE.ToSqlString(),
+                FILE_NAME.ToSqlString(),
+                FILE_EXTENSION.ToSqlString(),
+                FILE_PATH.ToSqlString(),
+                MD5_HASH.ToSqlString(),
+                AVE_HASH.ToSqlString(),
+                IMAGE_REPOSITORY_ID.ToSqlString(),
+                HEIGHT_PIX.ToSqlString(),
+                WIDTH_PIX.ToSqlString(),
+                DO_GET.ToSqlString(),
+                DELETE_TIMESTAMP.ToSqlString(),
+                CREATED_AT.ToSqlString(),
+                UPDATED_AT.ToSqlString(),
+            };
+        }
     }
 }

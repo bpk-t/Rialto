@@ -13,18 +13,32 @@ namespace Rialto.Models
     {
         private static readonly int PIC_SIZE = 16;
 
-        public static void Insert(long IMGINF_ID)
+        public static void Insert(long registerImageId)
         {
-            M_IMAGE_INFORepository.FindById(IMGINF_ID).Match(
+            RegisterImageRepository.FindById(registerImageId).Match(
                 (some) =>
                 {
                     T_AVEHASHRepository.Insert(new T_AVEHASH()
                     {
-                        IMGINF_ID = IMGINF_ID,
-                        AVEHASH = ComputeAveHash(some.FILE_PATH)
+                        IMGINF_ID = registerImageId,
+                        AVEHASH = ComputeAveHash(some.FilePath)
                     });
                 },
                 () => { });
+
+            /*
+        M_IMAGE_INFORepository.FindById(IMGINF_ID).Match(
+            (some) =>
+            {
+                T_AVEHASHRepository.Insert(new T_AVEHASH()
+                {
+                    IMGINF_ID = IMGINF_ID,
+                    AVEHASH = ComputeAveHash(some.FILE_PATH)
+                });
+            },
+            () => { });
+
+*/
         }
 
         private static string ComputeAveHash(string imgPath)

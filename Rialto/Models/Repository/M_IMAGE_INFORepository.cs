@@ -10,12 +10,13 @@ using Dapper;
 using Rialto.Models.DAO.Entity;
 using LangExt;
 using System.Diagnostics;
+using System.Dynamic;
 
 namespace Rialto.Models.Repository
 {
     public class M_IMAGE_INFORepository
     {
-
+        /*
         public static long GetAllCount()
         {
             using (var con = DBHelper.Instance.GetDbConnection())
@@ -121,7 +122,9 @@ namespace Rialto.Models.Repository
          , param: new { TAGINF_ID = tagId });
             }
         }
+        */
 
+            /*
         public static Option<M_IMAGE_INFO> FindByHash(string hash)
         {
             using (var con = DBHelper.Instance.GetDbConnection())
@@ -133,7 +136,9 @@ namespace Rialto.Models.Repository
                 return Option.Create(con.Query(query.ToSqlString(), new { HASH_VALUE = hash }).FirstOrDefault());
             }
         }
+        */
 
+            /*
         public static Option<M_IMAGE_INFO> FindById(long id)
         {
             using (var con = DBHelper.Instance.GetDbConnection())
@@ -145,40 +150,47 @@ namespace Rialto.Models.Repository
                 return Option.Create(con.Query(query.ToSqlString(), new { IMGINF_ID = id }).FirstOrDefault());
             }
         }
+        */
 
         public static M_IMAGE_INFO Insert(M_IMAGE_INFO info)
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
-                var tran = con.BeginTransaction();
-                con.Execute(
-                   @"INSERT INTO M_IMAGE_INFO(
+                using(var tran = con.BeginTransaction()) {
+
+                    dynamic queryParam = new ExpandoObject();
+                    queryParam.SetValue("", "");
+
+                    con.Execute(
+   @"INSERT INTO M_IMAGE_INFO(
 FILE_SIZE,FILE_NAME,FILE_TYPE,HASH_VALUE,FILE_PATH,HEIGHT_PIX,WIDTH_PIX,COLOR,DO_GET,DELETE_FLG,DELETE_REASON_ID,DELETE_DATE)
  VALUES(@FILE_SIZE,@FILE_NAME,@FILE_TYPE,@HASH_VALUE,@FILE_PATH,@HEIGHT_PIX,@WIDTH_PIX,@COLOR,@DO_GET,@DELETE_FLG,@DELETE_REASON_ID,@DELETE_DATE)",
-                   new
-                   {
-                       FILE_SIZE = info.FILE_SIZE,
-                       FILE_NAME = info.FILE_NAME,
-                       FILE_TYPE = info.FILE_TYPE,
-                       HASH_VALUE = info.HASH_VALUE,
-                       FILE_PATH = info.FILE_PATH,
-                       HEIGHT_PIX = info.HEIGHT_PIX,
-                       WIDTH_PIX = info.WIDTH_PIX,
-                       COLOR = info.COLOR,
-                       DO_GET = info.DO_GET,
-                       DELETE_FLG = info.DELETE_FLG,
-                       DELETE_REASON_ID = info.DELETE_REASON_ID,
-                       DELETE_DATE = info.DELETE_DATE
-                   });
+   new
+   {
+       FILE_SIZE = info.FILE_SIZE,
+       FILE_NAME = info.FILE_NAME,
+       FILE_TYPE = info.FILE_TYPE,
+       HASH_VALUE = info.HASH_VALUE,
+       FILE_PATH = info.FILE_PATH,
+       HEIGHT_PIX = info.HEIGHT_PIX,
+       WIDTH_PIX = info.WIDTH_PIX,
+       COLOR = info.COLOR,
+       DO_GET = info.DO_GET,
+       DELETE_FLG = info.DELETE_FLG,
+       DELETE_REASON_ID = info.DELETE_REASON_ID,
+       DELETE_DATE = info.DELETE_DATE
+   });
 
-                var selectQuery = QueryBuilder.Select()
-                    .From(M_IMAGE_INFO_DEF.ThisTable)
-                    .Where(ConditionBuilder.Eq("ROWID", SQLFunctionBuilder.LastInsertLowId().ToSqlString()));
-                var inserted = con.Query<M_IMAGE_INFO>(selectQuery.ToSqlString()).First();
+                    var selectQuery = QueryBuilder.Select()
+                        .From(M_IMAGE_INFO_DEF.ThisTable)
+                        .Where(ConditionBuilder.Eq("ROWID", SQLFunctionBuilder.LastInsertLowId().ToSqlString()));
+                    var inserted = con.Query<M_IMAGE_INFO>(selectQuery.ToSqlString()).First();
 
-                tran.Commit();
+                    tran.Commit();
 
-                return inserted;
+                    return inserted;
+                }
+
             }
         }
     }

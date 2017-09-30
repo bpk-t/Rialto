@@ -14,6 +14,7 @@ namespace Rialto.Models.DAO.Builder
         {
             get => Table.TableName + "." + ColumnName;
         }
+
         public ColumnDefinition(TableDefinition table, string column)
         {
             Table = table;

@@ -95,7 +95,8 @@ namespace Rialto.Models
         private static bool ExistsDB(FileInfo file)
         {
             var hashValue = MD5Helper.GenerateMD5HashCodeFromFile(file.FullName);
-            return M_IMAGE_INFORepository.FindByHash(hashValue).IsSome;
+            return RegisterImageRepository.FindByHash(hashValue).IsSome;
+            //return M_IMAGE_INFORepository.FindByHash(hashValue).IsSome;
         }
 
         private static FileInfo CopyFile(FileInfo file, string destDir)

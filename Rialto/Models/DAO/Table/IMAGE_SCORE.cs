@@ -9,7 +9,7 @@ namespace Rialto.Models.DAO.Table
 {
     public class IMAGE_SCORE : TableDefinition
     {
-        public IMAGE_SCORE() : base(nameof(IMAGE_SCORE))
+        private IMAGE_SCORE() : base(nameof(IMAGE_SCORE))
         {
         }
 

@@ -124,6 +124,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Constant\TagConstant.cs" />
+    <Compile Include="Models\DAO\Builder\InsertQuery.cs" />
     <Compile Include="Models\DAO\Entity\ImageRepository.cs" />
     <Compile Include="Models\DAO\Entity\ImageScore.cs" />
     <Compile Include="Models\DAO\Entity\RegisterImage.cs" />

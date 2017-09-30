@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Dapper;
 using Rialto.Models.DAO.Entity;
+using LangExt;
 
 namespace Rialto.Models.Repository
 {
@@ -29,9 +30,10 @@ namespace Rialto.Models.Repository
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
+                // TODO 
                 Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
 
-                var query = QueryBuilder.Select()
+                var query = QueryBuilder.Select(REGISTER_IMAGE.Columns())
                     .From(REGISTER_IMAGE.ThisTable)
                     .Where(REGISTER_IMAGE.DELETE_TIMESTAMP.IsNull())
                     .OrderBy(REGISTER_IMAGE.ID, order)
@@ -60,7 +62,10 @@ namespace Rialto.Models.Repository
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
-                var query = QueryBuilder.Select()
+                // TODO 
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+                var query = QueryBuilder.Select(REGISTER_IMAGE.Columns())
                     .From(REGISTER_IMAGE.ThisTable)
                     .Where(REGISTER_IMAGE.DELETE_TIMESTAMP.IsNull())
                     .Where(ConditionBuilder.NotExists(
@@ -93,7 +98,10 @@ namespace Rialto.Models.Repository
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
-                var query = QueryBuilder.Select()
+                // TODO 
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+                var query = QueryBuilder.Select(REGISTER_IMAGE.Columns())
                     .From(REGISTER_IMAGE.ThisTable)
                     .InnerJoin(TAG_ASSIGN.ThisTable, REGISTER_IMAGE.ID.Eq(TAG_ASSIGN.REGISTER_IMAGE_ID))
                     .InnerJoin(TAG.ThisTable, TAG_ASSIGN.TAG_ID.Eq(TAG.ID))
@@ -104,6 +112,77 @@ namespace Rialto.Models.Repository
                     .Offset(offset);
 
                 return con.Query<RegisterImage>(query.ToSqlString(), param: new { TAG_ID = tagId });
+            }
+        }
+
+        public static Option<RegisterImage> FindByHash(string hash)
+        {
+            using (var con = DBHelper.Instance.GetDbConnection())
+            {
+                var query = QueryBuilder.Select()
+                    .From(REGISTER_IMAGE.ThisTable)
+                    .Where(ConditionBuilder.Eq(SQLFunctionBuilder.Trim(REGISTER_IMAGE.MD5_HASH).ToSqlString(), "@HASH_VALUE"));
+
+                return Option.Create(con.Query(query.ToSqlString(), new { HASH_VALUE = hash }).FirstOrDefault());
+            }
+        }
+
+        public static Option<RegisterImage> FindById(long id)
+        {
+            using (var con = DBHelper.Instance.GetDbConnection())
+            {
+                var query = QueryBuilder.Select()
+                    .From(REGISTER_IMAGE.ThisTable)
+                    .Where(REGISTER_IMAGE.ID.Eq("@ID"));
+
+                return Option.Create(con.Query(query.ToSqlString(), new { ID = id }).FirstOrDefault());
+            }
+        }
+
+        public static Option<RegisterImage> Insert(RegisterImage info)
+        {
+            using (var con = DBHelper.Instance.GetDbConnection())
+            {
+                using (var tran = con.BeginTransaction())
+                {
+                    var query = QueryBuilder.Insert().Into(REGISTER_IMAGE.ThisTable)
+                        .Set(REGISTER_IMAGE.FILE_SIZE, info.FileSize)
+                        .Set(REGISTER_IMAGE.FILE_NAME, info.FileName)
+                        .Set(REGISTER_IMAGE.FILE_EXTENSION, info.FileExtension)
+                        .Set(REGISTER_IMAGE.FILE_PATH, info.FilePath)
+                        .Set(REGISTER_IMAGE.MD5_HASH, info.Md5Hash)
+                        .Set(REGISTER_IMAGE.AVE_HASH, info.AveHash)
+                        .Set(REGISTER_IMAGE.HEIGHT_PIX, info.HeightPix)
+                        .Set(REGISTER_IMAGE.WIDTH_PIX, info.WidthPix)
+                        .Set(REGISTER_IMAGE.DO_GET, info.DoGet)
+                        .Set(REGISTER_IMAGE.DELETE_TIMESTAMP, info.DeleteTimestamp);
+
+                    var queryParams = new
+                    {
+                        FILE_SIZE = info.FileSize,
+                        FILE_NAME = info.FileName,
+                        FILE_EXTENSION = info.FileExtension,
+                        FILE_PATH = info.FilePath,
+                        MD5_HASH = info.Md5Hash,
+                        AVE_HASH = info.AveHash,
+                        HEIGHT_PIX = info.HeightPix,
+                        WIDTH_PIX = info.WidthPix,
+                        DO_GET = info.DoGet,
+                        DELETE_TIMESTAMP = info.DeleteTimestamp
+                    };
+
+                    con.Execute(query.ToSqlString(), queryParams);
+
+                    var selectQuery = QueryBuilder.Select()
+                        .From(M_IMAGE_INFO_DEF.ThisTable)
+                        .Where(ConditionBuilder.Eq("ROWID", SQLFunctionBuilder.LastInsertLowId().ToSqlString()));
+                    var inserted = con.Query<RegisterImage>(selectQuery.ToSqlString()).FirstOrDefault();
+
+                    tran.Commit();
+
+                    return Option.Create(inserted);
+                }
+
             }
         }
     }

@@ -9,7 +9,7 @@ namespace Rialto.Models.DAO.Table
 {
     public class VIEW_HISTORY : TableDefinition
     {
-        public VIEW_HISTORY() : base(nameof(VIEW_HISTORY))
+        private VIEW_HISTORY() : base(nameof(VIEW_HISTORY))
         {
         }
 

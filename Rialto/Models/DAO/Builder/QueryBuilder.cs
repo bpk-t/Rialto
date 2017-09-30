@@ -1,5 +1,4 @@
-﻿using Rialto.Models.DAO.Table;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -30,37 +29,10 @@ namespace Rialto.Models.DAO.Builder
         {
             return new SelectQuery().Select(columns);
         }
-    }
 
-    public class InsertQuery : QueryParts
-    {
-        private string tableName;
-
-        public InsertQuery Into(string tableName)
+        public static InsertQuery Insert()
         {
-            this.tableName = tableName;
-            return this;
-        }
-
-        public InsertQuery Into(TableDefinition table)
-        {
-            this.tableName = table.TableName;
-            return this;
-        }
-
-        public InsertQuery Set(string column, string value)
-        {
-            return this;
-        }
-
-        public InsertQuery Set(ColumnDefinition column, string value)
-        {
-            return this;
-        }
-
-        public string ToSqlString()
-        {
-            throw new NotImplementedException();
+            return new InsertQuery();
         }
     }
 }

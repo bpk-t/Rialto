@@ -9,7 +9,7 @@ namespace Rialto.Models.DAO.Table
 {
     public class TAG_GROUP_ASSIGN : TableDefinition
     {
-        public TAG_GROUP_ASSIGN() : base(nameof(TAG_GROUP_ASSIGN))
+        private TAG_GROUP_ASSIGN() : base(nameof(TAG_GROUP_ASSIGN))
         {
         }
 
