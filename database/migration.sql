@@ -41,7 +41,7 @@ select * from register_image;
 
 INSERT INTO "image_repository" ( 
   "id"
-  , "repository_path"
+  , "path"
   , "created_at"
   , "updated_at"
 ) 

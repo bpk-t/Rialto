@@ -124,6 +124,14 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Constant\TagConstant.cs" />
+    <Compile Include="Models\DAO\Entity\ImageRepository.cs" />
+    <Compile Include="Models\DAO\Entity\ImageScore.cs" />
+    <Compile Include="Models\DAO\Entity\RegisterImage.cs" />
+    <Compile Include="Models\DAO\Entity\Tag.cs" />
+    <Compile Include="Models\DAO\Entity\TagAssign.cs" />
+    <Compile Include="Models\DAO\Entity\TagGroup.cs" />
+    <Compile Include="Models\DAO\Entity\TagGroupAssign.cs" />
+    <Compile Include="Models\DAO\Entity\ViewHistory.cs" />
     <Compile Include="Models\DAO\Table\M_TABSETTING_DEF.cs" />
     <Compile Include="Models\DAO\Table\M_TAGADDTAB_DEF.cs" />
     <Compile Include="Models\DataModel\PageViewImageCount.cs" />

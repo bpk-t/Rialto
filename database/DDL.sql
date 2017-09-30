@@ -22,7 +22,7 @@ CREATE TABLE "register_image" (
 drop table image_repository;
 CREATE TABLE "image_repository" ( 
   `id` INTEGER PRIMARY KEY AUTOINCREMENT
-  , repository_path TEXT
+  , `path` TEXT
   , `created_at` TIMESTAMP DEFAULT (datetime('now', 'localtime'))
   , `updated_at` TIMESTAMP DEFAULT (datetime('now', 'localtime'))
 );
