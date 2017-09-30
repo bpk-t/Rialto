@@ -12,7 +12,7 @@ INSERT INTO "register_image" (
   , "height_pix"
   , "width_pix"
   , "do_get"
-  , "delete_date"
+  , "delete_timestamp"
   , "created_at"
   , "updated_at"
 ) 

@@ -49,9 +49,11 @@ namespace Rialto.Models.DAO.Builder
 
         public static Condition Like(string operand1, string operand2) => new ConditionLike(operand1, operand2);
 
-
         public static Condition Exists(SelectQuery query) => new ExistsCondition(query);
         public static Condition NotExists(SelectQuery query) => new NotExistsCondition(query);
+
+        public static Condition IsNull(string operand) => new ConditionIsNull(operand);
+        public static Condition IsNotNull(string operand) => new ConditionIsNotNull(operand);
     }
 
     public abstract class Condition : QueryParts
@@ -116,6 +118,29 @@ namespace Rialto.Models.DAO.Builder
         public ConditionLike(string operand1, string operand2) : base(operand1, operand2) { }
         public override string ToSqlString() => $"({Operand1} LIKE {Operand2})";
     }
+
+    public class ConditionIsNull : Condition
+    {
+        public string Operand { get; }
+        public ConditionIsNull(string operand)
+        {
+            Operand = operand;
+        }
+
+        public override string ToSqlString() => $"({Operand} IS NULL)";
+    }
+
+    public class ConditionIsNotNull : Condition
+    {
+        public string Operand { get; }
+        public ConditionIsNotNull(string operand)
+        {
+            Operand = operand;
+        }
+
+        public override string ToSqlString() => $"({Operand} IS NOT NULL)";
+    }
+
 
     public class And : Condition
     {

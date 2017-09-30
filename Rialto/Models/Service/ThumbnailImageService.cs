@@ -225,10 +225,19 @@ namespace Rialto.Models.Service
                     ThumbnailImageFilePath = GetThumbnailImage(image.FILE_PATH, image.HASH_VALUE),
                     SourceImageFilePath = new Uri(Path.Combine(Properties.Settings.Default.ImgDataDirectory, image.FILE_PATH))
                 };
-                
+
+                ImageInfo RegisterImageToImageInfo(RegisterImage image) => new ImageInfo()
+                {
+                    ImgID = image.Id,
+                    ThumbnailImageFilePath = GetThumbnailImage(image.FilePath, image.Md5Hash),
+                    SourceImageFilePath = new Uri(Path.Combine(Properties.Settings.Default.ImgDataDirectory, image.FilePath))
+                };
+
                 if (tagId == TagConstant.ALL_TAG_ID)
                 {
-                    var list = M_IMAGE_INFORepository.GetAll(offset, limit, imageOrder).Select(x => ToImageInfo(x)).ToList();
+                    //var list = M_IMAGE_INFORepository.GetAll(offset, limit, imageOrder).Select(x => ToImageInfo(x)).ToList();
+
+                    var list = RegisterImageRepository.GetAll(offset, limit, imageOrder).Select(x => RegisterImageToImageInfo(x)).ToList();
                     var count = M_IMAGE_INFORepository.GetAllCount();
                     return (count, list);
                 }

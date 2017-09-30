@@ -20,7 +20,7 @@ namespace Rialto.Models.DAO.Entity
         public int WidthPix { get; set; }
         
         public int DoGet { get; set; }
-        public DateTime? DeleteDate { get; set; }
+        public DateTime? DeleteTimestamp { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
     }

@@ -29,5 +29,8 @@ namespace Rialto.Models.DAO.Builder
         public Condition NotEq(string operand2) => new ConditionNotEq(this.ToSqlString(), operand2);
         public Condition NotEq(Literal operand2) => new ConditionNotEq(this.ToSqlString(), operand2.ToSqlString());
         public Condition NotEq(ColumnDefinition operand2) => new ConditionNotEq(this.ToSqlString(), operand2.ToSqlString());
+
+        public Condition IsNull() => new ConditionIsNull(this.ToSqlString());
+        public Condition IsNotNull() => new ConditionIsNotNull(this.ToSqlString());
     }
 }

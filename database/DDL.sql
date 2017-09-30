@@ -14,7 +14,7 @@ CREATE TABLE "register_image" (
   , `height_pix` INTEGER NOT NULL
   , `width_pix` INTEGER NOT NULL
   , `do_get` INTEGER
-  , `delete_date` TIMESTAMP
+  , `delete_timestamp` TIMESTAMP
   , `created_at` TIMESTAMP DEFAULT (datetime('now', 'localtime'))
   , `updated_at` TIMESTAMP DEFAULT (datetime('now', 'localtime'))
 );
