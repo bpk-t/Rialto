@@ -205,27 +205,20 @@ namespace Rialto.Models.Service
             {
                 if (tagId == TagConstant.ALL_TAG_ID)
                 {
-                    return M_IMAGE_INFORepository.GetAllCount();
+                    return RegisterImageRepository.GetAllCount();
                 }
                 else if (tagId == TagConstant.NOTAG_TAG_ID)
                 {
-                    return M_IMAGE_INFORepository.GetNoTagCount();
+                    return RegisterImageRepository.GetNoTagCount();
                 }
                 else
                 {
-                    return M_IMAGE_INFORepository.GetByTagCount(tagId);
+                    return RegisterImageRepository.GetByTagCount(tagId);
                 }
             }
 
             private (long allCount, List<ImageInfo> imgList) GetThumbnailImage(long tagId, long offset, long limit, Order imageOrder)
             {
-                ImageInfo ToImageInfo(M_IMAGE_INFO image) => new ImageInfo()
-                {
-                    ImgID = image.IMGINF_ID.Value,
-                    ThumbnailImageFilePath = GetThumbnailImage(image.FILE_PATH, image.HASH_VALUE),
-                    SourceImageFilePath = new Uri(Path.Combine(Properties.Settings.Default.ImgDataDirectory, image.FILE_PATH))
-                };
-
                 ImageInfo RegisterImageToImageInfo(RegisterImage image) => new ImageInfo()
                 {
                     ImgID = image.Id,
@@ -235,22 +228,20 @@ namespace Rialto.Models.Service
 
                 if (tagId == TagConstant.ALL_TAG_ID)
                 {
-                    //var list = M_IMAGE_INFORepository.GetAll(offset, limit, imageOrder).Select(x => ToImageInfo(x)).ToList();
-
                     var list = RegisterImageRepository.GetAll(offset, limit, imageOrder).Select(x => RegisterImageToImageInfo(x)).ToList();
-                    var count = M_IMAGE_INFORepository.GetAllCount();
+                    var count = RegisterImageRepository.GetAllCount();
                     return (count, list);
                 }
                 else if (tagId == TagConstant.NOTAG_TAG_ID)
                 {
-                    var list = M_IMAGE_INFORepository.GetNoTag(offset, limit, imageOrder).Select(x => ToImageInfo(x)).ToList();
-                    var count = M_IMAGE_INFORepository.GetNoTagCount();
+                    var list = RegisterImageRepository.GetNoTag(offset, limit, imageOrder).Select(x => RegisterImageToImageInfo(x)).ToList();
+                    var count = RegisterImageRepository.GetNoTagCount();
                     return (count, list);
                 }
                 else
                 {
-                    var list = M_IMAGE_INFORepository.GetByTag(tagId, offset, limit, imageOrder).Select(x => ToImageInfo(x)).ToList();
-                    var count = M_IMAGE_INFORepository.GetByTagCount(tagId);
+                    var list = RegisterImageRepository.GetByTag(tagId, offset, limit, imageOrder).Select(x => RegisterImageToImageInfo(x)).ToList();
+                    var count = RegisterImageRepository.GetByTagCount(tagId);
                     return (count, list);
                 }
             }

@@ -33,16 +33,6 @@ namespace Rialto.Models.Repository
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
-                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-                var list = con.Query<RegisterImage>("select * from register_image limit 1");
-                Debug.WriteLine("************************************************");
-                Debug.WriteLine(list.ToList()[0].Id);
-                Debug.WriteLine(list.ToList()[0].FileName);
-                Debug.WriteLine(list.ToList()[0].FilePath);
-                Debug.WriteLine(list.ToList()[0].CreatedAt);
-                Debug.WriteLine(list.ToList()[0].UpdatedAt);
-                Debug.WriteLine("************************************************");
-
                 var query = QueryBuilder.Select()
                     .From(M_IMAGE_INFO_DEF.ThisTable)
                     .InnerJoin(T_AVEHASH_DEF.ThisTable, M_IMAGE_INFO_DEF.IMGINF_ID.Eq(T_AVEHASH_DEF.IMGINF_ID))
