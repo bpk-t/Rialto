@@ -49,12 +49,12 @@ namespace Rialto.Models.Service
                         ClickEvent = (ev) =>
                         {
                             selectedThumbnailImgList.ForEach(x =>
-                                T_ADD_TAGRepository.Insert(
-                                    new T_ADD_TAG()
-                                    {
-                                        IMGINF_ID = x.ImgID,
-                                        TAGINF_ID = ev.TagInfId
-                                    }));
+                            TagRepository.InsertTagAssign(
+                                new TagAssign
+                                {
+                                    RegisterImageId = x.ImgID,
+                                    TagId = ev.TagInfId
+                                }));
                         }
                     })
                     .ForEach(x => tabInfo.Buttons.Add(x));

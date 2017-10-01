@@ -5,7 +5,7 @@ namespace Rialto.Model.DataModel
 {
     public class TagAddButtonInfo
     {
-        public long? TagInfId { get; set; }
+        public int TagInfId { get; set; }
 
         /// <summary>
         /// ボタン名称

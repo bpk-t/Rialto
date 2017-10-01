@@ -123,6 +123,7 @@ namespace Rialto.Models.Repository
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
                 var query = QueryBuilder.Select(TAG_GROUP.Columns())
                     .Select(TAG.Columns())
                     .From(TAG_GROUP.ThisTable)
@@ -136,6 +137,40 @@ namespace Rialto.Models.Repository
                 return result.Read((TagGroup tagGroup, Tag tag) => (tagGroup, tag))
                     .GroupBy(x => x.Item1, x => x.Item2, new CompareSelector<TagGroup, int>(x => x.Id))
                     .ToDictionary(x => x.Key, x => x.ToList());
+            }
+        }
+
+        public static void InsertTagAssign(TagAssign insertObj)
+        {
+            using (var con = DBHelper.Instance.GetDbConnection())
+            {
+                var query = QueryBuilder.Insert().Into(TAG_ASSIGN.ThisTable)
+                    .Set(TAG_ASSIGN.REGISTER_IMAGE_ID, insertObj.RegisterImageId)
+                    .Set(TAG_ASSIGN.TAG_ID, insertObj.TagId);
+
+                var queryParam = new
+                {
+                    REGISTER_IMAGE_ID = insertObj.RegisterImageId,
+                    TAG_ID = insertObj.TagId,
+                };
+
+                con.Execute(query.ToSqlString(), queryParam);
+            }
+        }
+
+        public static IEnumerable<Tag> GetTagByImageAssigned(long imgId)
+        {
+            using (var con = DBHelper.Instance.GetDbConnection())
+            {
+                Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+
+                var query = QueryBuilder.Select(TAG.Columns())
+                    .From(TAG.ThisTable)
+                    .InnerJoin(TAG_ASSIGN.ThisTable, TAG.ID.Eq(TAG_ASSIGN.TAG_ID))
+                    .Where(TAG_ASSIGN.REGISTER_IMAGE_ID.Eq(imgId.ToString()))
+                    .OrderBy(TAG_ASSIGN.CREATED_AT, Order.Asc);
+
+                return con.Query<Tag>(query.ToSqlString());
             }
         }
     }

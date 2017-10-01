@@ -1,6 +1,6 @@
 ﻿using Livet;
 using Rialto.Model.DataModel;
-using Rialto.Models.DAO.Custom;
+using Rialto.Models.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,16 +28,18 @@ namespace Rialto.Models.Service
         public void GetAllocatedTags(long IMGINF_ID)
         {
             if (ItemHaveTags.Count > 0) { ItemHaveTags.Clear(); }
-            
-            ImageHasTags.FindByImgId(IMGINF_ID).ForEach(x =>
+
+            TagRepository.GetTagByImageAssigned(IMGINF_ID).ForEach(x =>
+            {
                 ItemHaveTags.Add(new TagMasterInfo()
                 {
-                    ID = x.TAGINF_ID.Value,
-                    Name = x.TAG_NAME,
-                    Define = x.TAG_DEFINE,
-                    CreatedAt = x.CREATE_LINE_DATE,
-                    UpdatedAt = x.UPDATE_LINE_DATE
-                }));
+                    ID = x.Id,
+                    Name = x.Name,
+                    Description = x.Description,
+                    CreatedAt = x.CreatedAt,
+                    UpdatedAt = x.UpdatedAt
+                });
+            });
         }
     }
 }

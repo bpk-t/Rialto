@@ -18,27 +18,15 @@ namespace Rialto.Models
             RegisterImageRepository.FindById(registerImageId).Match(
                 (some) =>
                 {
+                    /*
                     T_AVEHASHRepository.Insert(new T_AVEHASH()
                     {
                         IMGINF_ID = registerImageId,
                         AVEHASH = ComputeAveHash(some.FilePath)
                     });
+                    */
                 },
                 () => { });
-
-            /*
-        M_IMAGE_INFORepository.FindById(IMGINF_ID).Match(
-            (some) =>
-            {
-                T_AVEHASHRepository.Insert(new T_AVEHASH()
-                {
-                    IMGINF_ID = IMGINF_ID,
-                    AVEHASH = ComputeAveHash(some.FILE_PATH)
-                });
-            },
-            () => { });
-
-*/
         }
 
         private static string ComputeAveHash(string imgPath)
