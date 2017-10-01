@@ -15,8 +15,8 @@ namespace Rialto.ViewModels
     public class TagSettingWindowViewModel : ViewModel
     {
         #region Properties
-        private ObservableCollection<M_TAG_INFO> AllTags_ = new ObservableCollection<M_TAG_INFO>();
-        public ObservableCollection<M_TAG_INFO> AllTags
+        private ObservableCollection<Tag> AllTags_ = new ObservableCollection<Tag>();
+        public ObservableCollection<Tag> AllTags
         {
             get
             {
@@ -29,7 +29,7 @@ namespace Rialto.ViewModels
             }
         }
 
-        private ObservableCollection<M_TAG_INFO> _SelectedTags = new ObservableCollection<M_TAG_INFO>();
+        private ObservableCollection<Tag> _SelectedTags = new ObservableCollection<Tag>();
         public IList SelectedTags
         {
             get
@@ -39,7 +39,7 @@ namespace Rialto.ViewModels
             set
             {
                 _SelectedTags.Clear();
-                foreach (M_TAG_INFO elem in value)
+                foreach (Tag elem in value)
                 {
                     _SelectedTags.Add(elem);
                 }
@@ -80,7 +80,9 @@ namespace Rialto.ViewModels
         {
             Task.Run(() =>
             {
-                var list = M_TAG_INFORepository.GetAll();
+                //var list = M_TAG_INFORepository.GetAll();
+                var list = TagRepository.GetAllTag();
+
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     if (!AllTags.IsEmpty())
@@ -122,16 +124,16 @@ namespace Rialto.ViewModels
         {
             if (SelectedTags.Count > 0)
             {
-                var selectedTag = SelectedTags[0] as M_TAG_INFO;
-                TagNameText = selectedTag.TAG_NAME;
-                TagDefineText = selectedTag.TAG_DEFINE;
+                var selectedTag = SelectedTags[0] as Tag;
+                TagNameText = selectedTag.Name;
+                TagDefineText = selectedTag.Description;
             }
         }
 
         public void DeleteTag()
         {
-            var selectedTag = SelectedTags[0] as M_TAG_INFO;
-            M_TAG_INFORepository.DeleteById(selectedTag.TAGINF_ID.Value);
+            var selectedTag = SelectedTags[0] as Tag;
+            M_TAG_INFORepository.DeleteById(selectedTag.Id);
             Initialize();
         }
     }

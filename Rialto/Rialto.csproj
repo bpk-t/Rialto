@@ -125,6 +125,7 @@
     </ApplicationDefinition>
     <Compile Include="Constant\TagConstant.cs" />
     <Compile Include="Models\DAO\Builder\InsertQuery.cs" />
+    <Compile Include="Models\DAO\Builder\UpdateQuery.cs" />
     <Compile Include="Models\DAO\Entity\ImageRepository.cs" />
     <Compile Include="Models\DAO\Entity\ImageScore.cs" />
     <Compile Include="Models\DAO\Entity\RegisterImage.cs" />
@@ -148,6 +149,7 @@
     <Compile Include="Models\Repository\M_TAGADDTABRepository.cs" />
     <Compile Include="Models\Repository\M_TAG_INFORepository.cs" />
     <Compile Include="Models\Repository\RegisterImageRepository.cs" />
+    <Compile Include="Models\Repository\TagRepository.cs" />
     <Compile Include="Models\Repository\T_ADD_TAGRepository.cs" />
     <Compile Include="Models\Repository\T_AVEHASHRepository.cs" />
     <Compile Include="Models\Service\AllocatedTagsService.cs" />

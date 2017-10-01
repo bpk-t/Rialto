@@ -30,11 +30,14 @@ namespace Rialto.Models.Service
             await InitTagTree((_) => true);
         }
 
-        public Task InitTagTree(Func<M_TAG_INFO, bool> predicate)
+        public Task InitTagTree(Func<Tag, bool> predicate)
         {
             return Task.Run(() =>
             {
-                var list = M_TAG_INFORepository.GetAll();
+                //var list = M_TAG_INFORepository.GetAll();
+
+                var list = TagRepository.GetAllTag();
+
                 TagTreeItems.Clear();
                 TagTreeItems.Add(new TagTreeNode() {
                     ID = TagConstant.ALL_TAG_ID,
@@ -51,9 +54,9 @@ namespace Rialto.Models.Service
                 list.Where(predicate)
                     .Select((x) => new TagTreeNode()
                     {
-                        ID = x.TAGINF_ID.GetValueOrDefault(0),
-                        Name = x.TAG_NAME,
-                        ImageCount = x.IMG_COUNT
+                        ID = x.Id,
+                        Name = x.Name,
+                        ImageCount = x.AssignImageCount
                     }).ForEach(x => TagTreeItems.Add(x));
             });
         }

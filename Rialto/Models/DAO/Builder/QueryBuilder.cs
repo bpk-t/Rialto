@@ -34,5 +34,15 @@ namespace Rialto.Models.DAO.Builder
         {
             return new InsertQuery();
         }
+
+        public static UpdateQuery Update(string tableName)
+        {
+            return new UpdateQuery(tableName);
+        }
+
+        public static UpdateQuery Update(TableDefinition table)
+        {
+            return new UpdateQuery(table);
+        }
     }
 }

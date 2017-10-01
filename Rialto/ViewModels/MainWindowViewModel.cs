@@ -368,7 +368,8 @@ namespace Rialto.ViewModels
         {
             if (SearchTagText.Count() > 0)
             {
-                await tagMasterService.InitTagTree((x) => x.TAG_NAME.IndexOf(SearchTagText) >= 0);
+                //await tagMasterService.InitTagTree((x) => x.TAG_NAME.IndexOf(SearchTagText) >= 0);
+                await tagMasterService.InitTagTree((x) => x.Name.Contains(SearchTagText));
             }
             else
             {

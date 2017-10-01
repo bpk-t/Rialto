@@ -14,6 +14,7 @@ namespace Rialto.Models.Repository
 {
     public class M_TAG_INFORepository
     {
+        /*
         public static IEnumerable<M_TAG_INFO> GetAll()
         {
             using (var con = DBHelper.Instance.GetDbConnection())
@@ -24,7 +25,9 @@ namespace Rialto.Models.Repository
                 return con.Query<M_TAG_INFO>(query.ToSqlString());
             }
         }
+        */
 
+        /*
         /// <summary>
         /// 全画像の枚数を返す
         /// </summary>
@@ -44,6 +47,7 @@ namespace Rialto.Models.Repository
 @"SELECT COUNT(*) AS ITEM_COUNT FROM M_IMAGE_INFO
  WHERE DELETE_FLG='0' AND IMGINF_ID NOT IN (SELECT IMGINF_ID FROM T_ADD_TAG)");
         }
+        */
 
         /// <summary>
         /// 引数で指定されたタグ情報を追加する、すでに存在する場合は上書きする

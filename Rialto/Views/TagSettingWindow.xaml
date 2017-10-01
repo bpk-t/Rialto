@@ -49,11 +49,11 @@
         <ListView x:Name="TagListView" Grid.Row="1"  Grid.Column="1" Grid.ColumnSpan="3" ItemsSource="{Binding AllTags}" >
             <ListView.View>
                 <GridView>
-                    <GridViewColumn Header="タグ名" DisplayMemberBinding="{Binding TAG_NAME}"></GridViewColumn>
-                    <GridViewColumn Header="タグ定義(説明)" DisplayMemberBinding="{Binding TAG_DEFINE}"></GridViewColumn>
-                    <GridViewColumn Header="検索回数" DisplayMemberBinding="{Binding SEARCH_COUNT}"></GridViewColumn>
-                    <GridViewColumn Header="作成日時" DisplayMemberBinding="{Binding CREATE_LINE_DATE, StringFormat='yyyy/MM/dd HH:mm:ss'}"></GridViewColumn>
-                    <GridViewColumn Header="更新日時" DisplayMemberBinding="{Binding UPDATE_LINE_DATE, StringFormat='yyyy/MM/dd HH:mm:ss'}"></GridViewColumn>
+                    <GridViewColumn Header="タグ名" DisplayMemberBinding="{Binding Name}"></GridViewColumn>
+                    <GridViewColumn Header="タグ定義(説明)" DisplayMemberBinding="{Binding Description}"></GridViewColumn>
+                    <GridViewColumn Header="検索回数" DisplayMemberBinding="{Binding SearchCount}"></GridViewColumn>
+                    <GridViewColumn Header="作成日時" DisplayMemberBinding="{Binding CreatedAt, StringFormat='yyyy/MM/dd HH:mm:ss'}"></GridViewColumn>
+                    <GridViewColumn Header="更新日時" DisplayMemberBinding="{Binding UpdatedAt, StringFormat='yyyy/MM/dd HH:mm:ss'}"></GridViewColumn>
                 </GridView>
             </ListView.View>
 
