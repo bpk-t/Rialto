@@ -56,6 +56,9 @@
       <HintPath>..\packages\LangExt.2.1.1.0\lib\portable-net40+win\LangExt.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="LanguageExt.Core, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\LanguageExt.Core.2.1.22\lib\net451\LanguageExt.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Livet">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>InfrastructureAssemblies\Livet.dll</HintPath>
@@ -100,9 +103,25 @@
     <Reference Include="System.Interactive">
       <HintPath>..\packages\Ix-Main.1.2.3\lib\net45\System.Interactive.dll</HintPath>
     </Reference>
+    <Reference Include="System.Reactive.Core, Version=3.0.3000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Core.3.1.1\lib\net46\System.Reactive.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Interfaces, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Interfaces.3.1.1\lib\net45\System.Reactive.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Linq, Version=3.0.3000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Linq.3.1.1\lib\net46\System.Reactive.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.PlatformServices, Version=3.0.3000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.PlatformServices.3.1.1\lib\net46\System.Reactive.PlatformServices.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Reactive.Windows.Threading, Version=3.0.1000.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Reactive.Windows.Threading.3.1.1\lib\net45\System.Reactive.Windows.Threading.dll</HintPath>
+    </Reference>
     <Reference Include="System.ValueTuple, Version=4.0.2.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.1.1.2.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -157,16 +176,10 @@
     <Compile Include="Models\DAO\Builder\QueryBuilder.cs" />
     <Compile Include="Models\DAO\Builder\SelectQuery.cs" />
     <Compile Include="Models\DAO\Builder\SQLFunction.cs" />
-    <Compile Include="Models\ImageRegister.cs" />
-    <Compile Include="Models\ImageRegisterTask.cs" />
-    <Compile Include="Models\IWorker.cs" />
-    <Compile Include="Models\IWorkerTask.cs" />
     <Compile Include="Models\Service\ImageRegisterService.cs" />
     <Compile Include="Models\Service\TagAllocateService.cs" />
     <Compile Include="Models\Service\TagMasterService.cs" />
     <Compile Include="Models\Service\ThumbnailImageService.cs" />
-    <Compile Include="Models\Transaction.cs" />
-    <Compile Include="Models\WorkerTaskExecutor.cs" />
     <Compile Include="Util\CompareSelector.cs" />
     <Compile Include="Util\MD5Helper.cs" />
     <Compile Include="Util\RangeObservableCollection.cs" />

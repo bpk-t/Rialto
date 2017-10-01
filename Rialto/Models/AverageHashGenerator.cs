@@ -13,23 +13,12 @@ namespace Rialto.Models
     {
         private static readonly int PIC_SIZE = 16;
 
-        public static void Insert(long registerImageId)
-        {
-            RegisterImageRepository.FindById(registerImageId).Match(
-                (some) =>
-                {
-                    /*
-                    T_AVEHASHRepository.Insert(new T_AVEHASH()
-                    {
-                        IMGINF_ID = registerImageId,
-                        AVEHASH = ComputeAveHash(some.FilePath)
-                    });
-                    */
-                },
-                () => { });
-        }
-
-        private static string ComputeAveHash(string imgPath)
+        /// <summary>
+        /// 指定したパスのAverageHashを計算します。
+        /// </summary>
+        /// <param name="imgPath"></param>
+        /// <returns></returns>
+        public static string ComputeAveHash(string imgPath)
         {
             return GetHashStr(
                     GetGlayscaleBitmap(
