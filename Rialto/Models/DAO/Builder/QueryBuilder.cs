@@ -30,6 +30,11 @@ namespace Rialto.Models.DAO.Builder
             return new SelectQuery().Select(columns);
         }
 
+        public static SelectQuery Select(params ColumnDefinition[] columns)
+        {
+            return new SelectQuery().Select(columns);
+        }
+
         public static InsertQuery Insert()
         {
             return new InsertQuery();

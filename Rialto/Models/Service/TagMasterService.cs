@@ -34,8 +34,6 @@ namespace Rialto.Models.Service
         {
             return Task.Run(() =>
             {
-                //var list = M_TAG_INFORepository.GetAll();
-
                 var list = TagRepository.GetAllTag();
 
                 TagTreeItems.Clear();

@@ -146,7 +146,6 @@
     <Compile Include="Models\DAO\Table\VIEW_HISTORY.cs" />
     <Compile Include="Models\DataModel\PageViewImageCount.cs" />
     <Compile Include="Models\Repository\M_IMAGE_INFORepository.cs" />
-    <Compile Include="Models\Repository\M_TAGADDTABRepository.cs" />
     <Compile Include="Models\Repository\M_TAG_INFORepository.cs" />
     <Compile Include="Models\Repository\RegisterImageRepository.cs" />
     <Compile Include="Models\Repository\TagRepository.cs" />
@@ -184,6 +183,7 @@
     <Compile Include="Models\Service\ThumbnailImageService.cs" />
     <Compile Include="Models\Transaction.cs" />
     <Compile Include="Models\WorkerTaskExecutor.cs" />
+    <Compile Include="Util\CompareSelector.cs" />
     <Compile Include="Util\MD5Helper.cs" />
     <Compile Include="Util\RangeObservableCollection.cs" />
     <Compile Include="ViewModels\TagSettingWindowViewModel.cs" />

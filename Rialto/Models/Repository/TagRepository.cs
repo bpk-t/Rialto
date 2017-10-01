@@ -8,7 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
-using LangExt;
 
 namespace Rialto.Models.Repository
 {
@@ -25,7 +24,7 @@ namespace Rialto.Models.Repository
             }
         }
 
-        public static Option<Tag> FindByName(string name)
+        public static LangExt.Option<Tag> FindByName(string name)
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
@@ -33,27 +32,66 @@ namespace Rialto.Models.Repository
                         .From(TAG.ThisTable)
                         .Where(TAG.NAME.Eq("@TAG_NAME"));
 
-                return Option.Create(
+                return LangExt.Option.Create(
                     con.Query<Tag>(query.ToSqlString(), new { TAG_NAME = name }).FirstOrDefault()
                 );
             }
         }
 
-        public static void Update(M_TAG_INFO updateObj)
+        /// <summary>
+        /// 引数で指定されたタグ情報を追加する、すでに存在する場合は上書きする
+        /// </summary>
+        /// <param name="upsertObj"></param>
+        /// <param name="existTagAction"></param>
+        public static void Upsert(Tag upsertObj, Func<bool> existTagAction)
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
-                con.Execute(
-@"UPDATE M_TAG_INFO 
- SET TAG_NAME = @TAG_NAME
- ,TAG_DEFINE = @TAG_DEFINE
- ,UPDATE_LINE_DATE = datetime('now', 'localtime') 
- WHERE TAGINF_ID = @TAGINF_ID", new
-{
-    TAG_NAME = updateObj.TAG_NAME,
-    TAG_DEFINE = updateObj.TAG_DEFINE,
-    TAGINF_ID = updateObj.TAGINF_ID
-});
+                if (upsertObj.Id != 0)
+                {
+                    if (existTagAction())
+                    {
+                        Update(upsertObj);
+                    }
+                }
+                else
+                {
+                    FindByName(upsertObj.Name).Match(
+                        (some) =>
+                        {
+                            if (existTagAction())
+                            {
+                                some.Description = upsertObj.Description;
+                                Update(some);
+                            }
+                        },
+                        () =>
+                        {
+                            Insert(upsertObj);
+                        });
+                }
+            }
+        }
+
+
+        public static void Update(Tag updateObj)
+        {
+            using (var con = DBHelper.Instance.GetDbConnection())
+            {
+                var query = QueryBuilder.Update(TAG.ThisTable)
+                    .Set(TAG.NAME, updateObj.Name)
+                    .Set(TAG.DESCRIPTION, updateObj.Description)
+                    .Set(TAG.UPDATED_AT, updateObj.UpdatedAt)
+                    .Where(TAG.ID.Eq("@TAG_ID"));
+
+                var queryParam = new
+                {
+                    NAME = updateObj.Name,
+                    DESCRIPTION = updateObj.Description,
+                    UPDATED_AT = "datetime('now', 'localtime')",
+                    TAG_ID = updateObj.Id
+                };
+                con.Execute(query.ToSqlString(), queryParam);
             }
         }
 
@@ -78,6 +116,26 @@ namespace Rialto.Models.Repository
                 };
 
                 con.Execute(query.ToSqlString(), queryParam);
+            }
+        }
+
+        public static Dictionary<TagGroup, List<Tag>> GetAllTagGroup()
+        {
+            using (var con = DBHelper.Instance.GetDbConnection())
+            {
+                var query = QueryBuilder.Select(TAG_GROUP.Columns())
+                    .Select(TAG.Columns())
+                    .From(TAG_GROUP.ThisTable)
+                    .InnerJoin(TAG_GROUP_ASSIGN.ThisTable, TAG_GROUP_ASSIGN.TAG_GROUP_ID.Eq(TAG_GROUP.ID))
+                    .InnerJoin(TAG.ThisTable, TAG_GROUP_ASSIGN.TAG_ID.Eq(TAG.ID))
+                    .OrderBy(TAG_GROUP.ID, Order.Asc)
+                    .OrderBy(TAG.ID, Order.Asc);
+
+                var result = con.QueryMultiple(query.ToSqlString());
+
+                return result.Read((TagGroup tagGroup, Tag tag) => (tagGroup, tag))
+                    .GroupBy(x => x.Item1, x => x.Item2, new CompareSelector<TagGroup, int>(x => x.Id))
+                    .ToDictionary(x => x.Key, x => x.ToList());
             }
         }
     }

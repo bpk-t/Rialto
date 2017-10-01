@@ -19,5 +19,16 @@ namespace Rialto.Models.DAO.Table
         public static readonly ColumnDefinition NAME = new ColumnDefinition(ThisTable, nameof(NAME));
         public static readonly ColumnDefinition CREATED_AT = new ColumnDefinition(ThisTable, nameof(CREATED_AT));
         public static readonly ColumnDefinition UPDATED_AT = new ColumnDefinition(ThisTable, nameof(UPDATED_AT));
+
+        public static ColumnDefinition[] Columns()
+        {
+            return new ColumnDefinition[]
+            {
+                ID,
+                NAME,
+                CREATED_AT,
+                UPDATED_AT
+            };
+        }
     }
 }

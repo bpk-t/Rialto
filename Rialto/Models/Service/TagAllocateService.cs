@@ -34,21 +34,21 @@ namespace Rialto.Models.Service
 
         public void InitTabSettingPanel()
         {
-            M_TAGADDTABRepository.GetAll().ForEach(tabPanel =>
+            TagRepository.GetAllTagGroup().ForEach(group =>
             {
                 var tabInfo = new TabInfo
                 {
-                    Header = tabPanel.TAB_NAME
+                    Header = group.Key.Name,
                 };
-                M_TAGADDTABRepository.GetTabSettings(tabPanel).ForEach(tabSetting =>
-                {
-                    tabInfo.Buttons.Add(new TagAddButtonInfo()
+
+                group.Value.Select(tag =>
+                    new TagAddButtonInfo()
                     {
-                        TagInfId = tabSetting.TagInfID,
-                        Name = tabSetting.TagName,
+                        TagInfId = tag.Id,
+                        Name = tag.Name,
                         ClickEvent = (ev) =>
                         {
-                            selectedThumbnailImgList.ForEach(x => 
+                            selectedThumbnailImgList.ForEach(x =>
                                 T_ADD_TAGRepository.Insert(
                                     new T_ADD_TAG()
                                     {
@@ -56,8 +56,8 @@ namespace Rialto.Models.Service
                                         TAGINF_ID = ev.TagInfId
                                     }));
                         }
-                    });
-                });
+                    })
+                    .ForEach(x => tabInfo.Buttons.Add(x));
                 TabPanels.Add(tabInfo);
             });
         }

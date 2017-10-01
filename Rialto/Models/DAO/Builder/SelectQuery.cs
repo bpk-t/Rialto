@@ -31,6 +31,12 @@ namespace Rialto.Models.DAO.Builder
             return this;
         }
 
+        public SelectQuery Select(params ColumnDefinition[] columns)
+        {
+            this.selectColumns.AddRange(columns.Select(x => x.ToSqlString()));
+            return this;
+        }
+
         public SelectQuery From(string table)
         {
             tableName = table;
