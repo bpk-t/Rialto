@@ -174,7 +174,7 @@ namespace Rialto.Models.Repository
                     con.Execute(query.ToSqlString(), queryParams);
 
                     var selectQuery = QueryBuilder.Select()
-                        .From(M_IMAGE_INFO_DEF.ThisTable)
+                        .From(REGISTER_IMAGE.ThisTable)
                         .Where(ConditionBuilder.Eq("ROWID", SQLFunctionBuilder.LastInsertLowId().ToSqlString()));
                     var inserted = con.Query<RegisterImage>(selectQuery.ToSqlString()).FirstOrDefault();
 

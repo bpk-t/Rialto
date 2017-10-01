@@ -80,7 +80,6 @@ namespace Rialto.ViewModels
         {
             Task.Run(() =>
             {
-                //var list = M_TAG_INFORepository.GetAll();
                 var list = TagRepository.GetAllTag();
 
                 Application.Current.Dispatcher.Invoke(() =>
@@ -99,6 +98,8 @@ namespace Rialto.ViewModels
         /// </summary>
         public void AddTag()
         {
+            // TODO
+            /*
             M_TAG_INFO target = null;
             if (SelectedTags.Count > 0)
             {
@@ -114,6 +115,7 @@ namespace Rialto.ViewModels
             }
 
             M_TAG_INFORepository.Upsert(target, () => true);
+            */
             Initialize();
         }
 
@@ -132,8 +134,9 @@ namespace Rialto.ViewModels
 
         public void DeleteTag()
         {
+            // TODO ほんとに削除するのか
             var selectedTag = SelectedTags[0] as Tag;
-            M_TAG_INFORepository.DeleteById(selectedTag.Id);
+            //M_TAG_INFORepository.DeleteById(selectedTag.Id);
             Initialize();
         }
     }

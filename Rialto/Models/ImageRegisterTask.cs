@@ -38,6 +38,7 @@ namespace Rialto.Models
         /// <returns>登録した画像情報IDを返す、既にDBに存在している場合はその画像情報IDを返す、エラーの場合は-1</returns>
         private Option<long> InsertImageFromFile(FileInfo file)
         {
+            /*
             var img = new System.Drawing.Bitmap(file.FullName);
             var inserted = M_IMAGE_INFORepository.Insert(new M_IMAGE_INFO()
             {
@@ -56,6 +57,8 @@ namespace Rialto.Models
             });
             AverageHashGenerator.Insert(inserted.IMGINF_ID.Value);
             return Option.Create(inserted.IMGINF_ID);
+            */
+            return Option.None;
         }
     }
 }

@@ -49,6 +49,7 @@ namespace Rialto.Models.Repository
         }
         */
 
+            /*
         /// <summary>
         /// 引数で指定されたタグ情報を追加する、すでに存在する場合は上書きする
         /// </summary>
@@ -139,5 +140,6 @@ namespace Rialto.Models.Repository
                 con.Execute(@"DELETE FROM M_TAG_INFO WHERE TAGINF_ID=@TAGINF_ID", new { TAGINF_ID = id });
             }
         }
+        */
     }
 }
