@@ -195,6 +195,9 @@ namespace Rialto.ViewModels
                 {
                     await thumbnailImageService.GoToPrevPage();
                     currentIndex = thumbnailImageService.ThumbnailImgList.Count - 1;
+                } else
+                {
+                    currentIndex = 0;
                 }
             }
             var path = thumbnailImageService.ThumbnailImgList[currentIndex].SourceImageFilePath;
