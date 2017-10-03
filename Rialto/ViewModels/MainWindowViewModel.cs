@@ -31,6 +31,7 @@ namespace Rialto.ViewModels
         private TagMasterService tagMasterService;
         private TagAllocateService tagAllocateService;
         private AllocatedTagsService allocatedTags;
+        private DatabaseCreateService dbCreateService = new DatabaseCreateService();
 
         #endregion
 
@@ -407,6 +408,7 @@ namespace Rialto.ViewModels
 
         public void CreateNewDB()
         {
+            dbCreateService.CreateSchema();
             Debug.WriteLine("Call CreateNewDB");
         }
 
