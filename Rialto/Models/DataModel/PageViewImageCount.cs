@@ -8,13 +8,10 @@ namespace Rialto.Models.DataModel
 {
     public class PageViewImageCount
     {
-        public string DispImageCount { get; set; }
-        public int ImageCount
+        public string DispImageCount
         {
-            get
-            {
-                return int.Parse(DispImageCount);
-            }
+            get => ImageCount.ToString();
         }
+        public int ImageCount { get; set; }
     }
 }

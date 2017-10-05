@@ -19,6 +19,7 @@ using NLog.Fluent;
 using System.Threading.Tasks;
 using Rialto.Models.Service;
 using Rialto.Models.DataModel;
+using System.IO;
 
 namespace Rialto.ViewModels
 {
@@ -50,9 +51,6 @@ namespace Rialto.ViewModels
 
         private async Task Refresh()
         {
-            ThumbnailItemSizeHeight = 200.0;
-            ThumbnailItemSizeWidth = 200.0;
-
             await thumbnailService.ShowThumbnailImage(TagConstant.ALL_TAG_ID);
             tagAllocateService.InitTabSettingPanel();
             await tagMasterService.InitTagTree();
@@ -65,17 +63,29 @@ namespace Rialto.ViewModels
         {
             PageViewImageCountList = new ObservableCollection<PageViewImageCount>
             {
-                new PageViewImageCount { DispImageCount = "10" },
-                new PageViewImageCount { DispImageCount = "20" },
-                new PageViewImageCount { DispImageCount = "30" },
-                new PageViewImageCount { DispImageCount = "50" },
-                new PageViewImageCount { DispImageCount = "100" }
+                new PageViewImageCount { ImageCount = 10 },
+                new PageViewImageCount { ImageCount = 20 },
+                new PageViewImageCount { ImageCount = 30 },
+                new PageViewImageCount { ImageCount = 50 },
+                new PageViewImageCount { ImageCount = 100 }
             };
-
             SelectedPageViewImageCount = PageViewImageCountList[2];
             thumbnailService.OnePageItemCount = SelectedPageViewImageCount.ImageCount;
 
-            await Refresh();
+            ThumbnailItemSizeHeight = 200.0;
+            ThumbnailItemSizeWidth = 200.0;
+
+            // DBファイルの存在チェック
+            if (Properties.Settings.Default.LastOpenDbName.IsEmpty()
+                || !File.Exists(Properties.Settings.Default.LastOpenDbName))
+            {
+                // TODO DBファイルが無い場合、新規でDBファイルを作成する
+            }
+            else
+            {
+                // TODO DBファイルが存在する
+                await Refresh();
+            }
         }
 
         #region Properties
@@ -408,6 +418,8 @@ namespace Rialto.ViewModels
 
         public void CreateNewDB()
         {
+            // TODO ファイル作成ダイアログ
+            // TODO 指定されたファイル名から新規DBファイルを作成する
             dbCreateService.CreateSchema();
             Debug.WriteLine("Call CreateNewDB");
         }
