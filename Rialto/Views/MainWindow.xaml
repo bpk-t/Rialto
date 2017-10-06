@@ -11,6 +11,14 @@
         xmlns:controls="http://metro.mahapps.com/winfx/xaml/controls"
         xmlns:properties="clr-namespace:Rialto.Properties"
         xmlns:behaviors="clr-namespace:Rialto.Views.Behaviors"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto"        
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
         Title="Rialto" Height="1400" Width="1800">
 
     <Window.DataContext>
@@ -290,10 +298,10 @@
                     </Grid.ColumnDefinitions>
 
                     <Border Grid.Column="0" BorderThickness="2" BorderBrush="LightBlue" Margin="5">
-                        <Button>
+                        <Button Width="Auto" Height="Auto">
                             <Button.Template>
                                 <ControlTemplate TargetType="{x:Type Button}">
-                                    <Image MinWidth="300" MinHeight="300" Source="{Binding SideImage}"></Image>
+                                    <Image Source="{Binding SideImage}"></Image>
                                 </ControlTemplate>
                             </Button.Template>
 
