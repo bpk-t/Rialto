@@ -190,16 +190,24 @@
     <Compile Include="Util\CompareSelector.cs" />
     <Compile Include="Util\MD5Helper.cs" />
     <Compile Include="Util\RangeObservableCollection.cs" />
+    <Compile Include="ViewModels\ErrorDialogViewModel.cs" />
     <Compile Include="ViewModels\RegisterListWindowViewModel.cs" />
     <Compile Include="ViewModels\TagSettingWindowViewModel.cs" />
     <Compile Include="Views\Behaviors\FileDragAndDropBehavior.cs" />
     <Compile Include="Views\Behaviors\PlaceHolderBehavior.cs" />
+    <Compile Include="Views\ErrorDialog.xaml.cs">
+      <DependentUpon>ErrorDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\RegisterListWindow.xaml.cs">
       <DependentUpon>RegisterListWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TagSettingWindow.xaml.cs">
       <DependentUpon>TagSettingWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Views\ErrorDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Views\FullScreen.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

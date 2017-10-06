@@ -416,23 +416,39 @@ namespace Rialto.ViewModels
 
         #region メニューコマンド
 
-        public void CreateNewDB()
+        public void CreateNewDB(SavingFileSelectionMessage param)
         {
-            // TODO ファイル作成ダイアログ
-            // TODO 指定されたファイル名から新規DBファイルを作成する
-            dbCreateService.CreateSchema();
-            Debug.WriteLine("Call CreateNewDB");
+            if (param.Response != null && !param.Response.IsEmpty())
+            {
+                var filePath = param.Response[0];
+
+                if (File.Exists(filePath))
+                {
+                    // TODO 既に存在しているファイルのためエラー
+
+                    ErrorDialog = new ErrorDialogViewModel("タイトル", "テスト");
+                    ErrorDialogIsOpen = true;
+                } else
+                {
+
+                    // TODO ファイル作成ダイアログ
+                    // TODO 指定されたファイル名から新規DBファイルを作成する
+                    //dbCreateService.CreateSchema();
+                    Debug.WriteLine("Call CreateNewDB = " + param.Response[0]);
+                }
+            }
+
         }
 
         /// <summary>
         /// 既存のDBを開く
         /// </summary>
-        /// <param name="parameter"></param>
-        public async void OpenDB(OpeningFileSelectionMessage parameter)
+        /// <param name="param"></param>
+        public async void OpenDB(OpeningFileSelectionMessage param)
         {
-            if (parameter.Response != null)
+            if (param.Response != null)
             {
-                Properties.Settings.Default.LastOpenDbName = parameter.Response[0];
+                Properties.Settings.Default.LastOpenDbName = param.Response[0];
                 Properties.Settings.Default.Save();
                 await Refresh();
             }
@@ -545,6 +561,34 @@ namespace Rialto.ViewModels
         {
             thumbnailService.OnePageItemCount = SelectedPageViewImageCount.ImageCount;
             await thumbnailService.Refresh();
+        }
+
+        private ErrorDialogViewModel ErrorDialog_ = null;
+        public ErrorDialogViewModel ErrorDialog
+        {
+            get
+            {
+                return ErrorDialog_;
+            }
+            set
+            {
+                ErrorDialog_ = value;
+                RaisePropertyChanged(() => ErrorDialog);
+            }
+        }
+
+        private bool ErrorDialogIsOpen_ = false;
+        public bool ErrorDialogIsOpen
+        {
+            get
+            {
+                return ErrorDialogIsOpen_;
+            }
+            set
+            {
+                ErrorDialogIsOpen_ = value;
+                RaisePropertyChanged(() => ErrorDialogIsOpen);
+            }
         }
     }
 }
