@@ -20,6 +20,10 @@ using System.Threading.Tasks;
 using Rialto.Models.Service;
 using Rialto.Models.DataModel;
 using System.IO;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Reactive.Concurrency;
+using System.Reactive.Threading.Tasks;
 
 namespace Rialto.ViewModels
 {
@@ -49,11 +53,13 @@ namespace Rialto.ViewModels
             thumbnailService.OnChangePage += (value) => CurrentPageAllPage = value;
         }
 
-        private async Task Refresh()
+        private Task Refresh()
         {
-            await thumbnailService.ShowThumbnailImage(TagConstant.ALL_TAG_ID);
-            tagAllocateService.InitTabSettingPanel();
-            await tagMasterService.InitTagTree();
+            var thumbnailTask = thumbnailService.ShowThumbnailImage(TagConstant.ALL_TAG_ID);
+            var tagSettingTask = tagAllocateService.InitTabSettingPanel();
+            var initTagTask = tagMasterService.InitTagTree();
+
+            return Task.WhenAll(thumbnailTask, tagSettingTask, initTagTask);
         }
 
         /// <summary>
@@ -379,12 +385,11 @@ namespace Rialto.ViewModels
         {
             if (SearchTagText.Count() > 0)
             {
-                //await tagMasterService.InitTagTree((x) => x.TAG_NAME.IndexOf(SearchTagText) >= 0);
                 await tagMasterService.InitTagTree((x) => x.Name.Contains(SearchTagText));
             }
             else
             {
-                await tagMasterService.InitTagTree();
+                tagMasterService.InitTagTree().ToObservable();
             }
         }
         #endregion
@@ -428,7 +433,8 @@ namespace Rialto.ViewModels
 
                     ErrorDialog = new ErrorDialogViewModel("タイトル", "テスト");
                     ErrorDialogIsOpen = true;
-                } else
+                }
+                else
                 {
 
                     // TODO ファイル作成ダイアログ

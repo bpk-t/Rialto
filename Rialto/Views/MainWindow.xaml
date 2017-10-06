@@ -57,7 +57,7 @@
     <materialDesign:DialogHost DialogContent="{Binding ErrorDialog}" IsOpen="{Binding ErrorDialogIsOpen}">
         <Grid ShowGridLines="False">
             <Grid.RowDefinitions>
-                <RowDefinition Height="35px" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="35px" />
             </Grid.RowDefinitions>

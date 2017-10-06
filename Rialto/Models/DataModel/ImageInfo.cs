@@ -24,16 +24,11 @@ namespace Rialto.Model.DataModel
         {
             get
             {
-                if (_DispImage == null)
-                {
-                    _DispImage = new BitmapImage();
-                    _DispImage.BeginInit();
-                    _DispImage.UriSource = ThumbnailImageFilePath;
-                    _DispImage.DecodePixelWidth = 200;
-                    _DispImage.EndInit();
-                    _DispImage.Freeze();
-                }
                 return _DispImage;
+            }
+            set
+            {
+                _DispImage = value;
             }
         }
 

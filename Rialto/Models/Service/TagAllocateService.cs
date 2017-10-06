@@ -6,6 +6,7 @@ using StatefulModel;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Rialto.Models.Service
 {
@@ -32,33 +33,36 @@ namespace Rialto.Models.Service
             this.selectedThumbnailImgList = selectedThumbnailImgList;
         }
 
-        public void InitTabSettingPanel()
+        public Task InitTabSettingPanel()
         {
-            TagRepository.GetAllTagGroup().ForEach(group =>
+            return Task.Run(() =>
             {
-                var tabInfo = new TabInfo
+                TagRepository.GetAllTagGroup().ForEach(group =>
                 {
-                    Header = group.Key.Name,
-                };
-
-                group.Value.Select(tag =>
-                    new TagAddButtonInfo()
+                    var tabInfo = new TabInfo
                     {
-                        TagInfId = tag.Id,
-                        Name = tag.Name,
-                        ClickEvent = (ev) =>
+                        Header = group.Key.Name,
+                    };
+
+                    group.Value.Select(tag =>
+                        new TagAddButtonInfo()
                         {
-                            selectedThumbnailImgList.ForEach(x =>
-                            TagRepository.InsertTagAssign(
-                                new TagAssign
-                                {
-                                    RegisterImageId = x.ImgID,
-                                    TagId = ev.TagInfId
-                                }));
-                        }
-                    })
-                    .ForEach(x => tabInfo.Buttons.Add(x));
-                TabPanels.Add(tabInfo);
+                            TagInfId = tag.Id,
+                            Name = tag.Name,
+                            ClickEvent = (ev) =>
+                            {
+                                selectedThumbnailImgList.ForEach(x =>
+                                TagRepository.InsertTagAssign(
+                                    new TagAssign
+                                    {
+                                        RegisterImageId = x.ImgID,
+                                        TagId = ev.TagInfId
+                                    }));
+                            }
+                        })
+                        .ForEach(x => tabInfo.Buttons.Add(x));
+                    TabPanels.Add(tabInfo);
+                });
             });
         }
     }

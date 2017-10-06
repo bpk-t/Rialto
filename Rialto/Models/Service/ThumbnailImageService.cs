@@ -13,6 +13,7 @@ using System.Drawing;
 using Rialto.Models.Repository;
 using Akka.Actor;
 using Rialto.Models.DAO.Builder;
+using System.Windows.Media.Imaging;
 
 namespace Rialto.Models.Service
 {
@@ -225,22 +226,41 @@ namespace Rialto.Models.Service
                     ThumbnailImageFilePath = GetThumbnailImage(image.FilePath, image.Md5Hash),
                     SourceImageFilePath = new Uri(Path.Combine(Properties.Settings.Default.ImgDataDirectory, image.FilePath))
                 };
+                ImageInfo LoadImage(ImageInfo imgInfo) {
+                    var tmpBitmapImage = new BitmapImage();
+                    tmpBitmapImage.BeginInit();
+                    tmpBitmapImage.UriSource = imgInfo.ThumbnailImageFilePath;
+                    tmpBitmapImage.DecodePixelWidth = 200;
+                    tmpBitmapImage.EndInit();
+                    tmpBitmapImage.Freeze();
+                    imgInfo.DispImage = tmpBitmapImage;
+                    return imgInfo;
+                };
 
                 if (tagId == TagConstant.ALL_TAG_ID)
                 {
-                    var list = RegisterImageRepository.GetAll(offset, limit, imageOrder).Select(x => RegisterImageToImageInfo(x)).ToList();
+                    var list = RegisterImageRepository.GetAll(offset, limit, imageOrder)
+                        .Select(x => RegisterImageToImageInfo(x))
+                        .ToList();
+
+                    // 高速化のため、画像は並列読み込み
+                    Parallel.For(0, list.Count, i => list[i] = LoadImage(list[i]));
                     var count = RegisterImageRepository.GetAllCount();
                     return (count, list);
                 }
                 else if (tagId == TagConstant.NOTAG_TAG_ID)
                 {
                     var list = RegisterImageRepository.GetNoTag(offset, limit, imageOrder).Select(x => RegisterImageToImageInfo(x)).ToList();
+                    // 高速化のため、画像は並列読み込み
+                    Parallel.For(0, list.Count, i => list[i] = LoadImage(list[i]));
                     var count = RegisterImageRepository.GetNoTagCount();
                     return (count, list);
                 }
                 else
                 {
                     var list = RegisterImageRepository.GetByTag(tagId, offset, limit, imageOrder).Select(x => RegisterImageToImageInfo(x)).ToList();
+                    // 高速化のため、画像は並列読み込み
+                    Parallel.For(0, list.Count, i => list[i] = LoadImage(list[i]));
                     var count = RegisterImageRepository.GetByTagCount(tagId);
                     return (count, list);
                 }
