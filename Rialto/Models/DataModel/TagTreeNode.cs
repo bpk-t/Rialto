@@ -36,14 +36,9 @@ namespace Rialto.Model.DataModel
             }
         }
 
-        /// <summary>
-        /// 子ノード
-        /// </summary>
-        public ObservableCollection<TagTreeNode> Children { get; set; }
-
         public TagTreeNode()
         {
-            Children = new ObservableCollection<TagTreeNode>();
+
         }
     }
 }

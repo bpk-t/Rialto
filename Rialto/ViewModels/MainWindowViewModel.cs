@@ -24,6 +24,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Threading.Tasks;
+using Akka.Actor;
 
 namespace Rialto.ViewModels
 {
@@ -43,10 +44,11 @@ namespace Rialto.ViewModels
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public MainWindowViewModel()
+        /// <param name="system">ActorSystem</param>
+        public MainWindowViewModel(ActorSystem system)
         {
             logger.Debug().Write();
-            thumbnailService = new ThumbnailImageService();
+            thumbnailService = new ThumbnailImageService(system);
             tagMasterService = new TagMasterService();
             tagAllocateService = new TagAllocateService(_SelectedThumbnailImgList);
             allocatedTags = new AllocatedTagsService();
@@ -57,7 +59,8 @@ namespace Rialto.ViewModels
         {
             var thumbnailTask = thumbnailService.ShowThumbnailImage(TagConstant.ALL_TAG_ID);
             var tagSettingTask = tagAllocateService.InitTabSettingPanel();
-            var initTagTask = tagMasterService.InitTagTree();
+            var initTagTask = tagMasterService.InitTagTree()
+                .ContinueWith(t => TagTreeItems = t.Result);
 
             return Task.WhenAll(thumbnailTask, tagSettingTask, initTagTask);
         }
@@ -67,6 +70,7 @@ namespace Rialto.ViewModels
         /// </summary>
         public async void Initialize()
         {
+            ProgressBarVisible = true;
             PageViewImageCountList = new ObservableCollection<PageViewImageCount>
             {
                 new PageViewImageCount { ImageCount = 10 },
@@ -91,6 +95,7 @@ namespace Rialto.ViewModels
             {
                 // TODO DBファイルが存在する
                 await Refresh();
+                ProgressBarVisible = false;
             }
         }
 
@@ -164,31 +169,22 @@ namespace Rialto.ViewModels
             }
         }
 
-        /// <summary>
-        /// タグツリー上に表示するリスト
-        /// </summary>
-        private ReadOnlyDispatcherCollection<TagTreeNode> TagTreeItems_;
-        public ReadOnlyDispatcherCollection<TagTreeNode> TagTreeItems
+        private ObservableCollection<TagTreeNode> TagTreeItems_;
+        public ObservableCollection<TagTreeNode> TagTreeItems
         {
             get
             {
-                if (TagTreeItems_ == null)
-                {
-                    TagTreeItems_ = ViewModelHelper.CreateReadOnlyDispatcherCollection(
-                        tagMasterService.TagTreeItems
-                        , m => m
-                        , DispatcherHelper.UIDispatcher
-                        );
-                }
                 return TagTreeItems_;
+            }
+            set
+            {
+                TagTreeItems_ = value;
+                RaisePropertyChanged(() => TagTreeItems);
             }
         }
 
-        /// <summary>
-        /// タグツリー上で選択したタグ
-        /// </summary>
-        private TagTreeNode SelectedTagNode_;
-        public TagTreeNode SelectedTagNode
+        private ObservableCollection<TagTreeNode> SelectedTagNode_ = new ObservableCollection<TagTreeNode>();
+        public IList SelectedTagNode
         {
             get
             {
@@ -196,8 +192,11 @@ namespace Rialto.ViewModels
             }
             set
             {
-                SelectedTagNode_ = value;
-                RaisePropertyChanged(() => SelectedTagNode);
+                SelectedTagNode_.Clear();
+                foreach (TagTreeNode elem in value)
+                {
+                    SelectedTagNode_.Add(elem);
+                }
             }
         }
 
@@ -305,20 +304,21 @@ namespace Rialto.ViewModels
         /// <summary>
         /// サムネイルリストでアイテムを選択した場合に呼び出される
         /// </summary>
-        public void ThumbnailListSelectionChanged()
+        public async void ThumbnailListSelectionChanged()
         {
             if (SelectedThumbnailImgList.Count > 0) {
                 var selectedImg = SelectedThumbnailImgList[0] as ImageInfo;
 
-                // TODO 読み込み処理
-                var image = new BitmapImage();
-                image.BeginInit();
-                image.UriSource = selectedImg.SourceImageFilePath;
-                image.CacheOption = BitmapCacheOption.OnLoad;
-                image.EndInit();
-                SideImage = image;
-
                 allocatedTags.GetAllocatedTags(selectedImg.ImgID);
+                SideImage = await Task.Run(() => {
+                    var image = new BitmapImage();
+                    image.BeginInit();
+                    image.UriSource = selectedImg.SourceImageFilePath;
+                    image.CacheOption = BitmapCacheOption.OnLoad;
+                    image.EndInit();
+                    image.Freeze();
+                    return image;
+                });
             }
         }
 
@@ -327,8 +327,13 @@ namespace Rialto.ViewModels
         /// </summary>
         public async void TagTreeSelectionChanged()
         {
-            if (SelectedTagNode == null) return;
-            await thumbnailService.ShowThumbnailImage(SelectedTagNode.ID);
+            if (SelectedTagNode.Count > 0)
+            {
+                ProgressBarVisible = true;
+                var selected = SelectedTagNode[0] as TagTreeNode;
+                await thumbnailService.ShowThumbnailImage(selected.ID);
+                ProgressBarVisible = false;
+            }
         }
 
         #region SearchTagCommand
@@ -385,11 +390,11 @@ namespace Rialto.ViewModels
         {
             if (SearchTagText.Count() > 0)
             {
-                await tagMasterService.InitTagTree((x) => x.Name.Contains(SearchTagText));
+                TagTreeItems = await tagMasterService.InitTagTree((x) => x.Name.Contains(SearchTagText));
             }
             else
             {
-                tagMasterService.InitTagTree().ToObservable();
+                TagTreeItems = await tagMasterService.InitTagTree();
             }
         }
         #endregion
@@ -523,12 +528,16 @@ namespace Rialto.ViewModels
 
         public async void ShowPrevPage()
         {
+            ProgressBarVisible = true;
             await thumbnailService.GoToPrevPage();
+            ProgressBarVisible = false;
         }
 
         public async void ShowNextPage()
         {
+            ProgressBarVisible = true;
             await thumbnailService.GoToNextPage();
+            ProgressBarVisible = false;
         }
 
 
@@ -565,8 +574,10 @@ namespace Rialto.ViewModels
 
         public async void PageViewImageCountSelectionChanged()
         {
+            ProgressBarVisible = true;
             thumbnailService.OnePageItemCount = SelectedPageViewImageCount.ImageCount;
             await thumbnailService.Refresh();
+            ProgressBarVisible = false;
         }
 
         private ErrorDialogViewModel ErrorDialog_ = null;
@@ -594,6 +605,20 @@ namespace Rialto.ViewModels
             {
                 ErrorDialogIsOpen_ = value;
                 RaisePropertyChanged(() => ErrorDialogIsOpen);
+            }
+        }
+
+        private bool ProgressBarVisible_ = true;
+        public bool ProgressBarVisible
+        {
+            get
+            {
+                return ProgressBarVisible_;
+            }
+            set
+            {
+                ProgressBarVisible_ = value;
+                RaisePropertyChanged(() => ProgressBarVisible);
             }
         }
     }

@@ -4,6 +4,7 @@ using Rialto.Model.DataModel;
 using Rialto.Models.DAO.Entity;
 using Rialto.Models.Repository;
 using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -11,6 +12,7 @@ namespace Rialto.Models.Service
 {
     public class TagMasterService : NotificationObject
     {
+        /*
         private ObservableSynchronizedCollection<TagTreeNode> TagTreeItems_ = new ObservableSynchronizedCollection<TagTreeNode>();
         public ObservableSynchronizedCollection<TagTreeNode> TagTreeItems
         {
@@ -24,26 +26,28 @@ namespace Rialto.Models.Service
                 RaisePropertyChanged(() => TagTreeItems);
             }
         }
+        */
 
-        public async Task InitTagTree()
+        public Task<ObservableCollection<TagTreeNode>> InitTagTree()
         {
-            await InitTagTree((_) => true);
+            return InitTagTree((_) => true);
         }
 
-        public Task InitTagTree(Func<Tag, bool> predicate)
+        public Task<ObservableCollection<TagTreeNode>> InitTagTree(Func<Tag, bool> predicate)
         {
             return Task.Run(() =>
             {
+                var tagTreeCollection = new ObservableCollection<TagTreeNode>();
                 var list = TagRepository.GetAllTag();
 
-                TagTreeItems.Clear();
-                TagTreeItems.Add(new TagTreeNode() {
+
+                tagTreeCollection.Add(new TagTreeNode() {
                     ID = TagConstant.ALL_TAG_ID,
                     Name = "ALL",
                     ImageCount = 0
                     //ImageCount = M_TAG_INFO.GetAllImgCount()
                 });
-                TagTreeItems.Add(new TagTreeNode() {
+                tagTreeCollection.Add(new TagTreeNode() {
                     ID = TagConstant.NOTAG_TAG_ID,
                     Name = "NoTag",
                     ImageCount = 0
@@ -55,7 +59,9 @@ namespace Rialto.Models.Service
                         ID = x.Id,
                         Name = x.Name,
                         ImageCount = x.AssignImageCount
-                    }).ForEach(x => TagTreeItems.Add(x));
+                    }).ForEach(x => tagTreeCollection.Add(x));
+
+                return tagTreeCollection;
             });
         }
     }

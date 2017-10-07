@@ -13,6 +13,8 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 using MahApps.Metro.Controls;
+using Rialto.ViewModels;
+using Akka.Actor;
 
 namespace Rialto.Views
 {
@@ -29,9 +31,16 @@ namespace Rialto.Views
     /// </summary>
     public partial class MainWindow : Window
     {
+        private MainWindowViewModel viewModel;
+        private ActorSystem system;
+
         public MainWindow()
         {
             InitializeComponent();
+
+            system = ActorSystem.Create("MainWindowActorSystem");
+            viewModel = new MainWindowViewModel(system);
+            this.DataContext = viewModel;
         }
     }
 }

@@ -20,12 +20,8 @@
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}"
         Title="Rialto" Height="1400" Width="1800">
-
-    <Window.DataContext>
-        <vm:MainWindowViewModel/>
-    </Window.DataContext>
-
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
         <DataTemplate DataType="{x:Type vm:ErrorDialogViewModel}">
             <v:ErrorDialog/>
         </DataTemplate>
@@ -132,7 +128,6 @@
                         <MenuItem Header="タグ付加実績を表示" />
                     </MenuItem>
                 </Menu>
-
             </Grid>
 
             <Grid Grid.Row="1">
@@ -143,7 +138,6 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="2*" />
                 </Grid.ColumnDefinitions>
-
 
                 <Grid Grid.Column="0">
                     <Grid.RowDefinitions>
@@ -162,20 +156,20 @@
                         </TextBox.InputBindings>
                     </TextBox>
 
-                    <TreeView Name="TagTreeList" Grid.Row="1" Margin="5" ItemsSource="{Binding TagTreeItems}">
-                        <TreeView.Resources>
-                            <HierarchicalDataTemplate DataType="{x:Type dmodel:TagTreeNode}" ItemsSource="{Binding Children}">
+                    <ListView x:Name="TagTreeList" Grid.Row="1" Margin="5" ItemsSource="{Binding TagTreeItems}" SelectionMode="Single">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
                                 <TextBlock Text="{Binding DispName}" />
-                            </HierarchicalDataTemplate>
-                        </TreeView.Resources>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
 
                         <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="SelectedItemChanged">
-                                <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedTagNode" Value="{Binding Path=SelectedItem, ElementName=TagTreeList}"/>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedTagNode" Value="{Binding Path=SelectedItems, ElementName=TagTreeList}"/>
                                 <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="TagTreeSelectionChanged"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
-                    </TreeView>
+                    </ListView>
                 </Grid>
 
                 <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center"/>
@@ -184,6 +178,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="40px" />
                         <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="50px" />
                     </Grid.RowDefinitions>
 
@@ -223,8 +218,7 @@
                         </ComboBox>
                     </Grid>
 
-                    <ListView Name="ThumbnailList" Grid.Row="1" Margin="5" ItemsSource="{Binding ThumbnailImgList}" 
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListView Name="ThumbnailList" Grid.Row="1" Margin="5" ItemsSource="{Binding ThumbnailImgList}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Vertical" Margin="5">
@@ -264,7 +258,9 @@
                         </ListView.InputBindings>
                     </ListView>
 
-                    <Grid Grid.Row="2">
+                    <ProgressBar Grid.Row="2" IsIndeterminate="True" Margin="4" Visibility="{Binding ProgressBarVisible, Converter={StaticResource BoolToVisibility}}" />
+                    
+                    <Grid Grid.Row="3">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*" />
                             <ColumnDefinition Width="1*" />

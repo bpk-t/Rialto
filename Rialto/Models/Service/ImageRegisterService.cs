@@ -33,8 +33,6 @@ namespace Rialto.Models.Service
 
         class ImageRegisterActor : ReceiveActor
         {
-
-
             public class RegisterImagesParamater
             {
                 public IList<Uri> ImageUris { get; }

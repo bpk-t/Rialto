@@ -14,6 +14,7 @@ using Rialto.Models.Repository;
 using Akka.Actor;
 using Rialto.Models.DAO.Builder;
 using System.Windows.Media.Imaging;
+using LanguageExt;
 
 namespace Rialto.Models.Service
 {
@@ -36,15 +37,13 @@ namespace Rialto.Models.Service
             }
         }
 
-        public ThumbnailImageService()
+        public ThumbnailImageService(ActorSystem system)
         {
-            system = ActorSystem.Create("ThumbnailImageServiceSystem");
             thumbnailImageActor = system.ActorOf<ThumbnailImageActor>("ThumbnailImageActor");
 
             OnChangePage += (v) => { }; // null check不要にするための空実装
         }
 
-        private ActorSystem system;
         private IActorRef thumbnailImageActor;
 
         private long currentTagId = TagConstant.ALL_TAG_ID;
@@ -291,33 +290,38 @@ namespace Rialto.Models.Service
             /// </summary>
             /// <param name="imgPath">元画像のファイルパス</param>
             /// <param name="imgHash">元画像のハッシュ</param>
-            private void CreateThumbnailImage(string imgPath, string imgHash)
+            private Try<string> CreateThumbnailImage(string imgPath, string imgHash)
             {
-                using (var image = Image.FromFile(imgPath))
+                return () =>
                 {
-                    var resizeH = image.Height;
-                    var resizeW = image.Width;
-
-                    // リサイズ後の縦横を計算
-                    if (image.Height > 220)
+                    using (var image = Image.FromFile(imgPath))
                     {
-                        resizeH = 220;
-                        resizeW = (int)((double)resizeW * ((double)220 / (double)image.Height));
-                    }
+                        var resizeH = image.Height;
+                        var resizeW = image.Width;
 
-                    using (var canvas = new Bitmap(resizeW, resizeH))
-                    {
-                        using (var g = Graphics.FromImage(canvas))
+                        // リサイズ後の縦横を計算
+                        if (image.Height > 220)
                         {
-                            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                            g.DrawImage(image, new Rectangle(0, 0, resizeW, resizeH));
+                            resizeH = 220;
+                            resizeW = (int)((double)resizeW * ((double)220 / (double)image.Height));
+                        }
 
-                            var savePath = Path.Combine(Properties.Settings.Default.ThumbnailImageDirectory, imgHash);
-                            // サムネイル画像の保存
-                            canvas.Save(savePath, System.Drawing.Imaging.ImageFormat.Png);
+                        using (var canvas = new Bitmap(resizeW, resizeH))
+                        {
+                            using (var g = Graphics.FromImage(canvas))
+                            {
+                                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                                g.DrawImage(image, new Rectangle(0, 0, resizeW, resizeH));
+
+                                var savePath = Path.Combine(Properties.Settings.Default.ThumbnailImageDirectory, imgHash);
+                                // サムネイル画像の保存
+                                canvas.Save(savePath, System.Drawing.Imaging.ImageFormat.Png);
+
+                                return savePath;
+                            }
                         }
                     }
-                }
+                };
             }
         }
 

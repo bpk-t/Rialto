@@ -61,27 +61,26 @@ namespace Rialto.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute(@"
-          <WINDOWPLACEMENT xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
-            <length>0</length>
-            <flags>0</flags>
-            <showCmd>HIDE</showCmd>
-            <minPosition>
-              <X>0</X>
-              <Y>0</Y>
-            </minPosition>
-            <maxPosition>
-              <X>0</X>
-              <Y>0</Y>
-            </maxPosition>
-            <normalPosition>
-              <Left>0</Left>
-              <Top>0</Top>
-              <Right>0</Right>
-              <Bottom>0</Bottom>
-            </normalPosition>
-          </WINDOWPLACEMENT>
-        ")]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"<?xml version=""1.0"" encoding=""utf-16""?>
+<WINDOWPLACEMENT xmlns:xsi=""http://www.w3.org/2001/XMLSchema-instance"" xmlns:xsd=""http://www.w3.org/2001/XMLSchema"">
+  <length>0</length>
+  <flags>0</flags>
+  <showCmd>HIDE</showCmd>
+  <minPosition>
+    <X>0</X>
+    <Y>0</Y>
+  </minPosition>
+  <maxPosition>
+    <X>0</X>
+    <Y>0</Y>
+  </maxPosition>
+  <normalPosition>
+    <Left>0</Left>
+    <Top>0</Top>
+    <Right>0</Right>
+    <Bottom>0</Bottom>
+  </normalPosition>
+</WINDOWPLACEMENT>")]
         public global::Rialto.Components.Views.WINDOWPLACEMENT MainWindowPlacements {
             get {
                 return ((global::Rialto.Components.Views.WINDOWPLACEMENT)(this["MainWindowPlacements"]));
