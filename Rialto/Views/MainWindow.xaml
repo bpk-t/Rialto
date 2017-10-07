@@ -19,7 +19,7 @@
         TextOptions.TextRenderingMode="Auto"        
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}"
-        Title="Rialto" Height="1400" Width="1800">
+        Title="Rialto" Height="1400" Width="2000">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
         <DataTemplate DataType="{x:Type vm:ErrorDialogViewModel}">
@@ -55,7 +55,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
-                <RowDefinition Height="35px" />
+                <RowDefinition Height="20px" />
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0">
@@ -176,14 +176,14 @@
 
                 <Grid Grid.Column="2">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="40px" />
+                        <RowDefinition Height="60px" />
                         <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="50px" />
                     </Grid.RowDefinitions>
-
-                    <Grid Grid.Row="0">
+                    <Grid Grid.Row="0" materialDesign:ShadowAssist.ShadowDepth="Depth3">
                         <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*" />
                             <ColumnDefinition Width="1*" />
                             <ColumnDefinition Width="1*" />
                             <ColumnDefinition Width="1*" />
@@ -216,64 +216,67 @@
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                         </ComboBox>
+
+                        <!-- ページ番号表示 -->
+                        <TextBlock Grid.Column="3" Text="{Binding CurrentPageAllPage}" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" />
                     </Grid>
 
-                    <ListView Name="ThumbnailList" Grid.Row="1" Margin="5" ItemsSource="{Binding ThumbnailImgList}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                        <ListView.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Orientation="Vertical" Margin="5">
-                                    <Image Margin="2" Source="{Binding DispImage, UpdateSourceTrigger=PropertyChanged}" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListView.ItemTemplate>
+                    <Border Grid.Row="1" BorderThickness="1" BorderBrush="DarkGray" Margin="5">
+                        <ListView Name="ThumbnailList" ItemsSource="{Binding ThumbnailImgList}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Vertical" Margin="5">
+                                        <Image Margin="2" Source="{Binding DispImage, UpdateSourceTrigger=PropertyChanged}" />
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
 
-                        <ListView.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel ItemHeight="{Binding ThumbnailItemSizeHeight}" ItemWidth="{Binding ThumbnailItemSizeWidth}"/>
-                            </ItemsPanelTemplate>
-                        </ListView.ItemsPanel>
+                            <ListView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel ItemHeight="{Binding ThumbnailItemSizeHeight}" ItemWidth="{Binding ThumbnailItemSizeWidth}"/>
+                                </ItemsPanelTemplate>
+                            </ListView.ItemsPanel>
 
-                        <!-- 右クリックメニュー -->
-                        <ListView.ContextMenu>
-                            <ContextMenu>
-                                <MenuItem Header="タグをコピーする"></MenuItem>
-                                <MenuItem Header="タグを貼り付ける"></MenuItem>
-                                <MenuItem Header="削除"></MenuItem>
-                            </ContextMenu>
-                        </ListView.ContextMenu>
+                            <!-- 右クリックメニュー -->
+                            <ListView.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="タグをコピーする"></MenuItem>
+                                    <MenuItem Header="タグを貼り付ける"></MenuItem>
+                                    <MenuItem Header="削除"></MenuItem>
+                                </ContextMenu>
+                            </ListView.ContextMenu>
 
-                        <i:Interaction.Triggers>
-                            <i:EventTrigger EventName="SelectionChanged">
-                                <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedThumbnailImgList" Value="{Binding Path=SelectedItems, ElementName=ThumbnailList}"/>
-                                <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ThumbnailListSelectionChanged"/>
-                            </i:EventTrigger>
-                        </i:Interaction.Triggers>
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="SelectionChanged">
+                                    <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedThumbnailImgList" Value="{Binding Path=SelectedItems, ElementName=ThumbnailList}"/>
+                                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ThumbnailListSelectionChanged"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
 
-                        <i:Interaction.Behaviors>
-                            <behaviors:FileDragAndDropBehavior Command="{Binding AddItemsCommand}" />
-                        </i:Interaction.Behaviors>
+                            <i:Interaction.Behaviors>
+                                <behaviors:FileDragAndDropBehavior Command="{Binding AddItemsCommand}" />
+                            </i:Interaction.Behaviors>
 
-                        <ListView.InputBindings>
-                            <KeyBinding Gesture="Enter" Command="{Binding OpenFullScreenViewCommand}" />
-                        </ListView.InputBindings>
-                    </ListView>
+                            <ListView.InputBindings>
+                                <KeyBinding Gesture="Enter" Command="{Binding OpenFullScreenViewCommand}" />
+                            </ListView.InputBindings>
+                        </ListView>
+                    </Border>
 
                     <ProgressBar Grid.Row="2" IsIndeterminate="True" Margin="4" Visibility="{Binding ProgressBarVisible, Converter={StaticResource BoolToVisibility}}" />
                     
                     <Grid Grid.Row="3">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*" />
-                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="60px" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="60px" />
                             <ColumnDefinition Width="1*" />
                         </Grid.ColumnDefinitions>
 
                         <!-- 前のページ -->
-                        <Button Grid.Column="0" Margin="5" IsEnabled="{Binding PrevPageButtonIsEnable}">
-                            <StackPanel Orientation="Horizontal">
-                                <materialDesign:PackIcon Kind="ArrowLeftBold" />
-                                <TextBlock Text="前のページ" Margin="8 0 0 0" />
-                            </StackPanel>
-
+                        <Button Grid.Column="1" Margin="5" IsEnabled="{Binding PrevPageButtonIsEnable}" Style="{StaticResource MaterialDesignRaisedLightButton}" ToolTip="前のページへ移動">
+                            <materialDesign:PackIcon Kind="ArrowLeftBold" />
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ShowPrevPage"/>
@@ -281,16 +284,27 @@
                             </i:Interaction.Triggers>
                         </Button>
 
-                        <!-- ページ番号表示 -->
-                        <TextBlock  Grid.Column="1" Text="{Binding CurrentPageAllPage}" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" />
-
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <Border BorderThickness="1" BorderBrush="LightGray" Margin="5">
+                                <Button Width="40px"  Style="{StaticResource MaterialDesignFlatButton}">1</Button>
+                            </Border>
+                            <Border BorderThickness="0" BorderBrush="LightGray" Margin="5">
+                                <Button Width="40px" Style="{StaticResource MaterialDesignFlatButton}">2</Button>
+                            </Border>
+                            <Border BorderThickness="0" BorderBrush="LightGray" Margin="5">
+                                <Button Width="40px" Style="{StaticResource MaterialDesignFlatButton}">3</Button>
+                            </Border>
+                            <Border BorderThickness="0" BorderBrush="LightGray" Margin="5">
+                                <Button Width="40px" Style="{StaticResource MaterialDesignFlatButton}">4</Button>
+                            </Border>
+                            <Border BorderThickness="0" BorderBrush="LightGray" Margin="5">
+                                <Button Width="40px" Style="{StaticResource MaterialDesignFlatButton}">5</Button>
+                            </Border>
+                        </StackPanel>
+                        
                         <!-- 次のページ -->
-                        <Button Grid.Column="2" Margin="5" IsEnabled="{Binding NextPageButtoIsEnable}">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="次のページ" Margin="8 0 0 0" />
-                                <materialDesign:PackIcon Kind="ArrowRightBold" />
-                            </StackPanel>
-
+                        <Button Grid.Column="3" Margin="5" IsEnabled="{Binding NextPageButtoIsEnable}" Style="{StaticResource MaterialDesignRaisedLightButton}" ToolTip="次のページへ移動">
+                            <materialDesign:PackIcon Kind="ArrowRightBold" />
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
                                     <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ShowNextPage"/>
@@ -305,6 +319,7 @@
                 <Grid Grid.Column="4">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="1*" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="2*" />
                     </Grid.RowDefinitions>
 
@@ -346,9 +361,10 @@
                         </DockPanel>
                     </Grid>
 
+                    <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                    
                     <!-- タグ設定タブ -->
-
-                    <TabControl x:Name="tabControl" Grid.Row="1" Margin="5" ItemsSource="{Binding TabPanels}">
+                    <TabControl x:Name="tabControl" Grid.Row="2" Margin="5" ItemsSource="{Binding TabPanels}">
                         <TabControl.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding Header}" />
