@@ -145,21 +145,34 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <!-- タグツリー -->
-                    <TextBox Grid.Row="0" Margin="5" MaxLines="1" Text="{Binding SearchTagText, UpdateSourceTrigger=PropertyChanged}">
-                        <i:Interaction.Behaviors>
-                            <behaviors:PlaceHolderBehavior PlaceHolderText="検索" />
-                        </i:Interaction.Behaviors>
+                    <!-- タグリスト検索 -->
+                    <Grid Grid.Row="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="1*" />
+                        </Grid.ColumnDefinitions>
 
-                        <TextBox.InputBindings>
-                            <KeyBinding Key="Enter" Command="{Binding SearchTagCommand}" />
-                        </TextBox.InputBindings>
-                    </TextBox>
+                        <materialDesign:PackIcon Kind="FileFind" Grid.Column="0" Margin="5,5,0,5"/>
 
+                        <TextBox Grid.Column="1" Margin="5" MaxLines="1" Text="{Binding SearchTagText, UpdateSourceTrigger=PropertyChanged}">
+                            <i:Interaction.Behaviors>
+                                <behaviors:PlaceHolderBehavior PlaceHolderText="タグの検索" />
+                            </i:Interaction.Behaviors>
+
+                            <TextBox.InputBindings>
+                                <KeyBinding Key="Enter" Command="{Binding SearchTagCommand}" />
+                            </TextBox.InputBindings>
+                        </TextBox>
+                    </Grid>
+
+                    <!-- タグリスト -->
                     <ListView x:Name="TagTreeList" Grid.Row="1" Margin="5" ItemsSource="{Binding TagTreeItems}" SelectionMode="Single">
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding DispName}" />
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="Tag" />
+                                    <TextBlock Text="{Binding DispName}" Margin="5,0,0,0" />
+                                </StackPanel>
                             </DataTemplate>
                         </ListView.ItemTemplate>
 
