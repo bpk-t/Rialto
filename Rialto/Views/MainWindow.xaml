@@ -136,7 +136,7 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="5*" />
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="3*" />
                 </Grid.ColumnDefinitions>
 
                 <Grid Grid.Column="0">
@@ -331,48 +331,65 @@
 
                 <Grid Grid.Column="4">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="1*" />
+                        <RowDefinition Height="4*" />
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="2*" />
+                        <RowDefinition Height="5*" />
                     </Grid.RowDefinitions>
 
                     <!-- 画像情報エリア -->
-                    <Grid Grid.Row="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="2*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="1*" />
-                        </Grid.ColumnDefinitions>
+                    <GroupBox Grid.Row="0" Header="画像情報" Style="{DynamicResource MaterialDesignCardGroupBox}" Margin="5">
+                        <GroupBox.HeaderTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <materialDesign:PackIcon Kind="ImageArea" Height="32" Width="32" VerticalAlignment="Center" />
+                                    <TextBlock Margin="8,0,0,0" VerticalAlignment="Center" Style="{StaticResource MaterialDesignSubheadingTextBlock}" Text="{Binding}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </GroupBox.HeaderTemplate>
 
-                        <Border Grid.Column="0" BorderThickness="2" BorderBrush="LightBlue" Margin="5">
-                            <Button Width="Auto" Height="Auto">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="{x:Type Button}">
-                                        <Image Source="{Binding SideImage}"></Image>
-                                    </ControlTemplate>
-                                </Button.Template>
+                        <Grid Grid.Row="0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="2*" />
+                            </Grid.ColumnDefinitions>
 
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Click">
-                                        <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="OpenFullScreenView"/>
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </Button>
-                        </Border>
+                            <Border Grid.Column="0" BorderThickness="2" BorderBrush="LightBlue" Margin="5">
+                                <Button Width="Auto" Height="Auto">
+                                    <Button.Template>
+                                        <ControlTemplate TargetType="{x:Type Button}">
+                                            <Image Source="{Binding SideImage}"></Image>
+                                        </ControlTemplate>
+                                    </Button.Template>
 
-                        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center"/>
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="OpenFullScreenView"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </Button>
+                            </Border>
 
-                        <DockPanel Grid.Column="2" Margin="5" MinWidth="100">
-                            <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Stretch">既存のタグ</TextBlock>
-                            <ListView DockPanel.Dock="Top" ItemsSource="{Binding SelectedItemHaveTags}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                <ListView.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock Text="{Binding Name}" />
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
-                        </DockPanel>
-                    </Grid>
+                            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center"/>
+
+                            <DockPanel Grid.Column="2" Margin="5" MinWidth="100">
+                                <TextBlock DockPanel.Dock="Top" HorizontalAlignment="Stretch">既存のタグ</TextBlock>
+                                <ListView DockPanel.Dock="Top" ItemsSource="{Binding SelectedItemHaveTags}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <materialDesign:Chip Content="{Binding Name}" IsDeletable="True"          
+                                                IconBackground="{DynamicResource PrimaryHueDarkBrush}"
+                                                IconForeground="{DynamicResource PrimaryHueDarkForegroundBrush}">
+                                                <materialDesign:Chip.Icon>
+                                                    <materialDesign:PackIcon Kind="Tag"></materialDesign:PackIcon>
+                                                </materialDesign:Chip.Icon>
+                                            </materialDesign:Chip>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                            </DockPanel>
+                        </Grid>
+                    </GroupBox>
 
                     <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
                     
