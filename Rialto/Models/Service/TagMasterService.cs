@@ -12,34 +12,17 @@ namespace Rialto.Models.Service
 {
     public class TagMasterService : NotificationObject
     {
-        /*
-        private ObservableSynchronizedCollection<TagTreeNode> TagTreeItems_ = new ObservableSynchronizedCollection<TagTreeNode>();
-        public ObservableSynchronizedCollection<TagTreeNode> TagTreeItems
+        public Task<ObservableCollection<TagTreeNode>> GetAllTag()
         {
-            get
-            {
-                return TagTreeItems_;
-            }
-            set
-            {
-                TagTreeItems_ = value;
-                RaisePropertyChanged(() => TagTreeItems);
-            }
-        }
-        */
-
-        public Task<ObservableCollection<TagTreeNode>> InitTagTree()
-        {
-            return InitTagTree((_) => true);
+            return GetAllTag((_) => true);
         }
 
-        public Task<ObservableCollection<TagTreeNode>> InitTagTree(Func<Tag, bool> predicate)
+        public Task<ObservableCollection<TagTreeNode>> GetAllTag(Func<Tag, bool> predicate)
         {
             return Task.Run(() =>
             {
                 var tagTreeCollection = new ObservableCollection<TagTreeNode>();
                 var list = TagRepository.GetAllTag();
-
 
                 tagTreeCollection.Add(new TagTreeNode() {
                     ID = TagConstant.ALL_TAG_ID,

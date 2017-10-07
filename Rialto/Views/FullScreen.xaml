@@ -31,10 +31,10 @@
     <Window.InputBindings>
         <KeyBinding Key="Esc" Command="{Binding ESCKeyDownCommand}" CommandParameter="{Binding ElementName=FullScreenWindow}" />
 
-        <KeyBinding Key="Left" Command="{Binding NextPictureCommand}" CommandParameter="{Binding ElementName=FullScreenWindow}" />
+        <KeyBinding Key="Right" Command="{Binding NextPictureCommand}" CommandParameter="{Binding ElementName=FullScreenWindow}" />
         <KeyBinding Key="Space" Command="{Binding NextPictureCommand}" CommandParameter="{Binding ElementName=FullScreenWindow}" />
 
-        <KeyBinding Key="Right" Command="{Binding PrevPictureCommand}" CommandParameter="{Binding ElementName=FullScreenWindow}" />
+        <KeyBinding Key="Left" Command="{Binding PrevPictureCommand}" CommandParameter="{Binding ElementName=FullScreenWindow}" />
         <KeyBinding Key="Back" Command="{Binding PrevPictureCommand}" CommandParameter="{Binding ElementName=FullScreenWindow}" />
 
     </Window.InputBindings>

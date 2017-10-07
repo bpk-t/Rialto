@@ -25,6 +25,8 @@ using System.Reactive.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Threading.Tasks;
 using Akka.Actor;
+using LanguageExt;
+using static LanguageExt.Prelude;
 
 namespace Rialto.ViewModels
 {
@@ -36,8 +38,8 @@ namespace Rialto.ViewModels
         private ThumbnailImageService thumbnailService;
         private TagMasterService tagMasterService;
         private TagAllocateService tagAllocateService;
-        private AllocatedTagsService allocatedTags;
         private DatabaseCreateService dbCreateService = new DatabaseCreateService();
+        private ImageRegisterService imageRegisterService;
 
         #endregion
 
@@ -50,16 +52,16 @@ namespace Rialto.ViewModels
             logger.Debug().Write();
             thumbnailService = new ThumbnailImageService(system);
             tagMasterService = new TagMasterService();
-            tagAllocateService = new TagAllocateService(_SelectedThumbnailImgList);
-            allocatedTags = new AllocatedTagsService();
+            tagAllocateService = new TagAllocateService(_SelectedThumbnailImgList, tags => SelectedItemHaveTags = tags);
             thumbnailService.OnChangePage += (value) => CurrentPageAllPage = value;
+            imageRegisterService = new ImageRegisterService(system);
         }
 
         private Task Refresh()
         {
             var thumbnailTask = thumbnailService.ShowThumbnailImage(TagConstant.ALL_TAG_ID);
             var tagSettingTask = tagAllocateService.InitTabSettingPanel();
-            var initTagTask = tagMasterService.InitTagTree()
+            var initTagTask = tagMasterService.GetAllTag()
                 .ContinueWith(t => TagTreeItems = t.Result);
 
             return Task.WhenAll(thumbnailTask, tagSettingTask, initTagTask);
@@ -277,23 +279,17 @@ namespace Rialto.ViewModels
             }
         }
 
-        /// <summary>
-        /// 選択された画像に付与されたタグ
-        /// </summary>
-        private ReadOnlyDispatcherCollection<TagMasterInfo> SelectedItemHaveTags_;
-        public ReadOnlyDispatcherCollection<TagMasterInfo> SelectedItemHaveTags
+        private ObservableCollection<TagMasterInfo> SelectedItemHaveTags_ = new ObservableCollection<TagMasterInfo>();
+        public ObservableCollection<TagMasterInfo> SelectedItemHaveTags
         {
             get
             {
-                if (SelectedItemHaveTags_ == null)
-                {
-                    SelectedItemHaveTags_ = ViewModelHelper.CreateReadOnlyDispatcherCollection(
-                        allocatedTags.ItemHaveTags
-                        , m => m
-                        , DispatcherHelper.UIDispatcher
-                        );
-                }
                 return SelectedItemHaveTags_;
+            }
+            set
+            {
+                SelectedItemHaveTags_ = value;
+                RaisePropertyChanged(() => SelectedItemHaveTags);
             }
         }
 
@@ -308,8 +304,8 @@ namespace Rialto.ViewModels
         {
             if (SelectedThumbnailImgList.Count > 0) {
                 var selectedImg = SelectedThumbnailImgList[0] as ImageInfo;
+                SelectedItemHaveTags = tagAllocateService.GetAllocatedTags(selectedImg.ImgID);
 
-                allocatedTags.GetAllocatedTags(selectedImg.ImgID);
                 SideImage = await Task.Run(() => {
                     var image = new BitmapImage();
                     image.BeginInit();
@@ -359,7 +355,7 @@ namespace Rialto.ViewModels
             if (SelectedThumbnailImgList.Count > 0)
             {
                 var selectedImgId = ((ImageInfo)SelectedThumbnailImgList[0]).ImgID;
-                var currentIndex = Array.FindIndex(thumbnailService.ThumbnailImgList.ToArray(), (x) => x.ImgID == selectedImgId);
+                var currentIndex = System.Array.FindIndex(thumbnailService.ThumbnailImgList.ToArray(), (x) => x.ImgID == selectedImgId);
 
                 Messenger.Raise(new TransitionMessage(
                     new FullScreenViewModel(currentIndex, thumbnailService), "ShowFullScreen"));
@@ -390,11 +386,11 @@ namespace Rialto.ViewModels
         {
             if (SearchTagText.Count() > 0)
             {
-                TagTreeItems = await tagMasterService.InitTagTree((x) => x.Name.Contains(SearchTagText));
+                TagTreeItems = await tagMasterService.GetAllTag((x) => x.Name.Contains(SearchTagText));
             }
             else
             {
-                TagTreeItems = await tagMasterService.InitTagTree();
+                TagTreeItems = await tagMasterService.GetAllTag();
             }
         }
         #endregion
@@ -417,9 +413,12 @@ namespace Rialto.ViewModels
         /// ドラッグアンドドロップ
         /// </summary>
         /// <param name="uriList">ファイルリスト</param>
-        private void AddItems(IList<Uri> uriList)
+        private async void AddItems(IList<Uri> uriList)
         {
             uriList.ForEach(x => Debug.WriteLine(x));
+
+            var results = await imageRegisterService.RegisterImages(uriList, None);
+            Refresh();
         }
 
         #endregion
@@ -441,11 +440,10 @@ namespace Rialto.ViewModels
                 }
                 else
                 {
-
-                    // TODO ファイル作成ダイアログ
-                    // TODO 指定されたファイル名から新規DBファイルを作成する
-                    //dbCreateService.CreateSchema();
-                    Debug.WriteLine("Call CreateNewDB = " + param.Response[0]);
+                    Properties.Settings.Default.LastOpenDbName = filePath;
+                    Properties.Settings.Default.Save();
+                    dbCreateService.CreateSchema();
+                    Refresh();
                 }
             }
 
@@ -539,7 +537,6 @@ namespace Rialto.ViewModels
             await thumbnailService.GoToNextPage();
             ProgressBarVisible = false;
         }
-
 
         /// <summary>
         /// サムネイル上で選択した画像リスト

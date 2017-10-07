@@ -99,7 +99,6 @@ namespace Rialto.ViewModels
 
         #region NextPictureCommand
         private ListenerCommand<object> _NextPictureCommand;
-
         public ListenerCommand<object> NextPictureCommand
         {
             get
@@ -130,7 +129,7 @@ namespace Rialto.ViewModels
                     await thumbnailImageService.GoToFirstPage();
                 }
             }
-            var path = thumbnailImageService.ThumbnailImgList[currentIndex].SourceImageFilePath;
+             var path = thumbnailImageService.ThumbnailImgList[currentIndex].SourceImageFilePath;
             CurrentImage = new BitmapImage(path);
 
             /*
@@ -169,7 +168,6 @@ namespace Rialto.ViewModels
 
         #region PrevPictureCommand
         private ListenerCommand<object> _PrevPictureCommand;
-
         public ListenerCommand<object> PrevPictureCommand
         {
             get

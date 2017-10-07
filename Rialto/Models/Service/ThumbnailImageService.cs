@@ -39,8 +39,9 @@ namespace Rialto.Models.Service
 
         public ThumbnailImageService(ActorSystem system)
         {
-            thumbnailImageActor = system.ActorOf<ThumbnailImageActor>("ThumbnailImageActor");
+            thumbnailImageActor = system.ActorOf<ThumbnailImageActor>(nameof(ThumbnailImageActor));
 
+            // TODO 戻り値で返却するように修正する
             OnChangePage += (v) => { }; // null check不要にするための空実装
         }
 
@@ -55,19 +56,19 @@ namespace Rialto.Models.Service
 
         public Task<bool> ExistsPrevPage()
         {
-            var message = new ThumbnailImageActor.ExistsPrevPage(currentTagId, currentPage * OnePageItemCount);
+            var message = new ThumbnailImageActor.ExistsPrevPageMessage(currentTagId, currentPage * OnePageItemCount);
             return thumbnailImageActor.Ask<bool>(message);
         }
 
         public Task<bool> ExistsNextPage()
         {
-            var message = new ThumbnailImageActor.ExistsNextPage(currentTagId, currentPage * OnePageItemCount);
+            var message = new ThumbnailImageActor.ExistsNextPageMessage(currentTagId, currentPage * OnePageItemCount);
             return thumbnailImageActor.Ask<bool>(message);
         }
 
         public async Task Refresh()
         {
-            var message = new ThumbnailImageActor.GotToPage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
+            var message = new ThumbnailImageActor.GotToPageMessage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
             (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
             SetThumbnailImages(allCount, images);
         }
@@ -77,7 +78,7 @@ namespace Rialto.Models.Service
             if (await ExistsNextPage())
             {
                 currentPage++;
-                var message = new ThumbnailImageActor.GotToPage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
+                var message = new ThumbnailImageActor.GotToPageMessage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
                 (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
                 SetThumbnailImages(allCount, images);
             } else
@@ -91,7 +92,7 @@ namespace Rialto.Models.Service
             if (await ExistsPrevPage())
             {
                 currentPage--;
-                var message = new ThumbnailImageActor.GotToPage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
+                var message = new ThumbnailImageActor.GotToPageMessage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
                 (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
                 SetThumbnailImages(allCount, images);
             }
@@ -100,7 +101,7 @@ namespace Rialto.Models.Service
         public async Task GoToFirstPage()
         {
             currentPage = 0;
-            var message = new ThumbnailImageActor.GotToPage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
+            var message = new ThumbnailImageActor.GotToPageMessage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
             (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
             SetThumbnailImages(allCount, images);
         }
@@ -111,7 +112,7 @@ namespace Rialto.Models.Service
             currentTagId = tagId;
             currentImageOrder = Order.Desc;
 
-            var message = new ThumbnailImageActor.GotToPage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
+            var message = new ThumbnailImageActor.GotToPageMessage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
             (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
             SetThumbnailImages(allCount, images);
         }
@@ -131,7 +132,7 @@ namespace Rialto.Models.Service
             currentImageOrder = Order.Asc;
             currentPage = 0;
 
-            var message = new ThumbnailImageActor.GotToPage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
+            var message = new ThumbnailImageActor.GotToPageMessage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
             (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
             ThumbnailImgList.Clear();
             images.ForEach(x => ThumbnailImgList.Add(x));
@@ -146,13 +147,13 @@ namespace Rialto.Models.Service
 
         class ThumbnailImageActor : ReceiveActor
         {
-            public class GotToPage
+            public class GotToPageMessage
             {
                 public long TagId { get; }
                 public long Offset { get; }
                 public long Limit { get; }
                 public Order ImageOrder { get; }
-                public GotToPage(long tagId, int offset, int limit, Order imageOrder)
+                public GotToPageMessage(long tagId, int offset, int limit, Order imageOrder)
                 {
                     TagId = tagId;
                     Offset = offset;
@@ -162,11 +163,11 @@ namespace Rialto.Models.Service
             }
 
             // TODO トランザクション分けない
-            public class ExistsNextPage
+            public class ExistsNextPageMessage
             {
                 public long TagId { get; }
                 public long Offset { get; }
-                public ExistsNextPage(long tagId, int offset)
+                public ExistsNextPageMessage(long tagId, int offset)
                 {
                     TagId = tagId;
                     Offset = offset;
@@ -174,11 +175,11 @@ namespace Rialto.Models.Service
             }
 
             // TODO トランザクション分けない
-            public class ExistsPrevPage
+            public class ExistsPrevPageMessage
             {
                 public long TagId { get; }
                 public long Offset { get; }
-                public ExistsPrevPage(long tagId, int offset)
+                public ExistsPrevPageMessage(long tagId, int offset)
                 {
                     TagId = tagId;
                     Offset = offset;
@@ -187,15 +188,15 @@ namespace Rialto.Models.Service
 
             public ThumbnailImageActor()
             {
-                Receive<GotToPage>((message) =>
+                Receive<GotToPageMessage>((message) =>
                 {
                     Sender.Tell(GetThumbnailImage(message.TagId, message.Offset, message.Limit, message.ImageOrder));
                 });
-                Receive<ExistsNextPage>((message) =>
+                Receive<ExistsNextPageMessage>((message) =>
                 {
                     Sender.Tell(GetImageCount(message.TagId) > message.Offset);
                 });
-                Receive<ExistsPrevPage>((message) =>
+                Receive<ExistsPrevPageMessage>((message) =>
                 {
                     Sender.Tell(GetImageCount(message.TagId) > 0 && message.Offset >= 0);
                 });
@@ -219,11 +220,11 @@ namespace Rialto.Models.Service
 
             private (long allCount, List<ImageInfo> imgList) GetThumbnailImage(long tagId, long offset, long limit, Order imageOrder)
             {
-                ImageInfo RegisterImageToImageInfo(RegisterImage image) => new ImageInfo()
+                ImageInfo RegisterImageToImageInfo(Option<RegisterImage> img, Option<ImageRepository> repository) => new ImageInfo()
                 {
-                    ImgID = image.Id,
-                    ThumbnailImageFilePath = GetThumbnailImage(image.FilePath, image.Md5Hash),
-                    SourceImageFilePath = new Uri(Path.Combine(Properties.Settings.Default.ImgDataDirectory, image.FilePath))
+                    ImgID = img.Fold(0, (acc, x) => x.Id),
+                    ThumbnailImageFilePath = GetThumbnailImage(img.Fold("", (a, x) => x.FilePath), img.Fold("", (a, x) => x.Md5Hash)),
+                    SourceImageFilePath = new Uri(Path.Combine(Properties.Settings.Default.ImgDataDirectory, img.Fold("", (a, x) => x.FilePath)))
                 };
                 ImageInfo LoadImage(ImageInfo imgInfo) {
                     var tmpBitmapImage = new BitmapImage();
@@ -239,7 +240,7 @@ namespace Rialto.Models.Service
                 if (tagId == TagConstant.ALL_TAG_ID)
                 {
                     var list = RegisterImageRepository.GetAll(offset, limit, imageOrder)
-                        .Select(x => RegisterImageToImageInfo(x))
+                        .Select(x => RegisterImageToImageInfo(x.Item1, x.Item2))
                         .ToList();
 
                     // 高速化のため、画像は並列読み込み
@@ -249,7 +250,9 @@ namespace Rialto.Models.Service
                 }
                 else if (tagId == TagConstant.NOTAG_TAG_ID)
                 {
-                    var list = RegisterImageRepository.GetNoTag(offset, limit, imageOrder).Select(x => RegisterImageToImageInfo(x)).ToList();
+                    var list = RegisterImageRepository.GetNoTag(offset, limit, imageOrder)
+                        .Select(x => RegisterImageToImageInfo(x.Item1, x.Item2))
+                        .ToList();
                     // 高速化のため、画像は並列読み込み
                     Parallel.For(0, list.Count, i => list[i] = LoadImage(list[i]));
                     var count = RegisterImageRepository.GetNoTagCount();
@@ -257,7 +260,9 @@ namespace Rialto.Models.Service
                 }
                 else
                 {
-                    var list = RegisterImageRepository.GetByTag(tagId, offset, limit, imageOrder).Select(x => RegisterImageToImageInfo(x)).ToList();
+                    var list = RegisterImageRepository.GetByTag(tagId, offset, limit, imageOrder)
+                        .Select(x => RegisterImageToImageInfo(x.Item1, x.Item2))
+                        .ToList();
                     // 高速化のため、画像は並列読み込み
                     Parallel.For(0, list.Count, i => list[i] = LoadImage(list[i]));
                     var count = RegisterImageRepository.GetByTagCount(tagId);
@@ -278,6 +283,7 @@ namespace Rialto.Models.Service
                     return Path.Combine(Properties.Settings.Default.ThumbnailImageDirectory, fileName);
                 }
                 var filePath = GetPath(imgHash);
+                
                 if (!File.Exists(filePath))
                 {
                     CreateThumbnailImage(imgPath, imgHash);

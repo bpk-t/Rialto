@@ -42,13 +42,13 @@ namespace Rialto.Models.DAO.Builder
 
         public InsertQuery Set<T>(string column, T value)
         {
-            (queryParam as IDictionary<string, T>).Add(column, value);
+            (queryParam as IDictionary<string, object>).Add(column, value);
             return this;
         }
 
         public InsertQuery Set<T>(ColumnDefinition column, T value)
         {
-            (queryParam as IDictionary<string, T>).Add(column.ColumnName, value);
+            (queryParam as IDictionary<string, object>).Add(column.ColumnName, value);
             return this;
         }
 
@@ -64,7 +64,7 @@ namespace Rialto.Models.DAO.Builder
                 + "(" + (queryParam as IDictionary<string, object>).Select(x => x.Key).Aggregate((acc, x) => acc + "," + x) + ") "
                 + selectQuery.Match<string>(
                     (query) => query.ToSqlString(),
-                    () => "VALUES(" + (queryParam as IDictionary<string, object>).Select(x => x.Key).Aggregate((acc, x) => acc + ",@" + x) + ") "
+                    () => "VALUES(" + (queryParam as IDictionary<string, object>).Select(x => "@" + x.Key).Aggregate((acc, x) => acc + "," + x) + ") "
                     );
         }
     }

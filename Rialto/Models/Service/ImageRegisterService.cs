@@ -26,18 +26,25 @@ namespace Rialto.Models.Service
             }
         }
 
-        public void RegisterImages(IList<Uri> imageUris, Option<int> tagId)
+        private IActorRef registerActor;
+        public ImageRegisterService(ActorSystem system)
         {
+            registerActor = system.ActorOf<ImageRegisterActor>(nameof(ImageRegisterActor));
+        }
 
+        public Task<List<Either<RegisterFailureInfo, FileInfo>>> RegisterImages(IList<Uri> imageUris, Option<int> tagId)
+        {
+            var message = new ImageRegisterActor.RegisterImagesMessage(imageUris, tagId);
+            return registerActor.Ask<List<Either<RegisterFailureInfo, FileInfo>>>(message);
         }
 
         class ImageRegisterActor : ReceiveActor
         {
-            public class RegisterImagesParamater
+            public class RegisterImagesMessage
             {
                 public IList<Uri> ImageUris { get; }
-                public Option<long> TagId { get; }
-                public RegisterImagesParamater(IList<Uri> imageUris, Option<long> tagId)
+                public Option<int> TagId { get; }
+                public RegisterImagesMessage(IList<Uri> imageUris, Option<int> tagId)
                 {
                     ImageUris = imageUris;
                     TagId = tagId;
@@ -45,10 +52,9 @@ namespace Rialto.Models.Service
             }
             public ImageRegisterActor()
             {
-                Receive<RegisterImagesParamater>((message) =>
+                Receive<RegisterImagesMessage>((message) =>
                 {
-                    // TODO 登録結果を返す
-                    //Sender.Tell(RegisterImages(message.ImageUris, message.TagId));
+                    Sender.Tell(RegisterImages(message.ImageUris.Select(x => x.AbsolutePath).ToArray(), message.TagId));
                 });
             }
 

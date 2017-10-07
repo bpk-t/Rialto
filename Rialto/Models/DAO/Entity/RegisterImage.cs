@@ -17,6 +17,7 @@ namespace Rialto.Models.DAO.Entity
         public string FilePath { get; set; }
         public string Md5Hash { get; set; }
         public string AveHash { get; set; }
+        public int ImageRepositoryId { get; set; }
         
         public int HeightPix { get; set; }
         public int WidthPix { get; set; }

@@ -9,6 +9,7 @@ using System.Collections;
 using System.Diagnostics;
 using Rialto.Models.DAO.Entity;
 using Rialto.Models.Repository;
+using Rialto.Models.Service;
 
 namespace Rialto.ViewModels
 {
@@ -76,21 +77,22 @@ namespace Rialto.ViewModels
 
         #endregion
 
-        public void Initialize()
-        {
-            Task.Run(() =>
-            {
-                var list = TagRepository.GetAllTag();
+        private TagMasterService tagMasterService;
 
-                Application.Current.Dispatcher.Invoke(() =>
-                {
-                    if (!AllTags.IsEmpty())
-                    {
-                        AllTags.Clear();
-                    }
-                    list.ForEach(x => AllTags.Add(x));
-                });
-            });
+        public TagSettingWindowViewModel()
+        {
+            tagMasterService = new TagMasterService();
+        }
+
+        public async void Initialize()
+        {
+            var tags = await tagMasterService.GetAllTag();
+
+            if (!AllTags.IsEmpty())
+            {
+                AllTags.Clear();
+            }
+            //tags.ForEach(x => AllTags.Add(x));
         }
         
         /// <summary>

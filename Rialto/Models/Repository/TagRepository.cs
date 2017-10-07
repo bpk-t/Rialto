@@ -73,7 +73,6 @@ namespace Rialto.Models.Repository
             }
         }
 
-
         public static void Update(Tag updateObj)
         {
             using (var con = DBHelper.Instance.GetDbConnection())

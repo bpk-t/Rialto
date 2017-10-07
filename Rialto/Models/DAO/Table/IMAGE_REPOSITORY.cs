@@ -19,5 +19,16 @@ namespace Rialto.Models.DAO.Table
         public static readonly ColumnDefinition PATH = new ColumnDefinition(ThisTable, nameof(PATH));
         public static readonly ColumnDefinition CREATED_AT = new ColumnDefinition(ThisTable, nameof(CREATED_AT));
         public static readonly ColumnDefinition UPDATED_AT = new ColumnDefinition(ThisTable, nameof(UPDATED_AT));
+
+        public static string[] Columns()
+        {
+            return new string[]
+            {
+                ID.ToSqlString(),
+                PATH.ToSqlString(),
+                CREATED_AT.ToSqlString(),
+                UPDATED_AT.ToSqlString()
+            };
+        }
     }
 }

@@ -172,7 +172,6 @@
     <Compile Include="Models\Repository\M_TAG_INFORepository.cs" />
     <Compile Include="Models\Repository\RegisterImageRepository.cs" />
     <Compile Include="Models\Repository\TagRepository.cs" />
-    <Compile Include="Models\Service\AllocatedTagsService.cs" />
     <Compile Include="Models\AverageHashGenerator.cs" />
     <Compile Include="Models\DAO\Builder\ColumnDefinition.cs" />
     <Compile Include="Models\DAO\Builder\TableDefinition.cs" />
