@@ -64,8 +64,7 @@ namespace Rialto.Models.DAO.Builder
                 + "(" + (queryParam as IDictionary<string, object>).Select(x => x.Key).Aggregate((acc, x) => acc + "," + x) + ") "
                 + selectQuery.Match<string>(
                     (query) => query.ToSqlString(),
-                    () => "VALUES(" + (queryParam as IDictionary<string, object>).Select(x => "@" + x.Key).Aggregate((acc, x) => acc + "," + x) + ") "
-                    );
+                    () => "VALUES(" + (queryParam as IDictionary<string, object>).Select(x => "@" + x.Key).Aggregate((acc, x) => acc + "," + x) + ") ");
         }
     }
 }

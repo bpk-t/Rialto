@@ -143,17 +143,37 @@ namespace Rialto.Models.Repository
         {
             using (var con = DBHelper.Instance.GetDbConnection())
             {
-                var query = QueryBuilder.Insert().Into(TAG_ASSIGN.ThisTable)
-                    .Set(TAG_ASSIGN.REGISTER_IMAGE_ID, insertObj.RegisterImageId)
-                    .Set(TAG_ASSIGN.TAG_ID, insertObj.TagId);
-
-                var queryParam = new
+                con.Open();
+                using (var tran = con.BeginTransaction())
                 {
-                    REGISTER_IMAGE_ID = insertObj.RegisterImageId,
-                    TAG_ID = insertObj.TagId,
-                };
+                    try
+                    {
+                        // 本当は on duplicate keyみたいなことをやりたかった
+                        var select = QueryBuilder.Select("1").From(TAG_ASSIGN.ThisTable)
+                            .Where(TAG_ASSIGN.REGISTER_IMAGE_ID.Eq(insertObj.RegisterImageId.ToString()))
+                            .Where(TAG_ASSIGN.TAG_ID.Eq(insertObj.TagId.ToString()));
 
-                con.Execute(query.ToSqlString(), queryParam);
+                        if (con.Query(select.ToSqlString()).IsEmpty())
+                        {
+                            var query = QueryBuilder.Insert().Into(TAG_ASSIGN.ThisTable)
+                                .Set(TAG_ASSIGN.REGISTER_IMAGE_ID, insertObj.RegisterImageId)
+                                .Set(TAG_ASSIGN.TAG_ID, insertObj.TagId);
+
+                            var queryParam = new
+                            {
+                                REGISTER_IMAGE_ID = insertObj.RegisterImageId,
+                                TAG_ID = insertObj.TagId,
+                            };
+
+                            con.Execute(query.ToSqlString(), queryParam);
+                            tran.Commit();
+                        }
+
+                    } catch
+                    {
+                        tran.Rollback();
+                    }
+                }
             }
         }
 

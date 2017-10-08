@@ -605,16 +605,22 @@ namespace Rialto.ViewModels
             }
         }
 
-        private bool ProgressBarVisible_ = true;
+        private Queue<int> processingQueue = new Queue<int>();
         public bool ProgressBarVisible
         {
             get
             {
-                return ProgressBarVisible_;
+                return !processingQueue.IsEmpty();
             }
             set
             {
-                ProgressBarVisible_ = value;
+                if (value)
+                {
+                    processingQueue.Enqueue(0);
+                } else
+                {
+                    processingQueue.Dequeue();
+                }
                 RaisePropertyChanged(() => ProgressBarVisible);
             }
         }
