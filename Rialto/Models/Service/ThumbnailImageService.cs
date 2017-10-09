@@ -238,12 +238,17 @@ namespace Rialto.Models.Service
 
             private Task<(long allCount, List<ImageInfo> imgList)> GetThumbnailImage(long tagId, long offset, long limit, Order imageOrder)
             {
-                ImageInfo RegisterImageToImageInfo(Option<RegisterImage> img, Option<ImageRepository> repository) => new ImageInfo()
+                ImageInfo RegisterImageToImageInfo(Option<RegisterImage> img, Option<ImageRepository> repository)
                 {
-                    ImgID = img.Fold(0, (acc, x) => x.Id),
-                    ThumbnailImageFilePath = GetThumbnailImage(img.Fold("", (a, x) => x.FilePath), img.Fold("", (a, x) => x.Md5Hash)),
-                    SourceImageFilePath = new Uri(Path.Combine(Properties.Settings.Default.ImgDataDirectory, img.Fold("", (a, x) => x.FilePath)))
-                };
+                    var sourceImagePath = Path.Combine(repository.Fold("", (a, x) => x.Path), img.Fold("", (a, x) => x.FilePath));
+                    return new ImageInfo()
+                    {
+                        ImgID = img.Fold(0, (acc, x) => x.Id),
+                        ThumbnailImageFilePath = GetThumbnailImage(sourceImagePath, img.Fold("", (a, x) => x.Md5Hash)),
+                        SourceImageFilePath = new Uri(sourceImagePath)
+                    };
+                }
+
                 ImageInfo LoadImage(ImageInfo imgInfo) {
                     var tmpBitmapImage = new BitmapImage();
                     tmpBitmapImage.BeginInit();
@@ -336,38 +341,35 @@ namespace Rialto.Models.Service
             /// </summary>
             /// <param name="imgPath">元画像のファイルパス</param>
             /// <param name="imgHash">元画像のハッシュ</param>
-            private Try<string> CreateThumbnailImage(string imgPath, string imgHash)
+            private string CreateThumbnailImage(string imgPath, string imgHash)
             {
-                return () =>
+                using (var image = Image.FromFile(imgPath))
                 {
-                    using (var image = Image.FromFile(imgPath))
+                    var resizeH = image.Height;
+                    var resizeW = image.Width;
+
+                    // リサイズ後の縦横を計算
+                    if (image.Height > 220)
                     {
-                        var resizeH = image.Height;
-                        var resizeW = image.Width;
+                        resizeH = 220;
+                        resizeW = (int)((double)resizeW * ((double)220 / (double)image.Height));
+                    }
 
-                        // リサイズ後の縦横を計算
-                        if (image.Height > 220)
+                    using (var canvas = new Bitmap(resizeW, resizeH))
+                    {
+                        using (var g = Graphics.FromImage(canvas))
                         {
-                            resizeH = 220;
-                            resizeW = (int)((double)resizeW * ((double)220 / (double)image.Height));
-                        }
+                            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                            g.DrawImage(image, new Rectangle(0, 0, resizeW, resizeH));
 
-                        using (var canvas = new Bitmap(resizeW, resizeH))
-                        {
-                            using (var g = Graphics.FromImage(canvas))
-                            {
-                                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                                g.DrawImage(image, new Rectangle(0, 0, resizeW, resizeH));
+                            var savePath = Path.Combine(Properties.Settings.Default.ThumbnailImageDirectory, imgHash);
+                            // サムネイル画像の保存
+                            canvas.Save(savePath, System.Drawing.Imaging.ImageFormat.Png);
 
-                                var savePath = Path.Combine(Properties.Settings.Default.ThumbnailImageDirectory, imgHash);
-                                // サムネイル画像の保存
-                                canvas.Save(savePath, System.Drawing.Imaging.ImageFormat.Png);
-
-                                return savePath;
-                            }
+                            return savePath;
                         }
                     }
-                };
+                }
             }
         }
 

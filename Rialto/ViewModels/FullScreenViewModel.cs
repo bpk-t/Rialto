@@ -45,10 +45,10 @@ namespace Rialto.ViewModels
             thumbnailImageService = thumbnailImage;
         }
 
-        public void Initialize()
+        public async void Initialize()
         {
             var path = thumbnailImageService.ThumbnailImgList[currentIndex].SourceImageFilePath;
-            CurrentImage = new BitmapImage(path);
+            CurrentImage = await LoadImageAsync(path);
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace Rialto.ViewModels
                 }
             }
              var path = thumbnailImageService.ThumbnailImgList[currentIndex].SourceImageFilePath;
-            CurrentImage = new BitmapImage(path);
+            CurrentImage = await LoadImageAsync(path);
 
             /*
             if (nextImageTask.IsSome)
@@ -164,6 +164,19 @@ namespace Rialto.ViewModels
             
         }
         #endregion
+
+        private Task<BitmapImage> LoadImageAsync(Uri path)
+        {
+            return Task.Run(() =>
+            {
+                var tmpBitmapImage = new BitmapImage();
+                tmpBitmapImage.BeginInit();
+                tmpBitmapImage.UriSource = path;
+                tmpBitmapImage.EndInit();
+                tmpBitmapImage.Freeze();
+                return tmpBitmapImage;
+            });
+        }
 
 
         #region PrevPictureCommand
@@ -199,7 +212,7 @@ namespace Rialto.ViewModels
                 }
             }
             var path = thumbnailImageService.ThumbnailImgList[currentIndex].SourceImageFilePath;
-            CurrentImage = new BitmapImage(path);
+            CurrentImage = await LoadImageAsync(path);
         }
         #endregion
 
