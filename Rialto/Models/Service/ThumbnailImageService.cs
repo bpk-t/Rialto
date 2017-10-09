@@ -15,6 +15,8 @@ using Akka.Actor;
 using Rialto.Models.DAO.Builder;
 using System.Windows.Media.Imaging;
 using LanguageExt;
+using static LanguageExt.Prelude;
+using Rialto.Util;
 
 namespace Rialto.Models.Service
 {
@@ -190,35 +192,51 @@ namespace Rialto.Models.Service
             {
                 Receive<GotToPageMessage>((message) =>
                 {
-                    Sender.Tell(GetThumbnailImage(message.TagId, message.Offset, message.Limit, message.ImageOrder));
+                    var result = GetThumbnailImage(message.TagId, message.Offset, message.Limit, message.ImageOrder);
+                    result.Wait();
+                    Sender.Tell(result.Result);
                 });
                 Receive<ExistsNextPageMessage>((message) =>
                 {
-                    Sender.Tell(GetImageCount(message.TagId) > message.Offset);
+                    GetImageCount(message.TagId).Select(result =>
+                    {
+                        Sender.Tell(result > message.Offset);
+                        return unit;
+                    });
                 });
                 Receive<ExistsPrevPageMessage>((message) =>
                 {
-                    Sender.Tell(GetImageCount(message.TagId) > 0 && message.Offset >= 0);
+                    GetImageCount(message.TagId).Select(result =>
+                    {
+                        Sender.Tell(result > 0 && message.Offset >= 0);
+                        return unit;
+                    });
                 });
             }
 
-            private long GetImageCount(long tagId)
+            private Task<long> GetImageCount(long tagId)
             {
-                if (tagId == TagConstant.ALL_TAG_ID)
+                using (var connection = DBHelper.Instance.GetDbConnection())
                 {
-                    return RegisterImageRepository.GetAllCount();
-                }
-                else if (tagId == TagConstant.NOTAG_TAG_ID)
-                {
-                    return RegisterImageRepository.GetNoTagCount();
-                }
-                else
-                {
-                    return RegisterImageRepository.GetByTagCount(tagId);
+                    using (var tran = connection.BeginTransaction())
+                    {
+                        if (tagId == TagConstant.ALL_TAG_ID)
+                        {
+                            return RegisterImageRepository.GetAllCountAsync(connection);
+                        }
+                        else if (tagId == TagConstant.NOTAG_TAG_ID)
+                        {
+                            return RegisterImageRepository.GetNoTagCountAsync(connection);
+                        }
+                        else
+                        {
+                            return RegisterImageRepository.GetByTagCountAsync(connection, tagId);
+                        }
+                    }
                 }
             }
 
-            private (long allCount, List<ImageInfo> imgList) GetThumbnailImage(long tagId, long offset, long limit, Order imageOrder)
+            private Task<(long allCount, List<ImageInfo> imgList)> GetThumbnailImage(long tagId, long offset, long limit, Order imageOrder)
             {
                 ImageInfo RegisterImageToImageInfo(Option<RegisterImage> img, Option<ImageRepository> repository) => new ImageInfo()
                 {
@@ -237,37 +255,59 @@ namespace Rialto.Models.Service
                     return imgInfo;
                 };
 
-                if (tagId == TagConstant.ALL_TAG_ID)
+                using (var connection = DBHelper.Instance.GetDbConnection())
                 {
-                    var list = RegisterImageRepository.GetAll(offset, limit, imageOrder)
-                        .Select(x => RegisterImageToImageInfo(x.Item1, x.Item2))
-                        .ToList();
+                    using (var tran = connection.BeginTransaction())
+                    {
+                        if (tagId == TagConstant.ALL_TAG_ID)
+                        {
+                            var countTask = RegisterImageRepository.GetAllCountAsync(connection);
+                            var getListTask = RegisterImageRepository.GetAllAsync(connection, offset, limit, imageOrder).Select(results =>
+                                results.Select(x => RegisterImageToImageInfo(x.Item1, x.Item2)).ToList()
+                            );
+                            
+                            return Task.WhenAll(countTask, getListTask).ContinueWith(nouse =>
+                            {
+                                var list = getListTask.Result;
+                                // 高速化のため、画像は並列読み込み
+                                Parallel.For(0, list.Count, i => list[i] = LoadImage(list[i]));
+                                return (countTask.Result, list);
+                            });
+                            
+                        }
+                        else if (tagId == TagConstant.NOTAG_TAG_ID)
+                        {
+                            var countTask = RegisterImageRepository.GetNoTagCountAsync(connection);
+                            var getListTask = RegisterImageRepository.GetNoTagAsync(connection, offset, limit, imageOrder).Select(results =>
+                                results.Select(x => RegisterImageToImageInfo(x.Item1, x.Item2)).ToList()
+                            );
 
-                    // 高速化のため、画像は並列読み込み
-                    Parallel.For(0, list.Count, i => list[i] = LoadImage(list[i]));
-                    var count = RegisterImageRepository.GetAllCount();
-                    return (count, list);
+                            return Task.WhenAll(countTask, getListTask).ContinueWith(nouse =>
+                            {
+                                var list = getListTask.Result;
+                                // 高速化のため、画像は並列読み込み
+                                Parallel.For(0, list.Count, i => list[i] = LoadImage(list[i]));
+                                return (countTask.Result, list);
+                            });
+                        }
+                        else
+                        {
+                            var countTask = RegisterImageRepository.GetByTagCountAsync(connection, tagId);
+                            var getListTask = RegisterImageRepository.GetByTagAsync(connection, tagId, offset, limit, imageOrder).Select(results =>
+                                results.Select(x => RegisterImageToImageInfo(x.Item1, x.Item2)).ToList()
+                            );
+
+                            return Task.WhenAll(countTask, getListTask).ContinueWith(nouse =>
+                            {
+                                var list = getListTask.Result;
+                                // 高速化のため、画像は並列読み込み
+                                Parallel.For(0, list.Count, i => list[i] = LoadImage(list[i]));
+                                return (countTask.Result, list);
+                            });
+                        }
+                    }
                 }
-                else if (tagId == TagConstant.NOTAG_TAG_ID)
-                {
-                    var list = RegisterImageRepository.GetNoTag(offset, limit, imageOrder)
-                        .Select(x => RegisterImageToImageInfo(x.Item1, x.Item2))
-                        .ToList();
-                    // 高速化のため、画像は並列読み込み
-                    Parallel.For(0, list.Count, i => list[i] = LoadImage(list[i]));
-                    var count = RegisterImageRepository.GetNoTagCount();
-                    return (count, list);
-                }
-                else
-                {
-                    var list = RegisterImageRepository.GetByTag(tagId, offset, limit, imageOrder)
-                        .Select(x => RegisterImageToImageInfo(x.Item1, x.Item2))
-                        .ToList();
-                    // 高速化のため、画像は並列読み込み
-                    Parallel.For(0, list.Count, i => list[i] = LoadImage(list[i]));
-                    var count = RegisterImageRepository.GetByTagCount(tagId);
-                    return (count, list);
-                }
+
             }
 
             /// <summary>

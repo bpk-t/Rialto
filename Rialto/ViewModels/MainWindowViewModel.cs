@@ -304,9 +304,8 @@ namespace Rialto.ViewModels
         {
             if (SelectedThumbnailImgList.Count > 0) {
                 var selectedImg = SelectedThumbnailImgList[0] as ImageInfo;
-                SelectedItemHaveTags = tagAllocateService.GetAllocatedTags(selectedImg.ImgID);
-
-                SideImage = await Task.Run(() => {
+                var getSelectedTask = tagAllocateService.GetAllocatedTags(selectedImg.ImgID);
+                var getImageTask = Task.Run(() => {
                     var image = new BitmapImage();
                     image.BeginInit();
                     image.UriSource = selectedImg.SourceImageFilePath;
@@ -315,6 +314,9 @@ namespace Rialto.ViewModels
                     image.Freeze();
                     return image;
                 });
+
+                SideImage = await getImageTask;
+                SelectedItemHaveTags = await getSelectedTask;
             }
         }
 

@@ -10,6 +10,8 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using LanguageExt;
+using static LanguageExt.Prelude;
 
 namespace Rialto.Models.Service
 {
@@ -43,16 +45,16 @@ namespace Rialto.Models.Service
             this.OnChange += onChange;
         }
 
-        public Task InitTabSettingPanelAsync()
+        public Task<Unit> InitTabSettingPanelAsync()
         {
-            return Task.Run(() =>
+            using (var connection = DBHelper.Instance.GetDbConnection())
             {
-                using (var connection = DBHelper.Instance.GetDbConnection())
+                using (var tran = connection.BeginTransaction())
                 {
-                    using (var tran = connection.BeginTransaction())
+                    TabPanels.Clear();
+                    return TagRepository.GetAllTagGroupAsync(connection).SelectMany(results =>
                     {
-                        TabPanels.Clear();
-                        TagRepository.GetAllTagGroup(connection).ForEach(group =>
+                        results.ForEach(group =>
                         {
                             var tabInfo = new TabInfo
                             {
@@ -67,7 +69,7 @@ namespace Rialto.Models.Service
                                     ClickEvent = (ev) =>
                                     {
                                         selectedThumbnailImgList.ForEach(x =>
-                                        TagRepository.InsertTagAssign(connection,
+                                        TagRepository.InsertTagAssignAsync(connection,
                                             new TagAssign
                                             {
                                                 RegisterImageId = x.ImgID,
@@ -77,27 +79,36 @@ namespace Rialto.Models.Service
                                         if (selectedThumbnailImgList.Count == 1)
                                         {
                                             var imgId = selectedThumbnailImgList[0].ImgID;
-                                            OnChange(GetAllocatedTags(imgId));
+
+                                            GetAllocatedTags(imgId).Select(tags => {
+                                                OnChange(tags);
+                                                return unit;
+                                            });
                                         }
                                     }
                                 })
                                 .ForEach(x => tabInfo.Buttons.Add(x));
                             TabPanels.Add(tabInfo);
                         });
-                    }
+
+                        return Task.FromResult(unit);
+                    });
                 }
-            });
+            }
         }
 
-        public ObservableCollection<TagMasterInfo> GetAllocatedTags(long imgId)
+        public Task<ObservableCollection<TagMasterInfo>> GetAllocatedTags(long imgId)
         {
             using (var connection = DBHelper.Instance.GetDbConnection())
             {
                 using (var tran = connection.BeginTransaction())
                 {
-                    var tags = new ObservableCollection<TagMasterInfo>();
-                    TagRepository.GetTagByImageAssigned(connection, imgId).ForEach(x => tags.Add(TagToTagMaster(x)));
-                    return tags;
+                    return TagRepository.GetTagByImageAssignedAsync(connection, imgId).Select(results =>
+                    {
+                        var tags = new ObservableCollection<TagMasterInfo>();
+                        results.ForEach(x => tags.Add(TagToTagMaster(x)));
+                        return tags;
+                    });
                 }
             }
         }

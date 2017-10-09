@@ -24,45 +24,46 @@ namespace Rialto.Models.Repository
             return connection.QueryAsync<Tag>(query.ToSqlString());
         }
 
-        public static Option<Tag> FindByName(DbConnection connection, string name)
+        public static Task<Option<Tag>> FindByNameAsync(DbConnection connection, string name)
         {
             var query = QueryBuilder.Select()
                     .From(TAG.ThisTable)
                     .Where(TAG.NAME.Eq("@TAG_NAME"));
 
-            return Optional(
-                connection.Query<Tag>(query.ToSqlString(), new { TAG_NAME = name }).FirstOrDefault()
-            );
+            return connection.QueryAsync<Tag>(query.ToSqlString(), new { TAG_NAME = name })
+                .ContinueWith(x => x.Result.ToOption());
         }
 
-        public static Option<Tag> FindById(DbConnection connection, int tagId)
+        public static Task<Option<Tag>> FindByIdAsync(DbConnection connection, int tagId)
         {
             var query = QueryBuilder.Select()
                     .From(TAG.ThisTable)
                     .Where(TAG.ID.Eq("@TAG_ID"));
 
-            return Optional(
-                connection.Query<Tag>(query.ToSqlString(), new { TAG_ID = tagId }).FirstOrDefault()
-            );
+            return connection.QueryAsync<Tag>(query.ToSqlString(), new { TAG_ID = tagId })
+                    .ContinueWith(x => x.Result.ToOption());
         }
 
         /// <summary>
         /// 引数で指定されたタグ情報を追加する、すでに存在する場合は上書きする
         /// </summary>
         /// <param name="upsertObj"></param>
-        public static void Upsert(DbConnection connection, Tag upsertObj)
+        public static Task<int> UpsertAsync(DbConnection connection, Tag upsertObj)
         {
-            if (FindById(connection, upsertObj.Id).IsSome)
+            return FindByIdAsync(connection, upsertObj.Id).SelectMany(x =>
             {
-                Update(connection, upsertObj);
-            }
-            else
-            {
-                Insert(connection, upsertObj);
-            }
+                if (x.IsSome)
+                {
+                    return UpdateAsync(connection, upsertObj);
+                }
+                else
+                {
+                    return InsertAsync(connection, upsertObj);
+                }
+            });
         }
 
-        public static void Update(DbConnection connection, Tag updateObj)
+        public static Task<int> UpdateAsync(DbConnection connection, Tag updateObj)
         {
             var query = QueryBuilder.Update(TAG.ThisTable)
                 .Set(TAG.NAME, updateObj.Name)
@@ -77,10 +78,10 @@ namespace Rialto.Models.Repository
                 UPDATED_AT = "datetime('now', 'localtime')",
                 TAG_ID = updateObj.Id
             };
-            connection.Execute(query.ToSqlString(), queryParam);
+            return connection.ExecuteAsync(query.ToSqlString(), queryParam);
         }
 
-        public static void Insert(DbConnection connection, Tag insertObj)
+        public static Task<int> InsertAsync(DbConnection connection, Tag insertObj)
         {
             var query = QueryBuilder.Insert().Into(TAG.ThisTable)
                 .Set(TAG.NAME, insertObj.Name)
@@ -98,12 +99,11 @@ namespace Rialto.Models.Repository
                 DESCRIPTION = insertObj.Description
             };
 
-            connection.Execute(query.ToSqlString(), queryParam);
+            return connection.ExecuteAsync(query.ToSqlString(), queryParam);
         }
 
-        public static Dictionary<TagGroup, List<Tag>> GetAllTagGroup(DbConnection connection)
+        public static Task<Dictionary<TagGroup, List<Tag>>> GetAllTagGroupAsync(DbConnection connection)
         {
-            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
             var query = QueryBuilder.Select(TAG_GROUP.Columns())
                 .Select(TAG.Columns())
                 .From(TAG_GROUP.ThisTable)
@@ -112,47 +112,50 @@ namespace Rialto.Models.Repository
                 .OrderBy(TAG_GROUP.ID, Order.Asc)
                 .OrderBy(TAG.ID, Order.Asc);
 
-            var result = connection.QueryMultiple(query.ToSqlString());
-
-            return result.Read((TagGroup tagGroup, Tag tag) => (tagGroup, tag))
-                .GroupBy(x => x.Item1, x => x.Item2, new CompareSelector<TagGroup, int>(x => x.Id))
-                .ToDictionary(x => x.Key, x => x.ToList());
+            return connection.QueryMultipleAsync(query.ToSqlString()).Select(reader =>
+            {
+                return reader.Read((TagGroup tagGroup, Tag tag) => (tagGroup, tag))
+                    .GroupBy(x => x.Item1, x => x.Item2, new CompareSelector<TagGroup, int>(x => x.Id))
+                    .ToDictionary(x => x.Key, x => x.ToList());
+            });
         }
 
-        public static void InsertTagAssign(DbConnection connection, TagAssign insertObj)
+        public static Task<int> InsertTagAssignAsync(DbConnection connection, TagAssign insertObj)
         {
             // 本当は on duplicate keyみたいなことをやりたかったけどSQLiteにはない
             var select = QueryBuilder.Select("1").From(TAG_ASSIGN.ThisTable)
                 .Where(TAG_ASSIGN.REGISTER_IMAGE_ID.Eq(insertObj.RegisterImageId.ToString()))
                 .Where(TAG_ASSIGN.TAG_ID.Eq(insertObj.TagId.ToString()));
 
-            if (connection.Query(select.ToSqlString()).IsEmpty())
+            return connection.QueryAsync(select.ToSqlString()).SelectMany(x =>
             {
-                var query = QueryBuilder.Insert().Into(TAG_ASSIGN.ThisTable)
-                    .Set(TAG_ASSIGN.REGISTER_IMAGE_ID, insertObj.RegisterImageId)
-                    .Set(TAG_ASSIGN.TAG_ID, insertObj.TagId);
-
-                var queryParam = new
+                if (x.IsEmpty())
                 {
-                    REGISTER_IMAGE_ID = insertObj.RegisterImageId,
-                    TAG_ID = insertObj.TagId,
-                };
+                    var query = QueryBuilder.Insert().Into(TAG_ASSIGN.ThisTable)
+                        .Set(TAG_ASSIGN.REGISTER_IMAGE_ID, insertObj.RegisterImageId)
+                        .Set(TAG_ASSIGN.TAG_ID, insertObj.TagId);
 
-                connection.Execute(query.ToSqlString(), queryParam);
-            }
+                    var queryParam = new
+                    {
+                        REGISTER_IMAGE_ID = insertObj.RegisterImageId,
+                        TAG_ID = insertObj.TagId,
+                    };
+
+                    return connection.ExecuteAsync(query.ToSqlString(), queryParam);
+                }
+                return Task.FromResult(0);
+            });
         }
 
-        public static IEnumerable<Tag> GetTagByImageAssigned(DbConnection connection, long imgId)
+        public static Task<IEnumerable<Tag>> GetTagByImageAssignedAsync(DbConnection connection, long imgId)
         {
-            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
-
             var query = QueryBuilder.Select(TAG.Columns())
                 .From(TAG.ThisTable)
                 .InnerJoin(TAG_ASSIGN.ThisTable, TAG.ID.Eq(TAG_ASSIGN.TAG_ID))
                 .Where(TAG_ASSIGN.REGISTER_IMAGE_ID.Eq(imgId.ToString()))
                 .OrderBy(TAG_ASSIGN.CREATED_AT, Order.Asc);
 
-            return connection.Query<Tag>(query.ToSqlString());
+            return connection.QueryAsync<Tag>(query.ToSqlString());
         }
     }
 }
