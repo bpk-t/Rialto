@@ -86,7 +86,7 @@ namespace Rialto.ViewModels
 
         public async void Initialize()
         {
-            var tags = await tagMasterService.GetAllTag();
+            var tags = await tagMasterService.GetAllTagAsync();
 
             if (!AllTags.IsEmpty())
             {

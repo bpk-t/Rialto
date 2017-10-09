@@ -10,6 +10,7 @@ using Dapper;
 using Rialto.Models.DAO.Entity;
 using LanguageExt;
 using static LanguageExt.Prelude;
+using System.Data.Common;
 
 namespace Rialto.Models.Repository
 {
@@ -26,6 +27,16 @@ namespace Rialto.Models.Repository
 
                 return con.ExecuteScalar<long>(query.ToSqlString());
             }
+        }
+
+        public static Task<long> GetAllCountAsync(DbConnection connection)
+        {
+            var query = QueryBuilder.Select(SQLFunctionBuilder.Count("*").ToSqlString())
+                .From(REGISTER_IMAGE.ThisTable)
+                .InnerJoin(IMAGE_REPOSITORY.ThisTable, IMAGE_REPOSITORY.ID.Eq(REGISTER_IMAGE.IMAGE_REPOSITORY_ID))
+                .Where(REGISTER_IMAGE.DELETE_TIMESTAMP.IsNull());
+
+            return connection.ExecuteScalarAsync<long>(query.ToSqlString());
         }
 
         public static IEnumerable<(Option<RegisterImage>, Option<ImageRepository>)> GetAll(long offset, long limit, Order order)
@@ -62,6 +73,18 @@ namespace Rialto.Models.Repository
 
                 return con.ExecuteScalar<long>(query.ToSqlString());
             }
+        }
+
+        public static Task<long> GetNoTagCountAsync(DbConnection connection)
+        {
+            var query = QueryBuilder.Select(SQLFunctionBuilder.Count("*").ToSqlString())
+                .From(REGISTER_IMAGE.ThisTable)
+                .InnerJoin(IMAGE_REPOSITORY.ThisTable, IMAGE_REPOSITORY.ID.Eq(REGISTER_IMAGE.IMAGE_REPOSITORY_ID))
+                .Where(REGISTER_IMAGE.DELETE_TIMESTAMP.IsNull())
+                .Where(ConditionBuilder.NotExists(
+                    QueryBuilder.Select().From(TAG_ASSIGN.ThisTable).Where(REGISTER_IMAGE.ID.Eq(TAG_ASSIGN.REGISTER_IMAGE_ID))));
+
+            return connection.ExecuteScalarAsync<long>(query.ToSqlString());
         }
 
         public static IEnumerable<(Option<RegisterImage>, Option<ImageRepository>)> GetNoTag(long offset, long limit, Order order)

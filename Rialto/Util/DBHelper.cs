@@ -144,7 +144,10 @@ namespace Rialto.Util
 
         public SQLiteConnection GetDbConnection()
         {
-            return new SQLiteConnection(GetConnectionString());
+            var connection = new SQLiteConnection(GetConnectionString());
+            Dapper.DefaultTypeMap.MatchNamesWithUnderscores = true;
+            connection.Open();
+            return connection;
         }
 
         private string GetConnectionString()

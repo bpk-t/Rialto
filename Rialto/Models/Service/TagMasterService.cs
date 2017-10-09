@@ -3,6 +3,7 @@ using Rialto.Constant;
 using Rialto.Model.DataModel;
 using Rialto.Models.DAO.Entity;
 using Rialto.Models.Repository;
+using Rialto.Util;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -12,40 +13,52 @@ namespace Rialto.Models.Service
 {
     public class TagMasterService : NotificationObject
     {
-        public Task<ObservableCollection<TagTreeNode>> GetAllTag()
+        public Task<ObservableCollection<TagTreeNode>> GetAllTagAsync()
         {
-            return GetAllTag((_) => true);
+            return GetAllTagAsync((_) => true);
         }
 
-        public Task<ObservableCollection<TagTreeNode>> GetAllTag(Func<Tag, bool> predicate)
+        public Task<ObservableCollection<TagTreeNode>> GetAllTagAsync(Func<Tag, bool> predicate)
         {
-            return Task.Run(() =>
+            using (var connection = DBHelper.Instance.GetDbConnection())
             {
-                var tagTreeCollection = new ObservableCollection<TagTreeNode>();
-                var list = TagRepository.GetAllTag();
+                using (var tran = connection.BeginTransaction())
+                {
+                    var allTagsTask = TagRepository.GetAllTagAsync(connection);
+                    var allCountTask = RegisterImageRepository.GetAllCountAsync(connection);
+                    var noTagCount = RegisterImageRepository.GetNoTagCountAsync(connection);
 
-                tagTreeCollection.Add(new TagTreeNode() {
-                    ID = TagConstant.ALL_TAG_ID,
-                    Name = "ALL",
-                    ImageCount = 0
-                    //ImageCount = M_TAG_INFO.GetAllImgCount()
-                });
-                tagTreeCollection.Add(new TagTreeNode() {
-                    ID = TagConstant.NOTAG_TAG_ID,
-                    Name = "NoTag",
-                    ImageCount = 0
-                    //ImageCount = M_TAG_INFO.GetHasNotTagImgCount()
-                });
-                list.Where(predicate)
-                    .Select((x) => new TagTreeNode()
+                    return Task.WhenAll(
+                        allTagsTask,
+                        allCountTask,
+                        noTagCount
+                        ).ContinueWith(nouse =>
                     {
-                        ID = x.Id,
-                        Name = x.Name,
-                        ImageCount = x.AssignImageCount
-                    }).ForEach(x => tagTreeCollection.Add(x));
-
-                return tagTreeCollection;
-            });
+                        var tagTreeCollection = new ObservableCollection<TagTreeNode>();
+                        tagTreeCollection.Add(new TagTreeNode()
+                        {
+                            ID = TagConstant.ALL_TAG_ID,
+                            Name = "ALL",
+                            ImageCount = (int)allCountTask.Result
+                        });
+                        tagTreeCollection.Add(new TagTreeNode()
+                        {
+                            ID = TagConstant.NOTAG_TAG_ID,
+                            Name = "NoTag",
+                            ImageCount = (int)noTagCount.Result
+                        });
+                        allTagsTask.Result.Where(predicate)
+                            .Select((x) => new TagTreeNode()
+                            {
+                                ID = x.Id,
+                                Name = x.Name,
+                                ImageCount = x.AssignImageCount
+                            })
+                            .ForEach(x => tagTreeCollection.Add(x));
+                        return tagTreeCollection;
+                    });
+                }
+            }
         }
     }
 }
