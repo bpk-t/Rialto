@@ -8,8 +8,8 @@ namespace Rialto.Models.DAO.Entity
 {
     public class ViewHistory
     {
-        public int Id { get; set; }
-        public int RegisterImageId { get; set; }
+        public long Id { get; set; }
+        public long RegisterImageId { get; set; }
 
         public DateTime ViewTimestamp { get; set; }
         public int ViewTimeMs { get; set; }

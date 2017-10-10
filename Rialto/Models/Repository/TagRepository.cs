@@ -34,7 +34,7 @@ namespace Rialto.Models.Repository
                 .ContinueWith(x => x.Result.ToOption());
         }
 
-        public static Task<Option<Tag>> FindByIdAsync(DbConnection connection, int tagId)
+        public static Task<Option<Tag>> FindByIdAsync(DbConnection connection, long tagId)
         {
             var query = QueryBuilder.Select()
                     .From(TAG.ThisTable)
@@ -115,7 +115,7 @@ namespace Rialto.Models.Repository
             return connection.QueryMultipleAsync(query.ToSqlString()).Select(reader =>
             {
                 return reader.Read((TagGroup tagGroup, Tag tag) => (tagGroup, tag))
-                    .GroupBy(x => x.Item1, x => x.Item2, new CompareSelector<TagGroup, int>(x => x.Id))
+                    .GroupBy(x => x.Item1, x => x.Item2, new CompareSelector<TagGroup, long>(x => x.Id))
                     .ToDictionary(x => x.Key, x => x.ToList());
             });
         }

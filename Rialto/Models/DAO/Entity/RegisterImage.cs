@@ -10,14 +10,14 @@ namespace Rialto.Models.DAO.Entity
 {
     public class RegisterImage
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public int FileSize { get; set; }
         public string FileName { get; set; }
         public string FileExtension { get; set; }
         public string FilePath { get; set; }
         public string Md5Hash { get; set; }
         public string AveHash { get; set; }
-        public int ImageRepositoryId { get; set; }
+        public long ImageRepositoryId { get; set; }
         
         public int HeightPix { get; set; }
         public int WidthPix { get; set; }

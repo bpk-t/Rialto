@@ -13,7 +13,7 @@ namespace Rialto.Model.DataModel
         {
         }
 
-        public int ImgID { get; set; }
+        public long ImgID { get; set; }
 
         private BitmapImage _DispImage = null;
 

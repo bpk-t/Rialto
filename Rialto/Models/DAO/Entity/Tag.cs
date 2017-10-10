@@ -8,7 +8,7 @@ namespace Rialto.Models.DAO.Entity
 {
     public class Tag
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string Name { get; set; }
         public string Ruby { get; set; }
         public int SearchCount { get; set; }

@@ -64,7 +64,7 @@ namespace Rialto.Models.Service
 
         public Task<bool> ExistsNextPage()
         {
-            var message = new ThumbnailImageActor.ExistsNextPageMessage(currentTagId, currentPage * OnePageItemCount);
+            var message = new ThumbnailImageActor.ExistsNextPageMessage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount);
             return thumbnailImageActor.Ask<bool>(message);
         }
 
@@ -169,10 +169,12 @@ namespace Rialto.Models.Service
             {
                 public long TagId { get; }
                 public long Offset { get; }
-                public ExistsNextPageMessage(long tagId, int offset)
+                public long Limit { get; }
+                public ExistsNextPageMessage(long tagId, int offset, int limit)
                 {
                     TagId = tagId;
                     Offset = offset;
+                    Limit = limit;
                 }
             }
 
@@ -200,7 +202,7 @@ namespace Rialto.Models.Service
                 {
                     GetImageCount(message.TagId).Select(result =>
                     {
-                        Sender.Tell(result > message.Offset);
+                        Sender.Tell(result > 0 && (result - 1) > message.Offset + message.Limit);
                         return unit;
                     });
                 });
@@ -243,7 +245,7 @@ namespace Rialto.Models.Service
                     var sourceImagePath = Path.Combine(repository.Fold("", (a, x) => x.Path), img.Fold("", (a, x) => x.FilePath));
                     return new ImageInfo()
                     {
-                        ImgID = img.Fold(0, (acc, x) => x.Id),
+                        ImgID = img.Fold(0L, (acc, x) => x.Id),
                         ThumbnailImageFilePath = GetThumbnailImage(sourceImagePath, img.Fold("", (a, x) => x.Md5Hash)),
                         SourceImageFilePath = new Uri(sourceImagePath)
                     };
