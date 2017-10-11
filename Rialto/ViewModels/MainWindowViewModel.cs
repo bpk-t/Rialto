@@ -84,8 +84,13 @@ namespace Rialto.ViewModels
             SelectedPageViewImageCount = PageViewImageCountList[2];
             thumbnailService.OnePageItemCount = SelectedPageViewImageCount.ImageCount;
 
-            ThumbnailItemSizeHeight = 200.0;
-            ThumbnailItemSizeWidth = 200.0;
+            ThumbnailImageSizeList = new ObservableCollection<ThumbnailImageSize>
+            {
+                new ThumbnailImageSize { ThumbnailSize = ThumbnailImageSize.Size.Large},
+                new ThumbnailImageSize { ThumbnailSize = ThumbnailImageSize.Size.Middle},
+                new ThumbnailImageSize { ThumbnailSize = ThumbnailImageSize.Size.Small},
+            };
+            SelectedThumbnailImageSize = ThumbnailImageSizeList[0];
 
             // DBファイルの存在チェック
             if (Properties.Settings.Default.LastOpenDbName.IsEmpty()
@@ -102,6 +107,7 @@ namespace Rialto.ViewModels
         }
 
         #region Properties
+
 
         /// <summary>
         /// ページ番号表示（現在のページ/すべてのページ数）
@@ -541,7 +547,7 @@ namespace Rialto.ViewModels
         }
 
         /// <summary>
-        /// サムネイル上で選択した画像リスト
+        /// 1ページに表示するサムネイル画像の表示件数選択項目
         /// </summary>
         private ObservableCollection<PageViewImageCount> PageViewImageCountList_ = new ObservableCollection<PageViewImageCount>();
         public ObservableCollection<PageViewImageCount> PageViewImageCountList
@@ -557,6 +563,9 @@ namespace Rialto.ViewModels
             }
         }
 
+        /// <summary>
+        /// 1ページに表示するサムネイル画像の表示件数（選択された項目）
+        /// </summary>
         private PageViewImageCount SelectedPageViewImageCount_;
         public PageViewImageCount SelectedPageViewImageCount
         {
@@ -577,6 +586,56 @@ namespace Rialto.ViewModels
             thumbnailService.OnePageItemCount = SelectedPageViewImageCount.ImageCount;
             await thumbnailService.Refresh();
             ProgressBarVisible = false;
+        }
+
+        /// <summary>
+        /// サムネイル画像の大きさ選択項目
+        /// </summary>
+        private ObservableCollection<ThumbnailImageSize> ThumbnailImageSizeList_ = new ObservableCollection<ThumbnailImageSize>();
+        public ObservableCollection<ThumbnailImageSize> ThumbnailImageSizeList
+        {
+            get
+            {
+                return ThumbnailImageSizeList_;
+            }
+            set
+            {
+                ThumbnailImageSizeList_ = value;
+                RaisePropertyChanged(() => ThumbnailImageSizeList);
+            }
+        }
+
+        /// <summary>
+        /// サムネイル画像の大きさ（選択された項目）
+        /// </summary>
+        private ThumbnailImageSize SelectedThumbnailImageSize_;
+        public ThumbnailImageSize SelectedThumbnailImageSize
+        {
+            get
+            {
+                return SelectedThumbnailImageSize_;
+            }
+            set
+            {
+                SelectedThumbnailImageSize_ = value;
+                RaisePropertyChanged(() => SelectedThumbnailImageSize);
+
+                switch (SelectedThumbnailImageSize_.ThumbnailSize)
+                {
+                    case ThumbnailImageSize.Size.Large:
+                        ThumbnailItemSizeHeight = 200;
+                        ThumbnailItemSizeWidth = 200;
+                        break;
+                    case ThumbnailImageSize.Size.Middle:
+                        ThumbnailItemSizeHeight = 160;
+                        ThumbnailItemSizeWidth = 160;
+                        break;
+                    case ThumbnailImageSize.Size.Small:
+                        ThumbnailItemSizeHeight = 120;
+                        ThumbnailItemSizeWidth = 120;
+                        break;
+                }
+            }
         }
 
         private ErrorDialogViewModel ErrorDialog_ = null;

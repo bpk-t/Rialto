@@ -230,8 +230,17 @@
                             </i:Interaction.Triggers>
                         </ComboBox>
 
+                        <!-- サムネイル画像の大きさ切り替え -->
+                        <ComboBox Grid.Column="3" Margin="5" ItemsSource="{Binding ThumbnailImageSizeList}" SelectedItem="{Binding SelectedThumbnailImageSize}" SelectedValuePath="DispThumbnailSize">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding DispThumbnailSize}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
                         <!-- ページ番号表示 -->
-                        <TextBlock Grid.Column="3" Text="{Binding CurrentPageAllPage}" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                        <TextBlock Grid.Column="4" Text="{Binding CurrentPageAllPage}" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Center" />
                     </Grid>
 
                     <Border Grid.Row="1" BorderThickness="1" BorderBrush="DarkGray" Margin="5">
