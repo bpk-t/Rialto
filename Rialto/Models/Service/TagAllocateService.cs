@@ -64,28 +64,9 @@ namespace Rialto.Models.Service
                             group.Value.Select(tag =>
                                 new TagAddButtonInfo()
                                 {
-                                    TagInfId = tag.Id,
+                                    TagId = tag.Id,
                                     Name = tag.Name,
-                                    ClickEvent = (ev) =>
-                                    {
-                                        selectedThumbnailImgList.ForEach(x =>
-                                        TagRepository.InsertTagAssignAsync(connection,
-                                            new TagAssign
-                                            {
-                                                RegisterImageId = x.ImgID,
-                                                TagId = ev.TagInfId
-                                            }));
-
-                                        if (selectedThumbnailImgList.Count == 1)
-                                        {
-                                            var imgId = selectedThumbnailImgList[0].ImgID;
-
-                                            GetAllocatedTags(imgId).Select(tags => {
-                                                OnChange(tags);
-                                                return unit;
-                                            });
-                                        }
-                                    }
+                                    ClickEvent = AddTagAssign
                                 })
                                 .ForEach(x => tabInfo.Buttons.Add(x));
                             TabPanels.Add(tabInfo);
@@ -103,12 +84,48 @@ namespace Rialto.Models.Service
             {
                 using (var tran = connection.BeginTransaction())
                 {
-                    return TagRepository.GetTagByImageAssignedAsync(connection, imgId).Select(results =>
+                    return TagRepository.GetTagByImageAssignedAsync(connection, tran, imgId).Select(results =>
                     {
                         var tags = new ObservableCollection<TagMasterInfo>();
                         results.ForEach(x => tags.Add(TagToTagMaster(x)));
                         return tags;
                     });
+                }
+            }
+        }
+
+        private void AddTagAssign(TagAddButtonInfo buttonInfo)
+        {
+            using (var connection = DBHelper.Instance.GetDbConnection())
+            {
+                using (var tran = connection.BeginTransaction())
+                {
+                    selectedThumbnailImgList.ForEach(x =>
+                        TagRepository.InsertTagAssignAsync(connection, tran,
+                            new TagAssign
+                            {
+                                RegisterImageId = x.ImgID,
+                                TagId = buttonInfo.TagId
+                            }));
+
+                    if (selectedThumbnailImgList.Count == 1)
+                    {
+                        var imgId = selectedThumbnailImgList[0].ImgID;
+
+                        TagRepository.GetTagByImageAssignedAsync(connection, tran, imgId).Select(results =>
+                        {
+                            var tags = new ObservableCollection<TagMasterInfo>();
+                            results.ForEach(x => tags.Add(TagToTagMaster(x)));
+                            return tags;
+                        }).Select(tags =>
+                        {
+                            OnChange(tags);
+                            return unit;
+                        });
+                    }
+
+                    TagRepository.UpdateAssignImageCount(connection, tran, buttonInfo.TagId);
+                    tran.Commit();
                 }
             }
         }

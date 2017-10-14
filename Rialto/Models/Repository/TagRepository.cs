@@ -11,6 +11,7 @@ using Dapper;
 using LanguageExt;
 using static LanguageExt.Prelude;
 using System.Data.Common;
+using System.Data;
 
 namespace Rialto.Models.Repository
 {
@@ -120,14 +121,14 @@ namespace Rialto.Models.Repository
             });
         }
 
-        public static Task<int> InsertTagAssignAsync(DbConnection connection, TagAssign insertObj)
+        public static Task<int> InsertTagAssignAsync(DbConnection connection, IDbTransaction tran, TagAssign insertObj)
         {
             // 本当は on duplicate keyみたいなことをやりたかったけどSQLiteにはない
             var select = QueryBuilder.Select("1").From(TAG_ASSIGN.ThisTable)
                 .Where(TAG_ASSIGN.REGISTER_IMAGE_ID.Eq(insertObj.RegisterImageId.ToString()))
                 .Where(TAG_ASSIGN.TAG_ID.Eq(insertObj.TagId.ToString()));
 
-            return connection.QueryAsync(select.ToSqlString()).SelectMany(x =>
+            return connection.QueryAsync(select.ToSqlString(), transaction:tran).SelectMany(x =>
             {
                 if (x.IsEmpty())
                 {
@@ -141,13 +142,13 @@ namespace Rialto.Models.Repository
                         TAG_ID = insertObj.TagId,
                     };
 
-                    return connection.ExecuteAsync(query.ToSqlString(), queryParam);
+                    return connection.ExecuteAsync(query.ToSqlString(), queryParam, transaction:tran);
                 }
                 return Task.FromResult(0);
             });
         }
 
-        public static Task<IEnumerable<Tag>> GetTagByImageAssignedAsync(DbConnection connection, long imgId)
+        public static Task<IEnumerable<Tag>> GetTagByImageAssignedAsync(DbConnection connection, IDbTransaction tran, long imgId)
         {
             var query = QueryBuilder.Select(TAG.Columns())
                 .From(TAG.ThisTable)
@@ -156,6 +157,28 @@ namespace Rialto.Models.Repository
                 .OrderBy(TAG_ASSIGN.CREATED_AT, Order.Asc);
 
             return connection.QueryAsync<Tag>(query.ToSqlString());
+        }
+
+        public static Task<int> UpdateAssignImageCount(DbConnection connection, IDbTransaction tran, long tagId)
+        {
+            var query = QueryBuilder.Update(TAG.ThisTable)
+                .Set(TAG.ASSIGN_IMAGE_COUNT, string.Empty)
+                .Set(TAG.UPDATED_AT, string.Empty)
+                .Where(TAG.ID.Eq("@TAG_ID"));
+
+            var queryParam = new
+            {
+                UPDATED_AT = "datetime('now', 'localtime')",
+                ASSIGN_IMAGE_COUNT = QueryBuilder.Select(SQLFunctionBuilder.Count("*").ToSqlString())
+                        .From(TAG_ASSIGN.ThisTable)
+                        .InnerJoin(REGISTER_IMAGE.ThisTable, REGISTER_IMAGE.ID.Eq(TAG_ASSIGN.REGISTER_IMAGE_ID))
+                        .Where(
+                            REGISTER_IMAGE.DELETE_TIMESTAMP.IsNull(),
+                            TAG_ASSIGN.TAG_ID.Eq("@TAG_ID")
+                        ).ToSqlString(),
+                TAG_ID = tagId
+            };
+            return connection.ExecuteAsync(query.ToSqlString(), queryParam, transaction: tran);
         }
     }
 }
