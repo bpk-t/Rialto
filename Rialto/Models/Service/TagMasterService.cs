@@ -13,12 +13,12 @@ namespace Rialto.Models.Service
 {
     public class TagMasterService : NotificationObject
     {
-        public Task<ObservableCollection<TagTreeNode>> GetAllTagAsync()
+        public Task<ObservableCollection<TagItem>> GetAllTagAsync()
         {
             return GetAllTagAsync((_) => true);
         }
 
-        public Task<ObservableCollection<TagTreeNode>> GetAllTagAsync(Func<Tag, bool> predicate)
+        public Task<ObservableCollection<TagItem>> GetAllTagAsync(Func<Tag, bool> predicate)
         {
             using (var connection = DBHelper.Instance.GetDbConnection())
             {
@@ -34,21 +34,21 @@ namespace Rialto.Models.Service
                         noTagCount
                         ).ContinueWith(nouse =>
                     {
-                        var tagTreeCollection = new ObservableCollection<TagTreeNode>();
-                        tagTreeCollection.Add(new TagTreeNode()
+                        var tagTreeCollection = new ObservableCollection<TagItem>();
+                        tagTreeCollection.Add(new TagItem()
                         {
                             ID = TagConstant.ALL_TAG_ID,
                             Name = "ALL",
                             ImageCount = (int)allCountTask.Result
                         });
-                        tagTreeCollection.Add(new TagTreeNode()
+                        tagTreeCollection.Add(new TagItem()
                         {
                             ID = TagConstant.NOTAG_TAG_ID,
                             Name = "NoTag",
                             ImageCount = (int)noTagCount.Result
                         });
                         allTagsTask.Result.Where(predicate)
-                            .Select((x) => new TagTreeNode()
+                            .Select((x) => new TagItem()
                             {
                                 ID = x.Id,
                                 Name = x.Name,

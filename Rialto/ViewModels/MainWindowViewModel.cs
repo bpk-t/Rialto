@@ -62,7 +62,7 @@ namespace Rialto.ViewModels
             var thumbnailTask = thumbnailService.ShowThumbnailImage(TagConstant.ALL_TAG_ID);
             var tagSettingTask = tagAllocateService.InitTabSettingPanelAsync();
             var initTagTask = tagMasterService.GetAllTagAsync()
-                .ContinueWith(t => TagTreeItems = t.Result);
+                .ContinueWith(t => TagList = t.Result);
 
             return Task.WhenAll(thumbnailTask, tagSettingTask, initTagTask);
         }
@@ -115,10 +115,7 @@ namespace Rialto.ViewModels
         private string CurrentPageAllPage_ = string.Empty;
         public string CurrentPageAllPage
         {
-            get
-            {
-                return CurrentPageAllPage_;
-            }
+            get => CurrentPageAllPage_;
             set
             {
                 CurrentPageAllPage_ = value;
@@ -132,10 +129,7 @@ namespace Rialto.ViewModels
         private double ThumbnailItemSizeHeight_;
         public double ThumbnailItemSizeHeight
         {
-            get
-            {
-                return ThumbnailItemSizeHeight_;
-            }
+            get => ThumbnailItemSizeHeight_;
             set
             {
                 ThumbnailItemSizeHeight_ = value;
@@ -149,10 +143,7 @@ namespace Rialto.ViewModels
         private double ThumbnailItemSizeWidth_;
         public double ThumbnailItemSizeWidth
         {
-            get
-            {
-                return ThumbnailItemSizeWidth_;
-            }
+            get => ThumbnailItemSizeWidth_;
             set
             {
                 ThumbnailItemSizeWidth_ = value;
@@ -166,10 +157,7 @@ namespace Rialto.ViewModels
         private string SearchTagText_ = string.Empty;
         public string SearchTagText
         {
-            get
-            {
-                return SearchTagText_;
-            }
+            get => SearchTagText_;
             set
             {
                 SearchTagText_ = value;
@@ -177,33 +165,33 @@ namespace Rialto.ViewModels
             }
         }
 
-        private ObservableCollection<TagTreeNode> TagTreeItems_;
-        public ObservableCollection<TagTreeNode> TagTreeItems
+        /// <summary>
+        /// サイドペインに表示するタグの一覧
+        /// </summary>
+        private ObservableCollection<TagItem> TagList_;
+        public ObservableCollection<TagItem> TagList
         {
-            get
-            {
-                return TagTreeItems_;
-            }
+            get => TagList_;
             set
             {
-                TagTreeItems_ = value;
-                RaisePropertyChanged(() => TagTreeItems);
+                TagList_ = value;
+                RaisePropertyChanged(() => TagList);
             }
         }
 
-        private ObservableCollection<TagTreeNode> SelectedTagNode_ = new ObservableCollection<TagTreeNode>();
-        public IList SelectedTagNode
+        /// <summary>
+        /// サイドペインに表示するタグの一覧から選択されたタグ
+        /// </summary>
+        private ObservableCollection<TagItem> SelectedTagItems_ = new ObservableCollection<TagItem>();
+        public IList SelectedTagItems
         {
-            get
-            {
-                return SelectedTagNode_;
-            }
+            get => SelectedTagItems_;
             set
             {
-                SelectedTagNode_.Clear();
-                foreach (TagTreeNode elem in value)
+                SelectedTagItems_.Clear();
+                foreach (TagItem elem in value)
                 {
-                    SelectedTagNode_.Add(elem);
+                    SelectedTagItems_.Add(elem);
                 }
             }
         }
@@ -234,10 +222,7 @@ namespace Rialto.ViewModels
         private ObservableCollection<ImageInfo> _SelectedThumbnailImgList = new ObservableCollection<ImageInfo>();
         public IList SelectedThumbnailImgList
         {
-            get
-            {
-                return _SelectedThumbnailImgList;
-            }
+            get => _SelectedThumbnailImgList;
             set
             {
                 _SelectedThumbnailImgList.Clear();
@@ -274,10 +259,7 @@ namespace Rialto.ViewModels
         private BitmapImage SideImage_;
         public BitmapImage SideImage
         {
-            get
-            {
-                return SideImage_;
-            }
+            get => SideImage_;
             set
             {
                 SideImage_ = value;
@@ -288,10 +270,7 @@ namespace Rialto.ViewModels
         private ObservableCollection<TagMasterInfo> SelectedItemHaveTags_ = new ObservableCollection<TagMasterInfo>();
         public ObservableCollection<TagMasterInfo> SelectedItemHaveTags
         {
-            get
-            {
-                return SelectedItemHaveTags_;
-            }
+            get => SelectedItemHaveTags_;
             set
             {
                 SelectedItemHaveTags_ = value;
@@ -331,10 +310,10 @@ namespace Rialto.ViewModels
         /// </summary>
         public async void TagTreeSelectionChanged()
         {
-            if (SelectedTagNode.Count > 0)
+            if (SelectedTagItems.Count > 0)
             {
                 ProgressBarVisible = true;
-                var selected = SelectedTagNode[0] as TagTreeNode;
+                var selected = SelectedTagItems[0] as TagItem;
                 await thumbnailService.ShowThumbnailImage(selected.ID);
                 ProgressBarVisible = false;
             }
@@ -342,7 +321,6 @@ namespace Rialto.ViewModels
 
         #region SearchTagCommand
         private ViewModelCommand _OpenFullScreenViewCommand;
-
         public ViewModelCommand OpenFullScreenViewCommand
         {
             get
@@ -374,7 +352,6 @@ namespace Rialto.ViewModels
         
         #region SearchTagCommand
         private ViewModelCommand _SearchTagCommand;
-
         public ViewModelCommand SearchTagCommand
         {
             get
@@ -394,11 +371,11 @@ namespace Rialto.ViewModels
         {
             if (SearchTagText.Count() > 0)
             {
-                TagTreeItems = await tagMasterService.GetAllTagAsync((x) => x.Name.Contains(SearchTagText));
+                TagList = await tagMasterService.GetAllTagAsync((x) => x.Name.Contains(SearchTagText));
             }
             else
             {
-                TagTreeItems = await tagMasterService.GetAllTagAsync();
+                TagList = await tagMasterService.GetAllTagAsync();
             }
         }
         #endregion
@@ -504,10 +481,7 @@ namespace Rialto.ViewModels
         private bool PrevPageButtonIsEnable_ = true;
         public bool PrevPageButtonIsEnable
         {
-            get
-            {
-                return PrevPageButtonIsEnable_;
-            }
+            get => PrevPageButtonIsEnable_;
             set
             {
                 PrevPageButtonIsEnable_ = value;
@@ -521,10 +495,7 @@ namespace Rialto.ViewModels
         private bool NextPageButtoIsEnable_ = true;
         public bool NextPageButtoIsEnable
         {
-            get
-            {
-                return NextPageButtoIsEnable_;
-            }
+            get => NextPageButtoIsEnable_;
             set
             {
                 NextPageButtoIsEnable_ = value;
@@ -552,10 +523,7 @@ namespace Rialto.ViewModels
         private ObservableCollection<PageViewImageCount> PageViewImageCountList_ = new ObservableCollection<PageViewImageCount>();
         public ObservableCollection<PageViewImageCount> PageViewImageCountList
         {
-            get
-            {
-                return PageViewImageCountList_;
-            }
+            get => PageViewImageCountList_;
             set
             {
                 PageViewImageCountList_ = value;
@@ -569,10 +537,7 @@ namespace Rialto.ViewModels
         private PageViewImageCount SelectedPageViewImageCount_;
         public PageViewImageCount SelectedPageViewImageCount
         {
-            get
-            {
-                return SelectedPageViewImageCount_;
-            }
+            get => SelectedPageViewImageCount_;
             set
             {
                 SelectedPageViewImageCount_ = value;
@@ -594,10 +559,7 @@ namespace Rialto.ViewModels
         private ObservableCollection<ThumbnailImageSize> ThumbnailImageSizeList_ = new ObservableCollection<ThumbnailImageSize>();
         public ObservableCollection<ThumbnailImageSize> ThumbnailImageSizeList
         {
-            get
-            {
-                return ThumbnailImageSizeList_;
-            }
+            get => ThumbnailImageSizeList_;
             set
             {
                 ThumbnailImageSizeList_ = value;
@@ -611,10 +573,7 @@ namespace Rialto.ViewModels
         private ThumbnailImageSize SelectedThumbnailImageSize_;
         public ThumbnailImageSize SelectedThumbnailImageSize
         {
-            get
-            {
-                return SelectedThumbnailImageSize_;
-            }
+            get => SelectedThumbnailImageSize_;
             set
             {
                 SelectedThumbnailImageSize_ = value;
@@ -641,10 +600,7 @@ namespace Rialto.ViewModels
         private ErrorDialogViewModel ErrorDialog_ = null;
         public ErrorDialogViewModel ErrorDialog
         {
-            get
-            {
-                return ErrorDialog_;
-            }
+            get => ErrorDialog_;
             set
             {
                 ErrorDialog_ = value;
@@ -655,10 +611,7 @@ namespace Rialto.ViewModels
         private bool ErrorDialogIsOpen_ = false;
         public bool ErrorDialogIsOpen
         {
-            get
-            {
-                return ErrorDialogIsOpen_;
-            }
+            get => ErrorDialogIsOpen_;
             set
             {
                 ErrorDialogIsOpen_ = value;
@@ -669,10 +622,7 @@ namespace Rialto.ViewModels
         private Queue<int> processingQueue = new Queue<int>();
         public bool ProgressBarVisible
         {
-            get
-            {
-                return !processingQueue.IsEmpty();
-            }
+            get => !processingQueue.IsEmpty();
             set
             {
                 if (value)

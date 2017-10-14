@@ -166,7 +166,7 @@
                     </Grid>
 
                     <!-- タグリスト -->
-                    <ListView x:Name="TagTreeList" Grid.Row="1" Margin="5" ItemsSource="{Binding TagTreeItems}" SelectionMode="Single">
+                    <ListView x:Name="TagTreeList" Grid.Row="1" Margin="5" ItemsSource="{Binding TagList}" SelectionMode="Single">
                         <ListView.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel Orientation="Horizontal">

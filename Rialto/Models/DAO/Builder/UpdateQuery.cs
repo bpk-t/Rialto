@@ -25,13 +25,13 @@ namespace Rialto.Models.DAO.Builder
 
         public UpdateQuery Set<T>(string column, T value)
         {
-            (queryParam as IDictionary<string, T>).Add(column, value);
+            (queryParam as IDictionary<string, object>).Add(column, value);
             return this;
         }
 
         public UpdateQuery Set<T>(ColumnDefinition column, T value)
         {
-            (queryParam as IDictionary<string, T>).Add(column.ColumnName, value);
+            (queryParam as IDictionary<string, object>).Add(column.ColumnName, value);
             return this;
         }
 

@@ -7,7 +7,7 @@ using System.Collections.ObjectModel;
 
 namespace Rialto.Model.DataModel
 {
-    public class TagTreeNode
+    public class TagItem
     {
         /// <summary>
         /// ノード名
@@ -36,7 +36,7 @@ namespace Rialto.Model.DataModel
             }
         }
 
-        public TagTreeNode()
+        public TagItem()
         {
 
         }
