@@ -503,6 +503,37 @@ namespace Rialto.ViewModels
             }
         }
 
+        /// <summary>
+        /// ページ番号表示
+        /// </summary>
+        private string[] PageNumberList_ = new string[] { "1", "2", "3", "4", "5"};
+        public string[] PageNumberList
+        {
+            get => PageNumberList_;
+            set
+            {
+                PageNumberList_ = value;
+                RaisePropertyChanged(() => PageNumberList);
+            }
+        }
+
+        /// <summary>
+        /// ページ番号の現在位置
+        /// </summary>
+        private int[] PageNumberCurrentIndex_ = new int[] { 1, 0, 0, 0, 0 };
+        public int[] PageNumberCurrentIndex
+        {
+            get => PageNumberCurrentIndex_;
+            set
+            {
+                PageNumberCurrentIndex_ = value;
+                RaisePropertyChanged(() => PageNumberCurrentIndex);
+            }
+        }
+
+        /// <summary>
+        /// 前のページへ遷移する
+        /// </summary>
         public async void ShowPrevPage()
         {
             ProgressBarVisible = true;
@@ -510,6 +541,9 @@ namespace Rialto.ViewModels
             ProgressBarVisible = false;
         }
 
+        /// <summary>
+        /// 次のページへ遷移する
+        /// </summary>
         public async void ShowNextPage()
         {
             ProgressBarVisible = true;
@@ -548,8 +582,7 @@ namespace Rialto.ViewModels
         public async void PageViewImageCountSelectionChanged()
         {
             ProgressBarVisible = true;
-            thumbnailService.OnePageItemCount = SelectedPageViewImageCount.ImageCount;
-            await thumbnailService.Refresh();
+            await thumbnailService.SetOnePageItemCountAndRefresh(SelectedPageViewImageCount.ImageCount);
             ProgressBarVisible = false;
         }
 

@@ -37,7 +37,7 @@ namespace Rialto.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Z:\\rialto\\imgs\\Thumbnail")]
+        [global::System.Configuration.DefaultSettingValueAttribute("C:\\tmp\\thumbnail")]
         public string ThumbnailImageDirectory {
             get {
                 return ((string)(this["ThumbnailImageDirectory"]));

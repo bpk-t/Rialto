@@ -6,7 +6,7 @@
       <Value Profile="(Default)">imgdb.db</Value>
     </Setting>
     <Setting Name="ThumbnailImageDirectory" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Z:\rialto\imgs\Thumbnail</Value>
+      <Value Profile="(Default)">C:\tmp\thumbnail</Value>
     </Setting>
     <Setting Name="ImgDataDirectory" Type="System.String" Scope="User">
       <Value Profile="(Default)">Z:\rialto\imgs</Value>

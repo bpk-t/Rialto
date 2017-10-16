@@ -178,7 +178,7 @@
 
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="SelectionChanged">
-                                <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedTagNode" Value="{Binding Path=SelectedItems, ElementName=TagTreeList}"/>
+                                <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedTagItems" Value="{Binding Path=SelectedItems, ElementName=TagTreeList}"/>
                                 <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="TagTreeSelectionChanged"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
@@ -307,20 +307,20 @@
                         </Button>
 
                         <StackPanel Grid.Column="2" Orientation="Horizontal">
-                            <Border BorderThickness="1" BorderBrush="LightGray" Margin="5">
-                                <Button Width="40px"  Style="{StaticResource MaterialDesignFlatButton}">1</Button>
+                            <Border BorderThickness="{Binding PageNumberCurrentIndex[0]}" BorderBrush="LightGray" Margin="5">
+                                <Button Width="40px"  Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[0]}"></Button>
                             </Border>
-                            <Border BorderThickness="0" BorderBrush="LightGray" Margin="5">
-                                <Button Width="40px" Style="{StaticResource MaterialDesignFlatButton}">2</Button>
+                            <Border BorderThickness="{Binding PageNumberCurrentIndex[1]}" BorderBrush="LightGray" Margin="5">
+                                <Button Width="40px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[1]}"></Button>
                             </Border>
-                            <Border BorderThickness="0" BorderBrush="LightGray" Margin="5">
-                                <Button Width="40px" Style="{StaticResource MaterialDesignFlatButton}">3</Button>
+                            <Border BorderThickness="{Binding PageNumberCurrentIndex[2]}" BorderBrush="LightGray" Margin="5">
+                                <Button Width="40px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[2]}"></Button>
                             </Border>
-                            <Border BorderThickness="0" BorderBrush="LightGray" Margin="5">
-                                <Button Width="40px" Style="{StaticResource MaterialDesignFlatButton}">4</Button>
+                            <Border BorderThickness="{Binding PageNumberCurrentIndex[3]}" BorderBrush="LightGray" Margin="5">
+                                <Button Width="40px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[3]}"></Button>
                             </Border>
-                            <Border BorderThickness="0" BorderBrush="LightGray" Margin="5">
-                                <Button Width="40px" Style="{StaticResource MaterialDesignFlatButton}">5</Button>
+                            <Border BorderThickness="{Binding PageNumberCurrentIndex[4]}" BorderBrush="LightGray" Margin="5">
+                                <Button Width="40px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[4]}"></Button>
                             </Border>
                         </StackPanel>
                         

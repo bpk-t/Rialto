@@ -68,8 +68,14 @@ namespace Rialto.Models.Service
             return thumbnailImageActor.Ask<bool>(message);
         }
 
-        public async Task Refresh()
+        /// <summary>
+        /// 1ページの表示件数を変更
+        /// </summary>
+        /// <param name="onePageItemCount">1ページの表示件数</param>
+        /// <returns></returns>
+        public async Task SetOnePageItemCountAndRefresh(int onePageItemCount)
         {
+            OnePageItemCount = onePageItemCount;
             var message = new ThumbnailImageActor.GotToPageMessage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
             (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
             SetThumbnailImages(allCount, images);
@@ -351,10 +357,10 @@ namespace Rialto.Models.Service
                     var resizeW = image.Width;
 
                     // リサイズ後の縦横を計算
-                    if (image.Height > 220)
+                    if (image.Height > 240)
                     {
-                        resizeH = 220;
-                        resizeW = (int)((double)resizeW * ((double)220 / (double)image.Height));
+                        resizeH = 240;
+                        resizeW = (int)((double)resizeW * ((double)240 / (double)image.Height));
                     }
 
                     using (var canvas = new Bitmap(resizeW, resizeH))
@@ -366,7 +372,7 @@ namespace Rialto.Models.Service
 
                             var savePath = Path.Combine(Properties.Settings.Default.ThumbnailImageDirectory, imgHash);
                             // サムネイル画像の保存
-                            canvas.Save(savePath, System.Drawing.Imaging.ImageFormat.Png);
+                            canvas.Save(savePath, System.Drawing.Imaging.ImageFormat.Jpeg);
 
                             return savePath;
                         }
