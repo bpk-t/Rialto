@@ -37,26 +37,7 @@ namespace Rialto.Models.Service
     }
 
     public class ThumbnailImageService : NotificationObject
-    {
-        /*
-        /// <summary>
-        /// サムネイルに表示している画像リスト
-        /// </summary>
-        private ObservableSynchronizedCollection<ImageInfo> ThumbnailImgList_ = new ObservableSynchronizedCollection<ImageInfo>();
-        public ObservableSynchronizedCollection<ImageInfo> ThumbnailImgList
-        {
-            get
-            {
-                return ThumbnailImgList_;
-            }
-            set
-            {
-                ThumbnailImgList_ = value;
-                RaisePropertyChanged(() => ThumbnailImgList);
-            }
-        }
-        */
-
+    { 
         public ThumbnailImageService(ActorSystem system)
         {
             thumbnailImageActor = system.ActorOf<ThumbnailImageActor>(nameof(ThumbnailImageActor));
@@ -224,7 +205,7 @@ namespace Rialto.Models.Service
             return thumbnailImageActor.Ask<(long, List<ImageInfo>)>(message)
                 .Select(x => {
                     (long allCount, List<ImageInfo> images) = x;
-                    return (currentPage + 1, (int)(allCount / OnePageItemCount), images);
+                    return (currentPage + 1, Math.Max((int)(allCount / OnePageItemCount), 1), images);
                 })
                 .Select(x => {
                     OnChangePage(x);

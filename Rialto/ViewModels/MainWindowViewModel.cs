@@ -219,29 +219,6 @@ namespace Rialto.ViewModels
             }
         }
 
-        /// <summary>
-        /// サムネイルに表示する画像リスト
-        /// </summary>
-        /// 
-        /*
-        private ReadOnlyDispatcherCollection<ImageInfo> _ThumbnailImgList;
-        public ReadOnlyDispatcherCollection<ImageInfo> ThumbnailImgList
-        {
-            get
-            {
-                if (_ThumbnailImgList == null)
-                {
-                    _ThumbnailImgList = ViewModelHelper.CreateReadOnlyDispatcherCollection(
-                        thumbnailService.ThumbnailImgList
-                        , m => m
-                        , DispatcherHelper.UIDispatcher
-                        );
-                }
-                return _ThumbnailImgList;
-            }
-        }
-        */
-
         private ObservableCollection<ImageInfo> ThumbnailImgList_ = new ObservableCollection<ImageInfo>();
         public ObservableCollection<ImageInfo> ThumbnailImgList
         {
@@ -533,7 +510,7 @@ namespace Rialto.ViewModels
         /// <summary>
         /// ページ番号表示
         /// </summary>
-        private string[] PageNumberList_ = new string[] { "1", "2", "3", "4", "5"};
+        private string[] PageNumberList_ = null;
         public string[] PageNumberList
         {
             get => PageNumberList_;
@@ -580,7 +557,9 @@ namespace Rialto.ViewModels
 
         private void RefreshPageNumber(int allPageCount, int currentPage)
         {
-            if (!PageNumberList.HeadOrNone().Map(x => int.Parse(x)).Fold(false, (a, x) => x <= currentPage)
+            if (PageNumberList == null 
+                || currentPage == 1
+                || !PageNumberList.HeadOrNone().Map(x => int.Parse(x)).Fold(false, (a, x) => x <= currentPage)
                 || !PageNumberList.Reverse().HeadOrNone().Map(x => int.Parse(x)).Fold(false, (a, x) => x >= currentPage))
             {
                 PageNumberList = Range(currentPage, allPageCount)
