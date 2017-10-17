@@ -20,8 +20,25 @@ using Rialto.Util;
 
 namespace Rialto.Models.Service
 {
+    public class PagingImage
+    {
+        public long AllCount { get; }
+        public BitmapImage Image { get; }
+        public long ImgId { get; }
+        public long Index { get; }
+
+        public PagingImage(long allCount, BitmapImage iamge, long imgId, long index)
+        {
+            AllCount = allCount;
+            Image = iamge;
+            ImgId = imgId;
+            Index = index;
+        }
+    }
+
     public class ThumbnailImageService : NotificationObject
     {
+        /*
         /// <summary>
         /// サムネイルに表示している画像リスト
         /// </summary>
@@ -38,13 +55,13 @@ namespace Rialto.Models.Service
                 RaisePropertyChanged(() => ThumbnailImgList);
             }
         }
+        */
 
         public ThumbnailImageService(ActorSystem system)
         {
             thumbnailImageActor = system.ActorOf<ThumbnailImageActor>(nameof(ThumbnailImageActor));
-
-            // TODO 戻り値で返却するように修正する
-            OnChangePage += (v) => { }; // null check不要にするための空実装
+            OnChangeSelect += (nouse) => { };
+            OnChangePage += (nouse) => { };
         }
 
         private IActorRef thumbnailImageActor;
@@ -54,7 +71,79 @@ namespace Rialto.Models.Service
         private int currentPage = 0;
         public int OnePageItemCount { get; set; }
 
-        public event Action<string> OnChangePage;
+        /// <summary>
+        /// 選択画像が変更された場合に通知する
+        /// </summary>
+        public event Action<Option<PagingImage>> OnChangeSelect;
+
+        /// <summary>
+        /// ページ遷移した場合に通知する
+        /// </summary>
+        public event Action<(int currentPage, int allPage, List<ImageInfo> imgList)> OnChangePage;
+
+        private Option<int> selectImageIndex = None;
+        public Task<Option<PagingImage>> SelectImage(long imgId)
+        {
+            var message = new ThumbnailImageActor.GetImageMessage(imgId, currentTagId);
+            return thumbnailImageActor.Ask<Option<PagingImage>>(message)
+                .Select(x => {
+                    OnChangeSelect(x);
+                    return x;
+                });
+        }
+        public void UnSelectImage()
+        {
+            OnChangeSelect(None);
+        }
+
+        public Task<Option<PagingImage>> NextImage(long imgId)
+        {
+            var message = new ThumbnailImageActor.GetNextImageMessage(imgId, currentTagId);
+            return thumbnailImageActor.Ask<Option<PagingImage>>(message)
+                .SelectMany(x =>
+                {
+                    return x.Match(
+                        (some) => {
+                            return Task.FromResult(x);
+                        },
+                        () => {
+                            return GoToNextPage().SelectMany(next =>
+                            {
+                                var firstMessage = new ThumbnailImageActor.GetFirstImageMessage(currentTagId);
+                                return thumbnailImageActor.Ask<Option<PagingImage>>(firstMessage);
+                            });
+                        }
+                    );
+                })
+                .Select(x => {
+                    OnChangeSelect(x);
+                    return x;
+                });
+        }
+
+        public Task<Option<PagingImage>> PrevImageImage(long imgId)
+        {
+            var message = new ThumbnailImageActor.GetPrevImageMessage(imgId, currentTagId);
+            return thumbnailImageActor.Ask<Option<PagingImage>>(message)
+                .SelectMany(x =>
+                {
+                    return x.Match(
+                        (some) => {
+                            return Task.FromResult(x);
+                        },
+                        () => {
+                            return GetPrevPage().SelectMany(next => {
+                                var firstMessage = new ThumbnailImageActor.GetFirstImageMessage(currentTagId);
+                                return thumbnailImageActor.Ask<Option<PagingImage>>(firstMessage);
+                            });
+                        }
+                    );
+                })
+                .Select(x => {
+                    OnChangeSelect(x);
+                    return x;
+                });
+        }
 
         public Task<bool> ExistsPrevPage()
         {
@@ -73,56 +162,74 @@ namespace Rialto.Models.Service
         /// </summary>
         /// <param name="onePageItemCount">1ページの表示件数</param>
         /// <returns></returns>
-        public async Task SetOnePageItemCountAndRefresh(int onePageItemCount)
+        public Task<(int, int, List<ImageInfo>)> SetOnePageItemCountAndRefresh(int onePageItemCount)
         {
             OnePageItemCount = onePageItemCount;
-            var message = new ThumbnailImageActor.GotToPageMessage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
-            (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
-            SetThumbnailImages(allCount, images);
+            return GoToPage();
         }
 
-        public async Task GoToNextPage()
+        public Task<(int, int, List<ImageInfo>)> GoToNextPage()
         {
-            if (await ExistsNextPage())
+            return ExistsNextPage().SelectMany(exists =>
             {
-                currentPage++;
-                var message = new ThumbnailImageActor.GotToPageMessage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
-                (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
-                SetThumbnailImages(allCount, images);
-            } else
-            {
-                await GoToFirstPage();
-            }
+                if (exists)
+                {
+                    currentPage++;
+                    return GoToPage();
+                } else
+                {
+                    return GetFirstPage();
+                }
+            });
         }
 
-        public async Task GoToPrevPage()
+        public Task<(int, int, List<ImageInfo>)> GetPrevPage()
         {
-            if (await ExistsPrevPage())
+            return ExistsPrevPage().SelectMany(exists =>
             {
-                currentPage--;
-                var message = new ThumbnailImageActor.GotToPageMessage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
-                (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
-                SetThumbnailImages(allCount, images);
-            }
+                if (exists)
+                {
+                    currentPage++;
+                    return GoToPage();
+                } else
+                {
+                    return GetFirstPage();
+                }
+            });
         }
 
-        public async Task GoToFirstPage()
+        public Task<(int, int, List<ImageInfo>)> GetFirstPage()
         {
-            currentPage = 0;
-            var message = new ThumbnailImageActor.GotToPageMessage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
-            (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
-            SetThumbnailImages(allCount, images);
+            return GetFirstPage(currentTagId);
         }
 
-        public async Task ShowThumbnailImage(long tagId)
+        public Task<(int, int, List<ImageInfo>)> GetFirstPage(long tagId)
         {
             currentPage = 0;
             currentTagId = tagId;
             currentImageOrder = Order.Desc;
+            return GoToPage();
+        }
 
+        public Task<(int, int, List<ImageInfo>)> Reverse()
+        {
+            currentImageOrder = Order.Asc;
+            currentPage = 0;
+            return GoToPage();
+        }
+
+        private Task<(int, int, List<ImageInfo>)> GoToPage()
+        {
             var message = new ThumbnailImageActor.GotToPageMessage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
-            (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
-            SetThumbnailImages(allCount, images);
+            return thumbnailImageActor.Ask<(long, List<ImageInfo>)>(message)
+                .Select(x => {
+                    (long allCount, List<ImageInfo> images) = x;
+                    return (currentPage + 1, (int)(allCount / OnePageItemCount), images);
+                })
+                .Select(x => {
+                    OnChangePage(x);
+                    return x;
+                });
         }
 
         public async Task Shuffle()
@@ -130,27 +237,9 @@ namespace Rialto.Models.Service
             await Task.Run(() =>
             {
                 // TODO 直す
-                ThumbnailImgList.Clear();
-                ThumbnailImgList.OrderBy(_ => Guid.NewGuid()).ForEach(x => ThumbnailImgList.Add(x));
+                //ThumbnailImgList.Clear();
+                //ThumbnailImgList.OrderBy(_ => Guid.NewGuid()).ForEach(x => ThumbnailImgList.Add(x));
             });
-        }
-
-        public async Task Reverse()
-        {
-            currentImageOrder = Order.Asc;
-            currentPage = 0;
-
-            var message = new ThumbnailImageActor.GotToPageMessage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
-            (long allCount, List<ImageInfo> images) = await thumbnailImageActor.Ask<(long allCount, List<ImageInfo> images)>(message);
-            ThumbnailImgList.Clear();
-            images.ForEach(x => ThumbnailImgList.Add(x));
-        }
-
-        private void SetThumbnailImages(long allCount, List<ImageInfo> images)
-        {
-            ThumbnailImgList.Clear();
-            images.ForEach(x => ThumbnailImgList.Add(x));
-            OnChangePage($"{currentPage}/{allCount / OnePageItemCount}");
         }
 
         class ThumbnailImageActor : ReceiveActor
@@ -196,12 +285,69 @@ namespace Rialto.Models.Service
                 }
             }
 
+            public class GetImageMessage
+            {
+                public long ImgId { get; }
+                public long TagId { get; }
+                public GetImageMessage(long imgId, long tagId)
+                {
+                    ImgId = imgId;
+                    TagId = tagId;
+                }
+            }
+
+            public class GetNextImageMessage
+            {
+                public long ImgId { get; }
+                public long TagId { get; }
+                public GetNextImageMessage(long imgId, long tagId)
+                {
+                    ImgId = imgId;
+                    TagId = tagId;
+                }
+            }
+
+            public class GetPrevImageMessage
+            {
+                public long ImgId { get; }
+                public long TagId { get; }
+                public GetPrevImageMessage(long imgId, long tagId)
+                {
+                    ImgId = imgId;
+                    TagId = tagId;
+                }
+            }
+
+            public class GetFirstImageMessage
+            {
+                public long TagId { get; }
+                public GetFirstImageMessage(long tagId)
+                {
+                    TagId = tagId;
+                }
+            }
+
+            public class GetLastImageMessage
+            {
+                public long TagId { get; }
+                public GetLastImageMessage(long tagId)
+                {
+                    TagId = tagId;
+                }
+            }
+
+            private long cacheOffset;
+            private List<ImageInfo> cacheImages = new List<ImageInfo>();
+
             public ThumbnailImageActor()
             {
                 Receive<GotToPageMessage>((message) =>
                 {
                     var result = GetThumbnailImage(message.TagId, message.Offset, message.Limit, message.ImageOrder);
                     result.Wait();
+
+                    cacheImages = result.Result.imgList;
+                    cacheOffset = message.Offset;
                     Sender.Tell(result.Result);
                 });
                 Receive<ExistsNextPageMessage>((message) =>
@@ -219,6 +365,36 @@ namespace Rialto.Models.Service
                         Sender.Tell(result > 0 && message.Offset >= 0);
                         return unit;
                     });
+                });
+                Receive<GetImageMessage>((message) =>
+                {
+                    Sender.Tell(GetImage(message.ImgId, message.TagId));
+                });
+                Receive<GetNextImageMessage>((message) =>
+                {
+                    Sender.Tell(GetNextImage(message.ImgId, message.TagId));
+                });
+                Receive<GetPrevImageMessage>((message) =>
+                {
+                    Sender.Tell(GetPrevImage(message.ImgId, message.TagId));
+                });
+
+                Receive<GetFirstImageMessage>((message) =>
+                {
+                    var imgOpt = cacheImages
+                        .HeadOrNone()
+                        .SelectMany(img => GetImage(img.ImgID, message.TagId))
+                        .ToOption();
+                    Sender.Tell(imgOpt);
+                });
+
+                Receive<GetLastImageMessage>((message) =>
+                {
+                    var imgOpt = cacheImages.Rev()
+                        .HeadOrNone()
+                        .SelectMany(img => GetImage(img.ImgID, message.TagId))
+                        .ToOption();
+                    Sender.Tell(imgOpt);
                 });
             }
 
@@ -242,6 +418,69 @@ namespace Rialto.Models.Service
                         }
                     }
                 }
+            }
+
+            private Option<PagingImage> GetImage(long imgId, long tagId)
+            {
+                var index = cacheImages.FindIndex(x => x.ImgID == imgId);
+                if (index >= 0)
+                {
+                    var countTask = GetImageCount(tagId);
+                    countTask.Wait();
+
+                    return Option<ImageInfo>.Some(cacheImages[index])
+                        .Map(img => new PagingImage(countTask.Result, LoadBitmapImage(img.SourceImageFilePath), img.ImgID, cacheOffset + index));
+                } else
+                {
+                    return None;
+                }
+            }
+
+            private Option<PagingImage> GetNextImage(long imgId, long tagId)
+            {
+                var index = cacheImages.FindIndex(x => x.ImgID == imgId);
+                var nextIndex = index + 1;
+
+                if (index >= 0 && cacheImages.Count > nextIndex)
+                {
+                    var countTask = GetImageCount(tagId);
+                    countTask.Wait();
+
+                    return Option<ImageInfo>.Some(cacheImages[nextIndex])
+                        .Map(img => new PagingImage(countTask.Result, LoadBitmapImage(img.SourceImageFilePath), img.ImgID, cacheOffset + nextIndex));
+                } else
+                {
+                    return None;
+                }
+            }
+
+            private Option<PagingImage> GetPrevImage(long imgId, long tagId)
+            {
+                var index = cacheImages.FindIndex(x => x.ImgID == imgId);
+                var prevIndex = index - 1;
+
+                if (index >= 0 && prevIndex >= 0 && cacheImages.Count > prevIndex)
+                {
+                    var countTask = GetImageCount(tagId);
+                    countTask.Wait();
+
+                    return Option<ImageInfo>.Some(cacheImages[prevIndex])
+                        .Map(img => new PagingImage(countTask.Result, LoadBitmapImage(img.SourceImageFilePath), img.ImgID, cacheOffset + prevIndex));
+                }
+                else
+                {
+                    return None;
+                }
+            }
+
+            private BitmapImage LoadBitmapImage(Uri filePath)
+            {
+                var tmpBitmapImage = new BitmapImage();
+                tmpBitmapImage.BeginInit();
+                tmpBitmapImage.UriSource = filePath;
+                tmpBitmapImage.EndInit();
+                tmpBitmapImage.Freeze();
+                return tmpBitmapImage;
             }
 
             private Task<(long allCount, List<ImageInfo> imgList)> GetThumbnailImage(long tagId, long offset, long limit, Order imageOrder)

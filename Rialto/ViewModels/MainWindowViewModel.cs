@@ -27,6 +27,7 @@ using System.Reactive.Threading.Tasks;
 using Akka.Actor;
 using LanguageExt;
 using static LanguageExt.Prelude;
+using System.Windows;
 
 namespace Rialto.ViewModels
 {
@@ -53,13 +54,35 @@ namespace Rialto.ViewModels
             thumbnailService = new ThumbnailImageService(system);
             tagMasterService = new TagMasterService();
             tagAllocateService = new TagAllocateService(_SelectedThumbnailImgList, tags => SelectedItemHaveTags = tags);
-            thumbnailService.OnChangePage += (value) => CurrentPageAllPage = value;
             imageRegisterService = new ImageRegisterService(system);
+
+            thumbnailService.OnChangePage += (value) =>
+            {
+                (int currentPage, int allPage, List<ImageInfo> images) = value;
+                ThumbnailImgList.Clear();
+                images.ForEach(img => ThumbnailImgList.Add(img));
+                RefreshPageNumber(allPage, currentPage);
+                CurrentPageAllPage = $"{currentPage}/{allPage}";
+            };
+            thumbnailService.OnChangeSelect += (value) =>
+            {
+                value.Match(
+                    (some) =>
+                    {
+                        SideImage = some.Image;
+                    },
+                    () =>
+                    {
+                        SideImage = null;
+                    }
+                );
+            
+            };
         }
 
         private Task Refresh()
         {
-            var thumbnailTask = thumbnailService.ShowThumbnailImage(TagConstant.ALL_TAG_ID);
+            var thumbnailTask = thumbnailService.GetFirstPage(TagConstant.ALL_TAG_ID);
             var tagSettingTask = tagAllocateService.InitTabSettingPanelAsync();
             var initTagTask = tagMasterService.GetAllTagAsync()
                 .ContinueWith(t => TagList = t.Result);
@@ -199,6 +222,8 @@ namespace Rialto.ViewModels
         /// <summary>
         /// サムネイルに表示する画像リスト
         /// </summary>
+        /// 
+        /*
         private ReadOnlyDispatcherCollection<ImageInfo> _ThumbnailImgList;
         public ReadOnlyDispatcherCollection<ImageInfo> ThumbnailImgList
         {
@@ -213,6 +238,18 @@ namespace Rialto.ViewModels
                         );
                 }
                 return _ThumbnailImgList;
+            }
+        }
+        */
+
+        private ObservableCollection<ImageInfo> ThumbnailImgList_ = new ObservableCollection<ImageInfo>();
+        public ObservableCollection<ImageInfo> ThumbnailImgList
+        {
+            get => ThumbnailImgList_;
+            set
+            {
+                ThumbnailImgList_ = value;
+                RaisePropertyChanged(() => ThumbnailImgList);
             }
         }
 
@@ -290,18 +327,9 @@ namespace Rialto.ViewModels
             if (SelectedThumbnailImgList.Count > 0) {
                 var selectedImg = SelectedThumbnailImgList[0] as ImageInfo;
                 var getSelectedTask = tagAllocateService.GetAllocatedTags(selectedImg.ImgID);
-                var getImageTask = Task.Run(() => {
-                    var image = new BitmapImage();
-                    image.BeginInit();
-                    image.UriSource = selectedImg.SourceImageFilePath;
-                    image.CacheOption = BitmapCacheOption.OnLoad;
-                    image.EndInit();
-                    image.Freeze();
-                    return image;
-                });
 
-                SideImage = await getImageTask;
                 SelectedItemHaveTags = await getSelectedTask;
+                await thumbnailService.SelectImage(selectedImg.ImgID);
             }
         }
 
@@ -314,7 +342,8 @@ namespace Rialto.ViewModels
             {
                 ProgressBarVisible = true;
                 var selected = SelectedTagItems[0] as TagItem;
-                await thumbnailService.ShowThumbnailImage(selected.ID);
+                await thumbnailService.GetFirstPage(selected.ID);
+                
                 ProgressBarVisible = false;
             }
         }
@@ -341,10 +370,8 @@ namespace Rialto.ViewModels
             if (SelectedThumbnailImgList.Count > 0)
             {
                 var selectedImgId = ((ImageInfo)SelectedThumbnailImgList[0]).ImgID;
-                var currentIndex = System.Array.FindIndex(thumbnailService.ThumbnailImgList.ToArray(), (x) => x.ImgID == selectedImgId);
-
                 Messenger.Raise(new TransitionMessage(
-                    new FullScreenViewModel(currentIndex, thumbnailService), "ShowFullScreen"));
+                    new FullScreenViewModel(selectedImgId, thumbnailService), "ShowFullScreen"));
             }   
         }
 
@@ -537,7 +564,7 @@ namespace Rialto.ViewModels
         public async void ShowPrevPage()
         {
             ProgressBarVisible = true;
-            await thumbnailService.GoToPrevPage();
+            await thumbnailService.GetPrevPage();
             ProgressBarVisible = false;
         }
 
@@ -549,6 +576,19 @@ namespace Rialto.ViewModels
             ProgressBarVisible = true;
             await thumbnailService.GoToNextPage();
             ProgressBarVisible = false;
+        }
+
+        private void RefreshPageNumber(int allPageCount, int currentPage)
+        {
+            if (!PageNumberList.HeadOrNone().Map(x => int.Parse(x)).Fold(false, (a, x) => x <= currentPage)
+                || !PageNumberList.Reverse().HeadOrNone().Map(x => int.Parse(x)).Fold(false, (a, x) => x >= currentPage))
+            {
+                PageNumberList = Range(currentPage, allPageCount)
+                    .Take(5)
+                    .Select(x => x.ToString())
+                    .ToArray();
+            }
+            PageNumberCurrentIndex = PageNumberList.Map(x => int.Parse(x) == currentPage ? 1 : 0).ToArray();
         }
 
         /// <summary>

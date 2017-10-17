@@ -25,10 +25,9 @@ namespace Rialto.ViewModels
     public class FullScreenViewModel : ViewModel
     {
         #region Fields
-        private int currentIndex;
-
         private ThumbnailImageService thumbnailImageService;
 
+        private long selectedImgId;
         private LangExt.Option<Task<BitmapImage>> nextImageTask = LangExt.Option.None;
 
         #endregion
@@ -39,16 +38,23 @@ namespace Rialto.ViewModels
         /// </summary>
         /// <param name="index"></param>
         /// <param name="imageFilePathList"></param>
-        public FullScreenViewModel(int index, ThumbnailImageService thumbnailImage)
+        //public FullScreenViewModel(int index, ThumbnailImageService thumbnailImage)
+        public FullScreenViewModel(long selectedImgId, ThumbnailImageService thumbnailImage)
         {
-            currentIndex = index;
             thumbnailImageService = thumbnailImage;
+            thumbnailImageService.OnChangeSelect += (imgOpt) =>
+            {
+                imgOpt.ForEach(img => {
+                    this.CurrentImage = img.Image;
+                    this.selectedImgId = img.ImgId;
+                });
+            };
+            this.selectedImgId = selectedImgId;
         }
 
-        public async void Initialize()
+        public void Initialize()
         {
-            var path = thumbnailImageService.ThumbnailImgList[currentIndex].SourceImageFilePath;
-            CurrentImage = await LoadImageAsync(path);
+            thumbnailImageService.SelectImage(selectedImgId);
         }
 
         /// <summary>
@@ -115,69 +121,11 @@ namespace Rialto.ViewModels
         /// 次の画像を表示する
         /// </summary>
         /// <param name="parameter"></param>
-        public async void NextPicture(object parameter)
+        public void NextPicture(object parameter)
         {
-            currentIndex++;
-            if (currentIndex >= thumbnailImageService.ThumbnailImgList.Count)
-            {
-                currentIndex = 0;
-                if (await thumbnailImageService.ExistsNextPage())
-                {
-                    await thumbnailImageService.GoToNextPage();
-                } else
-                {
-                    await thumbnailImageService.GoToFirstPage();
-                }
-            }
-             var path = thumbnailImageService.ThumbnailImgList[currentIndex].SourceImageFilePath;
-            CurrentImage = await LoadImageAsync(path);
-
-            /*
-            if (nextImageTask.IsSome)
-            {
-                CurrentImage = await nextImageTask.GetOr(null);
-                nextImageTask = LangExt.Option.Some(
-                    Task.Run<BitmapImage>(() =>
-                    {
-                        var nextImgPath = thumbnailImageService.CurrentImageFilePathList[currentIndex + 1].SourceImageFilePath;
-
-                        using (var memStream = new MemoryStream())
-                        {
-                            using (var fileStream = File.OpenRead(nextImgPath.AbsolutePath))
-                            {
-                                memStream.SetLength(fileStream.Length);
-                                fileStream.Read(memStream.GetBuffer(), 0, (int)fileStream.Length);
-
-                                var image = new BitmapImage();
-                                image.BeginInit();
-                                image.StreamSource = memStream;
-                                image.EndInit();
-                                image.Freeze();
-                                return image;
-                            }
-                        }
-
-                    })
-                );
-            }
-            */
-            
+            thumbnailImageService.NextImage(selectedImgId);
         }
         #endregion
-
-        private Task<BitmapImage> LoadImageAsync(Uri path)
-        {
-            return Task.Run(() =>
-            {
-                var tmpBitmapImage = new BitmapImage();
-                tmpBitmapImage.BeginInit();
-                tmpBitmapImage.UriSource = path;
-                tmpBitmapImage.EndInit();
-                tmpBitmapImage.Freeze();
-                return tmpBitmapImage;
-            });
-        }
-
 
         #region PrevPictureCommand
         private ListenerCommand<object> _PrevPictureCommand;
@@ -197,22 +145,9 @@ namespace Rialto.ViewModels
         /// 前の画像を表示する
         /// </summary>
         /// <param name="parameter"></param>
-        public async void PrevPicture(object parameter)
+        public void PrevPicture(object parameter)
         {
-            currentIndex--;
-            if (currentIndex < 0)
-            {
-                if (await thumbnailImageService.ExistsPrevPage())
-                {
-                    await thumbnailImageService.GoToPrevPage();
-                    currentIndex = thumbnailImageService.ThumbnailImgList.Count - 1;
-                } else
-                {
-                    currentIndex = 0;
-                }
-            }
-            var path = thumbnailImageService.ThumbnailImgList[currentIndex].SourceImageFilePath;
-            CurrentImage = await LoadImageAsync(path);
+            thumbnailImageService.PrevImageImage(selectedImgId);
         }
         #endregion
 

@@ -308,19 +308,19 @@
 
                         <StackPanel Grid.Column="2" Orientation="Horizontal">
                             <Border BorderThickness="{Binding PageNumberCurrentIndex[0]}" BorderBrush="LightGray" Margin="5">
-                                <Button Width="40px"  Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[0]}"></Button>
+                                <Button Width="50px"  Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[0]}"></Button>
                             </Border>
                             <Border BorderThickness="{Binding PageNumberCurrentIndex[1]}" BorderBrush="LightGray" Margin="5">
-                                <Button Width="40px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[1]}"></Button>
+                                <Button Width="50px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[1]}"></Button>
                             </Border>
                             <Border BorderThickness="{Binding PageNumberCurrentIndex[2]}" BorderBrush="LightGray" Margin="5">
-                                <Button Width="40px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[2]}"></Button>
+                                <Button Width="50px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[2]}"></Button>
                             </Border>
                             <Border BorderThickness="{Binding PageNumberCurrentIndex[3]}" BorderBrush="LightGray" Margin="5">
-                                <Button Width="40px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[3]}"></Button>
+                                <Button Width="50px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[3]}"></Button>
                             </Border>
                             <Border BorderThickness="{Binding PageNumberCurrentIndex[4]}" BorderBrush="LightGray" Margin="5">
-                                <Button Width="40px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[4]}"></Button>
+                                <Button Width="50px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[4]}"></Button>
                             </Border>
                         </StackPanel>
                         
