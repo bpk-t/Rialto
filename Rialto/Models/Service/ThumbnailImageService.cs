@@ -189,7 +189,7 @@ namespace Rialto.Models.Service
             {
                 if (exists)
                 {
-                    currentPage++;
+                    currentPage--;
                     return GoToPage();
                 } else
                 {
