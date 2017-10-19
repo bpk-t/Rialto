@@ -6,7 +6,6 @@ using Livet.Commands;
 using Livet.Messaging;
 using Livet.Messaging.IO;
 
-using Rialto.Models;
 using System.Collections.ObjectModel;
 using System.Collections;
 using System.Windows.Media.Imaging;
@@ -20,14 +19,10 @@ using System.Threading.Tasks;
 using Rialto.Models.Service;
 using Rialto.Models.DataModel;
 using System.IO;
-using System.Reactive;
 using System.Reactive.Linq;
-using System.Reactive.Concurrency;
-using System.Reactive.Threading.Tasks;
 using Akka.Actor;
 using LanguageExt;
 using static LanguageExt.Prelude;
-using System.Windows;
 
 namespace Rialto.ViewModels
 {
@@ -535,6 +530,19 @@ namespace Rialto.ViewModels
             }
         }
 
+        public async void OnClickPageNumber(string number)
+        {
+            // 何故かstring型でしか取得できない
+            ProgressBarVisible = true;
+            var index = int.Parse(number);
+            if (!string.IsNullOrEmpty(PageNumberList[index]))
+            {
+                var page = int.Parse(PageNumberList[index]);
+                await thumbnailService.GoToPage(page);
+            }
+            ProgressBarVisible = false;
+        }
+
         /// <summary>
         /// 前のページへ遷移する
         /// </summary>
@@ -562,12 +570,15 @@ namespace Rialto.ViewModels
                 || !PageNumberList.HeadOrNone().Map(x => int.Parse(x)).Fold(false, (a, x) => x <= currentPage)
                 || !PageNumberList.Reverse().HeadOrNone().Map(x => int.Parse(x)).Fold(false, (a, x) => x >= currentPage))
             {
-                PageNumberList = Range(currentPage, allPageCount)
+                PageNumberList = Range(currentPage, Math.Max(allPageCount, 5))
                     .Take(5)
-                    .Select(x => x.ToString())
+                    .Select(x => x <= allPageCount ? x.ToString() : "")
                     .ToArray();
             }
-            PageNumberCurrentIndex = PageNumberList.Map(x => int.Parse(x) == currentPage ? 1 : 0).ToArray();
+            PageNumberCurrentIndex = PageNumberList
+                .Map(x => string.IsNullOrEmpty(x) ? None : Option<int>.Some(int.Parse(x)))
+                .Map(x => x.Map(y => y == currentPage).IfNone(false) ? 1 : 0)
+                .ToArray();
         }
 
         /// <summary>

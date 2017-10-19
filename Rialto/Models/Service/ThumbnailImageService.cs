@@ -199,6 +199,13 @@ namespace Rialto.Models.Service
             return GoToPage();
         }
 
+        public Task<(int, int, List<ImageInfo>)> GoToPage(int page)
+        {
+            currentImageOrder = Order.Desc;
+            currentPage = page - 1;
+            return GoToPage();
+        }
+
         private Task<(int, int, List<ImageInfo>)> GoToPage()
         {
             var message = new ThumbnailImageActor.GotToPageMessage(currentTagId, currentPage * OnePageItemCount, OnePageItemCount, currentImageOrder);
