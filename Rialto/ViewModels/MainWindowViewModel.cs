@@ -568,7 +568,7 @@ namespace Rialto.ViewModels
             if (PageNumberList == null 
                 || currentPage == 1
                 || !PageNumberList.HeadOrNone().Map(x => int.Parse(x)).Fold(false, (a, x) => x <= currentPage)
-                || !PageNumberList.Reverse().HeadOrNone().Map(x => int.Parse(x)).Fold(false, (a, x) => x >= currentPage))
+                || !PageNumberList.Reverse().Filter(x => !string.IsNullOrEmpty(x)).HeadOrNone().Map(x => int.Parse(x)).Fold(false, (a, x) => x >= currentPage))
             {
                 PageNumberList = Range(currentPage, Math.Max(allPageCount, 5))
                     .Take(5)
