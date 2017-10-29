@@ -324,11 +324,13 @@ namespace Rialto.Models.Service
                 }
             }
 
+            private IActorRef cachedImageActor;
             private long cacheOffset;
             private List<ImageInfo> cacheImages = new List<ImageInfo>();
 
             public ThumbnailImageActor()
             {
+                cachedImageActor = Context.ActorOf<CachedImageActor>(nameof(CachedImageActor));
                 Receive<GotToPageMessage>((message) =>
                 {
                     var result = GetThumbnailImage(message.TagId, message.Offset, message.Limit, message.ImageOrder);
@@ -413,6 +415,12 @@ namespace Rialto.Models.Service
                 var index = cacheImages.FindIndex(x => x.ImgID == imgId);
                 if (index >= 0)
                 {
+                    // 先読み
+                    if ((index + 1) < cacheImages.Count)
+                    {
+                        var message = new CachedImageActor.LoadImageMessage(cacheImages[index + 1].SourceImageFilePath);
+                        cachedImageActor.Ask(message);
+                    }
                     var countTask = GetImageCount(tagId);
                     countTask.Wait();
 
@@ -431,6 +439,13 @@ namespace Rialto.Models.Service
 
                 if (index >= 0 && cacheImages.Count > nextIndex)
                 {
+                    // 先読み
+                    if ((index + 1) < cacheImages.Count)
+                    {
+                        var message = new CachedImageActor.LoadImageMessage(cacheImages[index + 1].SourceImageFilePath);
+                        cachedImageActor.Ask(message);
+                    }
+
                     var countTask = GetImageCount(tagId);
                     countTask.Wait();
 
@@ -463,12 +478,19 @@ namespace Rialto.Models.Service
 
             private BitmapImage LoadBitmapImage(Uri filePath)
             {
+                var message = new CachedImageActor.LoadImageMessage(filePath);
+                var result = cachedImageActor.Ask<BitmapImage>(message);
+                result.Wait();
+                return result.Result;
+
+                /*
                 var tmpBitmapImage = new BitmapImage();
                 tmpBitmapImage.BeginInit();
                 tmpBitmapImage.UriSource = filePath;
                 tmpBitmapImage.EndInit();
                 tmpBitmapImage.Freeze();
                 return tmpBitmapImage;
+                */
             }
 
             private Task<(long allCount, List<ImageInfo> imgList)> GetThumbnailImage(long tagId, long offset, long limit, Order imageOrder)
