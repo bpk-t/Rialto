@@ -35,13 +35,13 @@ namespace Rialto.Models.Repository
                 .ContinueWith(x => x.Result.ToOption());
         }
 
-        public static Task<Option<Tag>> FindByIdAsync(DbConnection connection, long tagId)
+        public static Task<Option<Tag>> FindByIdAsync(DbConnection connection, IDbTransaction tran, long tagId)
         {
             var query = QueryBuilder.Select()
                     .From(TAG.ThisTable)
                     .Where(TAG.ID.Eq("@TAG_ID"));
 
-            return connection.QueryAsync<Tag>(query.ToSqlString(), new { TAG_ID = tagId })
+            return connection.QueryAsync<Tag>(query.ToSqlString(), new { TAG_ID = tagId }, transaction: tran)
                     .ContinueWith(x => x.Result.ToOption());
         }
 
@@ -49,22 +49,22 @@ namespace Rialto.Models.Repository
         /// 引数で指定されたタグ情報を追加する、すでに存在する場合は上書きする
         /// </summary>
         /// <param name="upsertObj"></param>
-        public static Task<int> UpsertAsync(DbConnection connection, Tag upsertObj)
+        public static Task<int> UpsertAsync(DbConnection connection, IDbTransaction tran, Tag upsertObj)
         {
-            return FindByIdAsync(connection, upsertObj.Id).SelectMany(x =>
+            return FindByIdAsync(connection, tran, upsertObj.Id).SelectMany(x =>
             {
                 if (x.IsSome)
                 {
-                    return UpdateAsync(connection, upsertObj);
+                    return UpdateAsync(connection, tran, upsertObj);
                 }
                 else
                 {
-                    return InsertAsync(connection, upsertObj);
+                    return InsertAsync(connection, tran, upsertObj);
                 }
             });
         }
 
-        public static Task<int> UpdateAsync(DbConnection connection, Tag updateObj)
+        public static Task<int> UpdateAsync(DbConnection connection, IDbTransaction tran, Tag updateObj)
         {
             var query = QueryBuilder.Update(TAG.ThisTable)
                 .Set(TAG.NAME, updateObj.Name)
@@ -79,10 +79,10 @@ namespace Rialto.Models.Repository
                 UPDATED_AT = "datetime('now', 'localtime')",
                 TAG_ID = updateObj.Id
             };
-            return connection.ExecuteAsync(query.ToSqlString(), queryParam);
+            return connection.ExecuteAsync(query.ToSqlString(), queryParam, transaction:tran);
         }
 
-        public static Task<int> InsertAsync(DbConnection connection, Tag insertObj)
+        public static Task<int> InsertAsync(DbConnection connection, IDbTransaction tran, Tag insertObj)
         {
             var query = QueryBuilder.Insert().Into(TAG.ThisTable)
                 .Set(TAG.NAME, insertObj.Name)
@@ -100,7 +100,7 @@ namespace Rialto.Models.Repository
                 DESCRIPTION = insertObj.Description
             };
 
-            return connection.ExecuteAsync(query.ToSqlString(), queryParam);
+            return connection.ExecuteAsync(query.ToSqlString(), queryParam, transaction:tran);
         }
 
         public static Task<Dictionary<TagGroup, List<Tag>>> GetAllTagGroupAsync(DbConnection connection)

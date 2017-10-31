@@ -11,14 +11,14 @@ using System.Threading.Tasks;
 
 namespace Rialto.Models.Service
 {
-    public class TagMasterService : NotificationObject
+    public class TagMasterService
     {
-        public Task<ObservableCollection<TagItem>> GetAllTagAsync()
+        public Task<ObservableCollection<TagItem>> GetAllTagItemAsync()
         {
-            return GetAllTagAsync((_) => true);
+            return GetAllTagItemAsync((_) => true);
         }
 
-        public Task<ObservableCollection<TagItem>> GetAllTagAsync(Func<Tag, bool> predicate)
+        public Task<ObservableCollection<TagItem>> GetAllTagItemAsync(Func<Tag, bool> predicate)
         {
             using (var connection = DBHelper.Instance.GetDbConnection())
             {
@@ -60,5 +60,46 @@ namespace Rialto.Models.Service
                 }
             }
         }
+
+        public Task<ObservableCollection<Tag>> GetAllTagAsync()
+        {
+            using (var connection = DBHelper.Instance.GetDbConnection())
+            {
+                using (var tran = connection.BeginTransaction())
+                {
+                    var allTagsTask = TagRepository.GetAllTagAsync(connection);
+                    var allCountTask = RegisterImageRepository.GetAllCountAsync(connection);
+                    var noTagCount = RegisterImageRepository.GetNoTagCountAsync(connection);
+
+                    return Task.WhenAll(
+                        allTagsTask,
+                        allCountTask,
+                        noTagCount
+                        ).ContinueWith(nouse =>
+                        {
+                            var tagTreeCollection = new ObservableCollection<Tag>();
+                            allTagsTask.Result.ForEach(x => tagTreeCollection.Add(x));
+                            return tagTreeCollection;
+                        });
+                }
+            }
+        }
+
+        public Task UpsertTag(string name, string ruby, string description)
+        {
+            using (var connection = DBHelper.Instance.GetDbConnection())
+            {
+                using (var tran = connection.BeginTransaction())
+                {
+                    var tag = new Tag()
+                    {
+                        Name = name,
+                        Ruby = ruby,
+                        Description = description
+                    };
+                    return TagRepository.UpsertAsync(connection, tran, tag);
+                }
+            }
+        } 
     }
 }

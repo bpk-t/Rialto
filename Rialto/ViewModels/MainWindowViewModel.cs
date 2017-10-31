@@ -79,7 +79,7 @@ namespace Rialto.ViewModels
         {
             var thumbnailTask = thumbnailService.GetFirstPage(TagConstant.ALL_TAG_ID);
             var tagSettingTask = tagAllocateService.InitTabSettingPanelAsync();
-            var initTagTask = tagMasterService.GetAllTagAsync()
+            var initTagTask = tagMasterService.GetAllTagItemAsync()
                 .ContinueWith(t => TagList = t.Result);
 
             return Task.WhenAll(thumbnailTask, tagSettingTask, initTagTask);
@@ -370,11 +370,11 @@ namespace Rialto.ViewModels
         {
             if (SearchTagText.Count() > 0)
             {
-                TagList = await tagMasterService.GetAllTagAsync((x) => x.Name.Contains(SearchTagText));
+                TagList = await tagMasterService.GetAllTagItemAsync((x) => x.Name.Contains(SearchTagText));
             }
             else
             {
-                TagList = await tagMasterService.GetAllTagAsync();
+                TagList = await tagMasterService.GetAllTagItemAsync();
             }
         }
         #endregion

@@ -92,7 +92,7 @@ namespace Rialto.ViewModels
             {
                 AllTags.Clear();
             }
-            //tags.ForEach(x => AllTags.Add(x));
+            tags.ForEach(x => AllTags.Add(x));
         }
         
         /// <summary>
@@ -100,25 +100,8 @@ namespace Rialto.ViewModels
         /// </summary>
         public void AddTag()
         {
-            // TODO
-            /*
-            M_TAG_INFO target = null;
-            if (SelectedTags.Count > 0)
-            {
-                target = SelectedTags[0] as M_TAG_INFO;
-            }
-            else
-            {
-                target = new M_TAG_INFO
-                {
-                    TAG_NAME = TagNameText,
-                    TAG_DEFINE = TagDefineText
-                };
-            }
-
-            M_TAG_INFORepository.Upsert(target, () => true);
-            */
-            Initialize();
+            tagMasterService.UpsertTag(TagNameText, TagNameText, TagDefineText);
+            //Initialize();
         }
 
         /// <summary>
