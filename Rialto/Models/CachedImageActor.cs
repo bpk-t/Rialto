@@ -19,7 +19,9 @@ namespace Rialto.Models
             }
         }
 
-        private Dictionary<Uri, BitmapImage> imageCache = new Dictionary<Uri, BitmapImage>();
+        private int MAX_CACHE_ITEM_COUNT = 10;
+        private IList<KeyValuePair<Uri, BitmapImage>> imageCache = new List<KeyValuePair<Uri, BitmapImage>>();
+
         public CachedImageActor()
         {
             Receive<LoadImageMessage>((message) =>
@@ -30,20 +32,29 @@ namespace Rialto.Models
 
         private BitmapImage LoadBitmapImage(Uri filePath)
         {
-            if (imageCache.TryGetValue(filePath, out var image))
-            {
-                return image;
-            } else
-            {
-                var tmpBitmapImage = new BitmapImage();
-                tmpBitmapImage.BeginInit();
-                tmpBitmapImage.UriSource = filePath;
-                tmpBitmapImage.EndInit();
-                tmpBitmapImage.Freeze();
+            return imageCache.Find(x => x.Key.Equals(filePath))
+                .Map(x =>
+                {
+                    imageCache.Remove(x);
+                    imageCache.Add(x);
+                    return x.Value;
+                }).IfNone(() =>
+                {
+                    var tmpBitmapImage = new BitmapImage();
+                    tmpBitmapImage.BeginInit();
+                    tmpBitmapImage.UriSource = filePath;
+                    tmpBitmapImage.EndInit();
+                    tmpBitmapImage.Freeze();
 
-                imageCache.Add(filePath, tmpBitmapImage);
-                return tmpBitmapImage;
-            }
+                    // キャッシュの最大数を超えた場合は一番古いものから削除
+                    if (imageCache.Count >= MAX_CACHE_ITEM_COUNT)
+                    {
+                        imageCache.HeadOrNone()
+                            .ForEach(head => imageCache.Remove(head));
+                    }
+                    imageCache.Add(new KeyValuePair<Uri, BitmapImage>(filePath, tmpBitmapImage));
+                    return tmpBitmapImage;
+                });
         }
     }
 }
