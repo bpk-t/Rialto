@@ -313,6 +313,7 @@ namespace Rialto.ViewModels
             if (SelectedTagItems.Count > 0)
             {
                 ProgressBarVisible = true;
+                thumbnailService.UnSelectImage();
                 var selected = SelectedTagItems[0] as TagItem;
                 await thumbnailService.GetFirstPage(selected.ID);
                 
@@ -549,6 +550,7 @@ namespace Rialto.ViewModels
         public async void ShowPrevPage()
         {
             ProgressBarVisible = true;
+            thumbnailService.UnSelectImage();
             await thumbnailService.GetPrevPage();
             ProgressBarVisible = false;
         }
@@ -559,6 +561,7 @@ namespace Rialto.ViewModels
         public async void ShowNextPage()
         {
             ProgressBarVisible = true;
+            thumbnailService.UnSelectImage();
             await thumbnailService.GoToNextPage();
             ProgressBarVisible = false;
         }
