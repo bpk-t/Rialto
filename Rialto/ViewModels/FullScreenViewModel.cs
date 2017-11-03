@@ -42,12 +42,15 @@ namespace Rialto.ViewModels
         public FullScreenViewModel(long selectedImgId, ThumbnailImageService thumbnailImage)
         {
             thumbnailImageService = thumbnailImage;
-            thumbnailImageService.OnChangeSelect += (imgOpt) =>
+            thumbnailImageService.OnChangeSelect += (imgOptTry) =>
             {
-                imgOpt.ForEach(img => {
-                    this.CurrentImage = img.Image;
-                    this.selectedImgId = img.ImgId;
-                });
+                imgOptTry.ForEach(imgTry => 
+                    imgTry.IfSucc(img =>
+                    {
+                        this.CurrentImage = img.Image;
+                        this.selectedImgId = img.ImgId;
+                    })
+                );
             };
             this.selectedImgId = selectedImgId;
         }

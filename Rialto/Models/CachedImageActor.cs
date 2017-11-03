@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
+using LanguageExt;
+using static LanguageExt.Prelude;
 
 namespace Rialto.Models
 {
@@ -30,30 +32,32 @@ namespace Rialto.Models
             });
         }
 
-        private BitmapImage LoadBitmapImage(Uri filePath)
+        private Try<BitmapImage> LoadBitmapImage(Uri filePath)
         {
             return imageCache.Find(x => x.Key.Equals(filePath))
                 .Map(x =>
                 {
                     imageCache.Remove(x);
                     imageCache.Add(x);
-                    return x.Value;
+                    return Try(x.Value);
                 }).IfNone(() =>
                 {
-                    var tmpBitmapImage = new BitmapImage();
-                    tmpBitmapImage.BeginInit();
-                    tmpBitmapImage.UriSource = filePath;
-                    tmpBitmapImage.EndInit();
-                    tmpBitmapImage.Freeze();
+                    return Try(() => {
+                        var tmpBitmapImage = new BitmapImage();
+                        tmpBitmapImage.BeginInit();
+                        tmpBitmapImage.UriSource = filePath;
+                        tmpBitmapImage.EndInit();
+                        tmpBitmapImage.Freeze();
 
-                    // キャッシュの最大数を超えた場合は一番古いものから削除
-                    if (imageCache.Count >= MAX_CACHE_ITEM_COUNT)
-                    {
-                        imageCache.HeadOrNone()
-                            .ForEach(head => imageCache.Remove(head));
-                    }
-                    imageCache.Add(new KeyValuePair<Uri, BitmapImage>(filePath, tmpBitmapImage));
-                    return tmpBitmapImage;
+                        // キャッシュの最大数を超えた場合は一番古いものから削除
+                        if (imageCache.Count >= MAX_CACHE_ITEM_COUNT)
+                        {
+                            imageCache.HeadOrNone()
+                                .ForEach(head => imageCache.Remove(head));
+                        }
+                        imageCache.Add(new KeyValuePair<Uri, BitmapImage>(filePath, tmpBitmapImage));
+                        return tmpBitmapImage;
+                    });
                 });
         }
     }

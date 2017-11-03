@@ -64,7 +64,10 @@ namespace Rialto.ViewModels
                 value.Match(
                     (some) =>
                     {
-                        SideImage = some.Image;
+                        some.IfSucc(image =>
+                        {
+                            SideImage = image.Image;
+                        });
                     },
                     () =>
                     {
