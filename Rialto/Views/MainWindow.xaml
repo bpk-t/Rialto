@@ -12,6 +12,7 @@
         xmlns:properties="clr-namespace:Rialto.Properties"
         xmlns:behaviors="clr-namespace:Rialto.Views.Behaviors"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
@@ -248,7 +249,8 @@
                             <ListView.ItemTemplate>
                                 <DataTemplate>
                                     <StackPanel Orientation="Vertical" Margin="5">
-                                        <Image Margin="2" Source="{Binding DispImage, UpdateSourceTrigger=PropertyChanged}" />
+                                        <Image Margin="2" Source="{Binding DispImage, UpdateSourceTrigger=PropertyChanged}" Visibility="{Binding ImageVisible, Converter={StaticResource BoolToVisibility}}" />
+                                        <fa:ImageAwesome Icon="Refresh" Spin="True" SpinDuration="3" Foreground="Gray" Margin="5" Visibility="{Binding LoadingVisible, Converter={StaticResource BoolToVisibility}}" />
                                     </StackPanel>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
