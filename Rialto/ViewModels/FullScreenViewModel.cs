@@ -38,7 +38,6 @@ namespace Rialto.ViewModels
         /// </summary>
         /// <param name="index"></param>
         /// <param name="imageFilePathList"></param>
-        //public FullScreenViewModel(int index, ThumbnailImageService thumbnailImage)
         public FullScreenViewModel(long selectedImgId, ThumbnailImageService thumbnailImage)
         {
             thumbnailImageService = thumbnailImage;
@@ -48,7 +47,7 @@ namespace Rialto.ViewModels
                     imgTry.IfSucc(img =>
                     {
                         this.CurrentImage = img.Image;
-                        this.selectedImgId = img.ImgId;
+                        this.selectedImgId = img.ImageId;
                     })
                 );
             };
@@ -126,7 +125,7 @@ namespace Rialto.ViewModels
         /// <param name="parameter"></param>
         public void NextPicture(object parameter)
         {
-            thumbnailImageService.NextImage(selectedImgId);
+            thumbnailImageService.NextImage();
         }
         #endregion
 
@@ -150,7 +149,7 @@ namespace Rialto.ViewModels
         /// <param name="parameter"></param>
         public void PrevPicture(object parameter)
         {
-            thumbnailImageService.PrevImageImage(selectedImgId);
+            thumbnailImageService.PrevImageImage();
         }
         #endregion
 

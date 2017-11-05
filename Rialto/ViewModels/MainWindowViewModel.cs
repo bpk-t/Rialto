@@ -53,11 +53,11 @@ namespace Rialto.ViewModels
 
             thumbnailService.OnChangePage += (value) =>
             {
-                (int currentPage, int allPage, List<ImageInfo> images) = value;
                 ThumbnailImgList.Clear();
-                images.ForEach(img => ThumbnailImgList.Add(img));
-                RefreshPageNumber(allPage, currentPage);
-                CurrentPageAllPage = $"{currentPage}/{allPage}";
+
+                value.ThumbnailImageList.ForEach(img => ThumbnailImgList.Add(img));
+                RefreshPageNumber(value.AllPage, value.CurrentPage);
+                CurrentPageAllPage = $"{value.CurrentPage}/{value.AllPage}";
             };
             thumbnailService.OnChangeSelect += (value) =>
             {
@@ -542,7 +542,7 @@ namespace Rialto.ViewModels
             if (!string.IsNullOrEmpty(PageNumberList[index]))
             {
                 var page = int.Parse(PageNumberList[index]);
-                await thumbnailService.GoToPage(page);
+                await thumbnailService.GoToPage(page - 1);
             }
             ProgressBarVisible = false;
         }
@@ -569,14 +569,15 @@ namespace Rialto.ViewModels
             ProgressBarVisible = false;
         }
 
-        private void RefreshPageNumber(int allPageCount, int currentPage)
+        private void RefreshPageNumber(long allPageCount, long currentPage)
         {
             if (PageNumberList == null 
                 || currentPage == 1
                 || !PageNumberList.HeadOrNone().Map(x => int.Parse(x)).Fold(false, (a, x) => x <= currentPage)
                 || !PageNumberList.Reverse().Filter(x => !string.IsNullOrEmpty(x)).HeadOrNone().Map(x => int.Parse(x)).Fold(false, (a, x) => x >= currentPage))
             {
-                PageNumberList = Range(currentPage, Math.Max(allPageCount, 5))
+                // TODO 直す
+                PageNumberList = Range((int)currentPage, (int)Math.Max(allPageCount, 5l))
                     .Take(5)
                     .Select(x => x <= allPageCount ? x.ToString() : "")
                     .ToArray();
