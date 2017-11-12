@@ -190,25 +190,20 @@ namespace Rialto.Models
                 var index = cacheImages.FindIndex(x => x.ImgID == imgId);
                 if (index >= 0)
                 {
-                    // 先読み
-                    if ((index + 1) < cacheImages.Count)
-                    {
-                        var message = new CachedImageActor.LoadImageMessage(cacheImages[index + 1].SourceImageFilePath);
-                        cachedImageActor.Ask(message);
-                    }
                     return GetImageCount(tagId).SelectMany(imgCount =>
                     {
                         var img = cacheImages[index];
-                        return LoadBitmapImage(img.SourceImageFilePath)
-                            .Select(loadImageTry =>
-                                Some(
-                                    loadImageTry.Map(
-                                        loadImage => new PagingImage(
-                                                            allCount: imgCount,
-                                                            image: loadImage,
-                                                            imageId: img.ImgID,
-                                                            index: cachePage + cacheLimit + index,
-                                                            page: pageInfo))));
+                        return LoadBitmapImage(img.SourceImageFilePath).Select(loadImage =>
+                        {
+                            var pagingImage = new PagingImage(
+                                                        allCount: imgCount,
+                                                        image: loadImage,
+                                                        imageId: img.ImgID,
+                                                        index: cachePage + cacheLimit + index,
+                                                        page: pageInfo);
+                            return Some(Try(pagingImage));
+
+                        });
                     });
                 }
                 else
@@ -233,13 +228,6 @@ namespace Rialto.Models
                 {
                     if (cacheImages.Count > nextIndex)
                     {
-                        // 先読み
-                        if ((index + 1) < cacheImages.Count)
-                        {
-                            var message = new CachedImageActor.LoadImageMessage(cacheImages[index + 1].SourceImageFilePath);
-                            cachedImageActor.Ask(message);
-                        }
-
                         return Some(cacheImages[nextIndex])
                             .Select(img => GetImage(img.ImgID, cacheTagId))
                             .Fold(Task.FromResult<Option<Try<PagingImage>>>(None), (a, x) => x);
@@ -297,13 +285,32 @@ namespace Rialto.Models
             }
         }
 
-        private Task<Try<BitmapImage>> LoadBitmapImage(Uri filePath)
+        private Task<BitmapImage> LoadBitmapImage(Uri filePath)
         {
             var message = new CachedImageActor.LoadImageMessage(filePath);
-            return cachedImageActor.Ask<Try<BitmapImage>>(message);
+            return cachedImageActor.Ask<Task<BitmapImage>>(message).SelectMany(x => x);
         }
 
         private Task<PagingInfo> GetThumbnailImage(long tagId, long page, long limit, Order imageOrder)
+        {
+            return _GetThumbnailImage(tagId, page, limit, imageOrder).Select(x => {
+                // 先読み
+                x.ThumbnailImageList
+                    .Select(img => new CachedImageActor.LoadImageMessage(img.SourceImageFilePath))
+                    .Fold(
+                        Task.FromResult(0),
+                        (acc, message) => {
+                            return acc.SelectMany(nouse => {
+                                return Task.Delay(TimeSpan.FromMilliseconds(1000))
+                                    .ContinueWith<Task<object>>(nouse2 => cachedImageActor.Ask(message))
+                                    .SelectMany(y => y);
+                                    })
+                                    .Map(nouse => 0);
+                            });
+                return x;
+            });
+        }
+        private Task<PagingInfo> _GetThumbnailImage(long tagId, long page, long limit, Order imageOrder)
         {
             ImageInfo RegisterImageToImageInfo(Option<RegisterImage> img, Option<ImageRepository> repository)
             {

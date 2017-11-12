@@ -21,8 +21,8 @@ namespace Rialto.Models
             }
         }
 
-        private int MAX_CACHE_ITEM_COUNT = 10;
-        private IList<KeyValuePair<Uri, BitmapImage>> imageCache = new List<KeyValuePair<Uri, BitmapImage>>();
+        private int MAX_CACHE_ITEM_COUNT = 50;
+        private IList<KeyValuePair<Uri, Task<BitmapImage>>> imageLoadTaskCache = new List<KeyValuePair<Uri, Task<BitmapImage>>>();
 
         public CachedImageActor()
         {
@@ -32,32 +32,26 @@ namespace Rialto.Models
             });
         }
 
-        private Try<BitmapImage> LoadBitmapImage(Uri filePath)
+        private Task<BitmapImage> LoadBitmapImage(Uri filePath)
         {
-            return imageCache.Find(x => x.Key.Equals(filePath))
+            return imageLoadTaskCache.Find(x => x.Key.Equals(filePath))
                 .Map(x =>
                 {
-                    imageCache.Remove(x);
-                    imageCache.Add(x);
-                    return Try(x.Value);
+                    imageLoadTaskCache.Remove(x);
+                    imageLoadTaskCache.Add(x);
+                    return x.Value;
                 }).IfNone(() =>
                 {
-                    return Try(() => {
-                        var tmpBitmapImage = new BitmapImage();
-                        tmpBitmapImage.BeginInit();
-                        tmpBitmapImage.UriSource = filePath;
-                        tmpBitmapImage.EndInit();
-                        tmpBitmapImage.Freeze();
+                    var loadTask = BitmapImageAsyncFactory.Create(filePath.AbsolutePath);
 
-                        // キャッシュの最大数を超えた場合は一番古いものから削除
-                        if (imageCache.Count >= MAX_CACHE_ITEM_COUNT)
-                        {
-                            imageCache.HeadOrNone()
-                                .ForEach(head => imageCache.Remove(head));
-                        }
-                        imageCache.Add(new KeyValuePair<Uri, BitmapImage>(filePath, tmpBitmapImage));
-                        return tmpBitmapImage;
-                    });
+                    // キャッシュの最大数を超えた場合は一番古いものから削除
+                    if (imageLoadTaskCache.Count >= MAX_CACHE_ITEM_COUNT)
+                    {
+                        imageLoadTaskCache.HeadOrNone()
+                            .ForEach(head => imageLoadTaskCache.Remove(head));
+                    }
+                    imageLoadTaskCache.Add(new KeyValuePair<Uri, Task<BitmapImage>>(filePath, loadTask));
+                    return loadTask;
                 });
         }
     }
