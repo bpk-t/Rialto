@@ -302,8 +302,8 @@ namespace Rialto.Models
                         (acc, message) => {
                             return acc.SelectMany(nouse => {
                                 return Task.Delay(TimeSpan.FromMilliseconds(1000))
-                                    .ContinueWith<Task<object>>(nouse2 => cachedImageActor.Ask(message))
-                                    .SelectMany(y => y);
+                                        .ContinueWith(nouse2 => cachedImageActor.Ask(message))
+                                        .SelectMany(y => y);
                                     })
                                     .Map(nouse => 0);
                             });
@@ -320,10 +320,13 @@ namespace Rialto.Models
                     ImgID = img.Fold(0L, (acc, x) => x.Id),
                     SourceImageFilePath = new Uri(sourceImagePath)
                 };
-                var imageLoadTask = Task.Run(() => 
-                    GetThumbnailImage(sourceImagePath, img.Fold("", (a, x) => x.Md5Hash))
-                        .Bind(thumbnailImageUri => LoadImage(thumbnailImageUri))
-                );
+
+                var imageLoadTask = GetThumbnailImage(sourceImagePath, img.Fold("", (a, x) => x.Md5Hash))
+                        .Bind(thumbnailImageUri => Try(BitmapImageAsyncFactory.Create(thumbnailImageUri.AbsolutePath)))
+                        .BiFold(state: Task.FromResult(Try((BitmapImage)null)),
+                           Succ: (acc, x) => x.Map(y => Try(y)),
+                           Fail: (acc, e) => Task.FromResult(Try<BitmapImage>(e))
+                        );
                 result.SetImage(imageLoadTask);
 
                 return result;
@@ -365,19 +368,6 @@ namespace Rialto.Models
                 }
             }
 
-        }
-
-        private Try<BitmapImage> LoadImage(Uri imageUri)
-        {
-            return Try(() => {
-                var tmpBitmapImage = new BitmapImage();
-                tmpBitmapImage.BeginInit();
-                tmpBitmapImage.UriSource = imageUri;
-                tmpBitmapImage.DecodePixelWidth = 200;
-                tmpBitmapImage.EndInit();
-                tmpBitmapImage.Freeze();
-                return tmpBitmapImage;
-            });
         }
 
         /// <summary>
