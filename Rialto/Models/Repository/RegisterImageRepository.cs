@@ -26,16 +26,16 @@ namespace Rialto.Models.Repository
             return connection.ExecuteScalarAsync<long>(query.ToSqlString());
         }
 
-        public static Task<IEnumerable<(Option<RegisterImage>, Option<ImageRepository>)>> GetAllAsync(DbConnection connection, long offset, long limit, Order order)
+        public static Task<IEnumerable<(Option<RegisterImage>, Option<ImageRepository>)>> GetAllAsync(DbConnection connection, Option<long> offsetOpt, Option<long> limitOpt, Order order)
         {
             var query = QueryBuilder.Select(REGISTER_IMAGE.Columns())
                 .Select(IMAGE_REPOSITORY.Columns())
                 .From(REGISTER_IMAGE.ThisTable)
                 .InnerJoin(IMAGE_REPOSITORY.ThisTable, IMAGE_REPOSITORY.ID.Eq(REGISTER_IMAGE.IMAGE_REPOSITORY_ID))
                 .Where(REGISTER_IMAGE.DELETE_TIMESTAMP.IsNull())
-                .OrderBy(REGISTER_IMAGE.ID, order)
-                .Limit(limit)
-                .Offset(offset);
+                .OrderBy(REGISTER_IMAGE.ID, order);
+            query = limitOpt.Fold(query, (nouse, limit) => query.Limit(limit));
+            query = offsetOpt.Fold(query, (nouse, offset) => query.Offset(offset));
 
             return connection.QueryMultipleAsync(query.ToSqlString()).Select(reader =>
                         reader.Read((RegisterImage img, ImageRepository repo) => (Optional(img), Optional(repo)))
@@ -54,19 +54,19 @@ namespace Rialto.Models.Repository
             return connection.ExecuteScalarAsync<long>(query.ToSqlString());
         }
 
-        public static Task<IEnumerable<(Option<RegisterImage>, Option<ImageRepository>)>> GetNoTagAsync(DbConnection connection, long offset, long limit, Order order)
+        public static Task<IEnumerable<(Option<RegisterImage>, Option<ImageRepository>)>> GetNoTagAsync(DbConnection connection, Option<long> offsetOpt, Option<long> limitOpt, Order order)
         {
-                var query = QueryBuilder.Select(REGISTER_IMAGE.Columns())
-                    .Select(IMAGE_REPOSITORY.Columns())
-                    .From(REGISTER_IMAGE.ThisTable)
-                    .InnerJoin(IMAGE_REPOSITORY.ThisTable, IMAGE_REPOSITORY.ID.Eq(REGISTER_IMAGE.IMAGE_REPOSITORY_ID))
-                    .Where(REGISTER_IMAGE.DELETE_TIMESTAMP.IsNull())
-                    .Where(ConditionBuilder.NotExists(
-                        QueryBuilder.Select().From(TAG_ASSIGN.ThisTable).Where(REGISTER_IMAGE.ID.Eq(TAG_ASSIGN.REGISTER_IMAGE_ID))
-                        ))
-                    .OrderBy(REGISTER_IMAGE.ID, order)
-                    .Limit(limit)
-                    .Offset(offset);
+            var query = QueryBuilder.Select(REGISTER_IMAGE.Columns())
+                .Select(IMAGE_REPOSITORY.Columns())
+                .From(REGISTER_IMAGE.ThisTable)
+                .InnerJoin(IMAGE_REPOSITORY.ThisTable, IMAGE_REPOSITORY.ID.Eq(REGISTER_IMAGE.IMAGE_REPOSITORY_ID))
+                .Where(REGISTER_IMAGE.DELETE_TIMESTAMP.IsNull())
+                .Where(ConditionBuilder.NotExists(
+                    QueryBuilder.Select().From(TAG_ASSIGN.ThisTable).Where(REGISTER_IMAGE.ID.Eq(TAG_ASSIGN.REGISTER_IMAGE_ID))
+                    ))
+                .OrderBy(REGISTER_IMAGE.ID, order);
+            query = limitOpt.Fold(query, (nouse, limit) => query.Limit(limit));
+            query = offsetOpt.Fold(query, (nouse, offset) => query.Offset(offset));
 
             return connection.QueryMultipleAsync(query.ToSqlString()).Select(reader =>
                 reader.Read((RegisterImage img, ImageRepository repo) => (Optional(img), Optional(repo)))
@@ -86,7 +86,7 @@ namespace Rialto.Models.Repository
             return connection.ExecuteScalarAsync<long>(query.ToSqlString(), param: new { TAG_ID = tagId });
         }
 
-        public static Task<IEnumerable<(Option<RegisterImage>, Option<ImageRepository>)>> GetByTagAsync(DbConnection connection, long tagId, long offset, long limit, Order order)
+        public static Task<IEnumerable<(Option<RegisterImage>, Option<ImageRepository>)>> GetByTagAsync(DbConnection connection, long tagId, Option<long> offsetOpt, Option<long> limitOpt, Order order)
         {
             var query = QueryBuilder.Select(REGISTER_IMAGE.Columns())
                 .Select(IMAGE_REPOSITORY.Columns())
@@ -96,9 +96,9 @@ namespace Rialto.Models.Repository
                 .InnerJoin(TAG.ThisTable, TAG_ASSIGN.TAG_ID.Eq(TAG.ID))
                 .Where(REGISTER_IMAGE.DELETE_TIMESTAMP.IsNull())
                 .Where(TAG.ID.Eq("@TAG_ID"))
-                .OrderBy(REGISTER_IMAGE.ID, order)
-                .Limit(limit)
-                .Offset(offset);
+                .OrderBy(REGISTER_IMAGE.ID, order);
+            query = limitOpt.Fold(query, (nouse, limit) => query.Limit(limit));
+            query = offsetOpt.Fold(query, (nouse, offset) => query.Offset(offset));
 
             return connection.QueryMultipleAsync(query.ToSqlString(), param: new { TAG_ID = tagId }).Select(reader =>
                 reader.Read((RegisterImage img, ImageRepository repo) => (Optional(img), Optional(repo)))

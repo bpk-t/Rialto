@@ -341,7 +341,7 @@ namespace Rialto.Models
                     if (tagId == TagConstant.ALL_TAG_ID)
                     {
                         var countTask = RegisterImageRepository.GetAllCountAsync(connection);
-                        var getListTask = RegisterImageRepository.GetAllAsync(connection, offset, limit, imageOrder).Select(results =>
+                        var getListTask = RegisterImageRepository.GetAllAsync(connection, Some(offset), Some(limit), imageOrder).Select(results =>
                             results.Select(x => RegisterImageToImageInfo(x.Item1, x.Item2)).ToList()
                         );
                         var allPage = countTask.Result / limit + (countTask.Result % limit > 0 ? 1 : 0);
@@ -350,7 +350,7 @@ namespace Rialto.Models
                     else if (tagId == TagConstant.NOTAG_TAG_ID)
                     {
                         var countTask = RegisterImageRepository.GetNoTagCountAsync(connection);
-                        var getListTask = RegisterImageRepository.GetNoTagAsync(connection, offset, limit, imageOrder).Select(results =>
+                        var getListTask = RegisterImageRepository.GetNoTagAsync(connection, Some(offset), Some(limit), imageOrder).Select(results =>
                             results.Select(x => RegisterImageToImageInfo(x.Item1, x.Item2)).ToList()
                         );
                         var allPage = countTask.Result / limit + (countTask.Result % limit > 0 ? 1 : 0);
@@ -359,7 +359,7 @@ namespace Rialto.Models
                     else
                     {
                         var countTask = RegisterImageRepository.GetByTagCountAsync(connection, tagId);
-                        var getListTask = RegisterImageRepository.GetByTagAsync(connection, tagId, offset, limit, imageOrder).Select(results =>
+                        var getListTask = RegisterImageRepository.GetByTagAsync(connection, tagId, Some(offset), Some(limit), imageOrder).Select(results =>
                             results.Select(x => RegisterImageToImageInfo(x.Item1, x.Item2)).ToList()
                         );
                         var allPage = countTask.Result / limit + (countTask.Result % limit > 0 ? 1 : 0);

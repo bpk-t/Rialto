@@ -189,6 +189,7 @@
     <Compile Include="Models\DAO\Builder\SelectQuery.cs" />
     <Compile Include="Models\DAO\Builder\SQLFunction.cs" />
     <Compile Include="Models\Service\DatabaseCreateService.cs" />
+    <Compile Include="Models\Service\ExportService.cs" />
     <Compile Include="Models\Service\ImageRegisterService.cs" />
     <Compile Include="Models\Service\TagAllocateService.cs" />
     <Compile Include="Models\Service\TagMasterService.cs" />
