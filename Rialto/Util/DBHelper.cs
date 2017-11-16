@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Data.Common;
 using System.Data.SQLite;
 
 namespace Rialto.Util
@@ -140,6 +140,36 @@ namespace Rialto.Util
                 return Convert.ToInt32(r[columnName].ToString());
             }
             return 0;
+        }
+
+        public T Execute<T>(Func<DbConnection, DbTransaction, T> func, int retry = 0)
+        {
+            DbTransaction transaction = null;
+            try
+            {
+                using (var connection = GetDbConnection())
+                {
+                    using (transaction = connection.BeginTransaction())
+                    {
+                        var result = func(connection, transaction);
+                        transaction.Commit();
+                        return result;
+                    }
+                }
+            } catch (Exception e)
+            {
+                if (transaction != null)
+                {
+                    transaction.Rollback();
+                }
+                if (retry <= 3)
+                {
+                    return Execute(func, retry + 1);
+                } else
+                {
+                    throw e;
+                }
+            }
         }
 
         public SQLiteConnection GetDbConnection()

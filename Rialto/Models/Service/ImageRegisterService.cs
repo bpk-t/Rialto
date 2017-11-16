@@ -65,84 +65,81 @@ namespace Rialto.Models.Service
             /// <param name="fileList">登録する画像ファイル、または画像ファイルが格納されたディレクトリ</param>
             public Task<IEnumerable<Either<RegisterFailureInfo, FileInfo>>> RegisterImages(string[] fileList, Option<int> tagId)
             {
-                using (var connection = DBHelper.Instance.GetDbConnection())
+                return DBHelper.Instance.Execute((connection, tran) =>
                 {
-                    using (var tran = connection.BeginTransaction())
-                    {
-                        var destDir = MakeTodayDir();
-                        var tasks = TreeToList(fileList)
-                            .Select(x => x.Bind(f =>
+                    var destDir = MakeTodayDir();
+                    var tasks = TreeToList(fileList)
+                        .Select(x => x.Bind(f =>
+                        {
+                            if (IsImageExt(f))
                             {
-                                if (IsImageExt(f))
+                                return Right<RegisterFailureInfo, FileInfo>(f);
+                            }
+                            else
+                            {
+                                return Left<RegisterFailureInfo, FileInfo>(new RegisterFailureInfo(path: f.FullName, result: "画像形式ではないファイル"));
+                            }
+                        }))
+                        .Select(x => x.Bind(f =>
+                        {
+                            if (ExistsFile(f, destDir))
+                            {
+                                return Left<RegisterFailureInfo, FileInfo>(new RegisterFailureInfo(path: f.FullName, result: "同名のファイルが既に存在します"));
+                            }
+                            else
+                            {
+                                return Right<RegisterFailureInfo, FileInfo>(f);
+                            }
+                        }))
+                        .Select(x => x.Match(
+                            Right: (f) => ExistsDB(connection, f).Select(result =>
+                            {
+                                if (result)
                                 {
-                                    return Right<RegisterFailureInfo, FileInfo>(f);
+                                    return Left<RegisterFailureInfo, FileInfo>(new RegisterFailureInfo(path: f.FullName, result: "同じMD5ハッシュを持つ画像がDBに存在します"));
                                 }
                                 else
                                 {
-                                    return Left<RegisterFailureInfo, FileInfo>(new RegisterFailureInfo(path: f.FullName, result: "画像形式ではないファイル"));
-                                }
-                            }))
-                            .Select(x => x.Bind(f =>
-                            {
-                                if (ExistsFile(f, destDir))
-                                {
-                                    return Left<RegisterFailureInfo, FileInfo>(new RegisterFailureInfo(path: f.FullName, result: "同名のファイルが既に存在します"));
-                                }
-                                else
-                                {
                                     return Right<RegisterFailureInfo, FileInfo>(f);
                                 }
-                            }))
-                            .Select(x => x.Match(
-                                Right: (f) => ExistsDB(connection, f).Select(result =>
+                            }),
+                            Left: (l) => Task.FromResult(Left<RegisterFailureInfo, FileInfo>(l))
+                         ))
+                    .Select(t => t.Select(e => e.Bind(x => CopyFile(x, destDir))))
+                    .Select(t => t.SelectMany(e => e.Match(
+                            Right: (f) =>
+                            {
+                                try
                                 {
-                                    if (result)
+                                    var img = new System.Drawing.Bitmap(f.FullName);
+                                    var r = new RegisterImage
                                     {
-                                        return Left<RegisterFailureInfo, FileInfo>(new RegisterFailureInfo(path: f.FullName, result: "同じMD5ハッシュを持つ画像がDBに存在します"));
-                                    }
-                                    else
-                                    {
-                                        return Right<RegisterFailureInfo, FileInfo>(f);
-                                    }
-                                }),
-                                Left: (l) => Task.FromResult(Left<RegisterFailureInfo, FileInfo>(l))
-                             ))
-                        .Select(t => t.Select(e => e.Bind(x => CopyFile(x, destDir))))
-                        .Select(t => t.SelectMany(e => e.Match(
-                                Right: (f) =>
-                                {
-                                    try
-                                    {
-                                        var img = new System.Drawing.Bitmap(f.FullName);
-                                        var r = new RegisterImage
-                                        {
-                                            FileSize = (int)f.Length, // TODO
+                                        FileSize = (int)f.Length, // TODO
                                             FileName = Path.GetFileNameWithoutExtension(f.Name),
-                                            FileExtension = f.Extension.Substring(1),
-                                            FilePath = Path.Combine(destDir, f.Name),
-                                            Md5Hash = MD5Helper.GenerateMD5HashCodeFromFile(f.FullName), // TODO 効率化
+                                        FileExtension = f.Extension.Substring(1),
+                                        FilePath = Path.Combine(destDir, f.Name),
+                                        Md5Hash = MD5Helper.GenerateMD5HashCodeFromFile(f.FullName), // TODO 効率化
                                             AveHash = AverageHashGenerator.ComputeAveHash(f.FullName),
-                                            HeightPix = img.Height,
-                                            WidthPix = img.Width,
-                                            DoGet = 2,
-                                            DeleteTimestamp = null
-                                        };
+                                        HeightPix = img.Height,
+                                        WidthPix = img.Width,
+                                        DoGet = 2,
+                                        DeleteTimestamp = null
+                                    };
 
-                                        return RegisterImageRepository.InsertAsync(connection, r).Select(nouse => Right<RegisterFailureInfo, FileInfo>(f));
-                                    }
-                                    catch (Exception exception)
-                                    {
-                                        var left = Left<RegisterFailureInfo, FileInfo>(new RegisterFailureInfo(path: f.FullName, result: $"画像登録時に何らかのエラーが発生しました。message={exception.Message}"));
-                                        return Task.FromResult(left);
-                                    }
-                                },
-                                Left: (l) => Task.FromResult(Left<RegisterFailureInfo, FileInfo>(l))
-                                )));
+                                    return RegisterImageRepository.InsertAsync(connection, r).Select(nouse => Right<RegisterFailureInfo, FileInfo>(f));
+                                }
+                                catch (Exception exception)
+                                {
+                                    var left = Left<RegisterFailureInfo, FileInfo>(new RegisterFailureInfo(path: f.FullName, result: $"画像登録時に何らかのエラーが発生しました。message={exception.Message}"));
+                                    return Task.FromResult(left);
+                                }
+                            },
+                            Left: (l) => Task.FromResult(Left<RegisterFailureInfo, FileInfo>(l))
+                            )));
 
-                        return Task.WhenAll(tasks)
-                            .ContinueWith(nouse => tasks.Select(t => t.Result));
-                    }
-                }    
+                    return Task.WhenAll(tasks)
+                        .ContinueWith(nouse => tasks.Select(t => t.Result));
+                });
             }
 
             private IEnumerable<Either<RegisterFailureInfo, FileInfo>> TreeToList(string[] fileList)

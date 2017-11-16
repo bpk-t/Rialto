@@ -20,19 +20,17 @@ namespace Rialto.Models.Service
 
         public Task<ObservableCollection<TagItem>> GetAllTagItemAsync(Func<Tag, bool> predicate)
         {
-            using (var connection = DBHelper.Instance.GetDbConnection())
+            return DBHelper.Instance.Execute((connection, tran) =>
             {
-                using (var tran = connection.BeginTransaction())
-                {
-                    var allTagsTask = TagRepository.GetAllTagAsync(connection);
-                    var allCountTask = RegisterImageRepository.GetAllCountAsync(connection);
-                    var noTagCount = RegisterImageRepository.GetNoTagCountAsync(connection);
+                var allTagsTask = TagRepository.GetAllTagAsync(connection);
+                var allCountTask = RegisterImageRepository.GetAllCountAsync(connection);
+                var noTagCount = RegisterImageRepository.GetNoTagCountAsync(connection);
 
-                    return Task.WhenAll(
-                        allTagsTask,
-                        allCountTask,
-                        noTagCount
-                        ).ContinueWith(nouse =>
+                return Task.WhenAll(
+                    allTagsTask,
+                    allCountTask,
+                    noTagCount
+                    ).ContinueWith(nouse =>
                     {
                         var tagTreeCollection = new ObservableCollection<TagItem>();
                         tagTreeCollection.Add(new TagItem()
@@ -48,58 +46,51 @@ namespace Rialto.Models.Service
                             ImageCount = (int)noTagCount.Result
                         });
                         allTagsTask.Result.Where(predicate)
-                            .Select((x) => new TagItem()
-                            {
-                                ID = x.Id,
-                                Name = x.Name,
-                                ImageCount = x.AssignImageCount
-                            })
-                            .ForEach(x => tagTreeCollection.Add(x));
+                                .Select((x) => new TagItem()
+                        {
+                            ID = x.Id,
+                            Name = x.Name,
+                            ImageCount = x.AssignImageCount
+                        })
+                                .ForEach(x => tagTreeCollection.Add(x));
                         return tagTreeCollection;
                     });
-                }
-            }
+            });
         }
 
         public Task<ObservableCollection<Tag>> GetAllTagAsync()
         {
-            using (var connection = DBHelper.Instance.GetDbConnection())
+            return DBHelper.Instance.Execute((connection, tran) =>
             {
-                using (var tran = connection.BeginTransaction())
-                {
-                    var allTagsTask = TagRepository.GetAllTagAsync(connection);
-                    var allCountTask = RegisterImageRepository.GetAllCountAsync(connection);
-                    var noTagCount = RegisterImageRepository.GetNoTagCountAsync(connection);
+                var allTagsTask = TagRepository.GetAllTagAsync(connection);
+                var allCountTask = RegisterImageRepository.GetAllCountAsync(connection);
+                var noTagCount = RegisterImageRepository.GetNoTagCountAsync(connection);
 
-                    return Task.WhenAll(
-                        allTagsTask,
-                        allCountTask,
-                        noTagCount
-                        ).ContinueWith(nouse =>
-                        {
-                            var tagTreeCollection = new ObservableCollection<Tag>();
-                            allTagsTask.Result.ForEach(x => tagTreeCollection.Add(x));
-                            return tagTreeCollection;
-                        });
-                }
-            }
+                return Task.WhenAll(
+                    allTagsTask,
+                    allCountTask,
+                    noTagCount
+                    ).ContinueWith(nouse =>
+                    {
+                        var tagTreeCollection = new ObservableCollection<Tag>();
+                        allTagsTask.Result.ForEach(x => tagTreeCollection.Add(x));
+                        return tagTreeCollection;
+                    });
+            });
         }
 
         public Task UpsertTag(string name, string ruby, string description)
         {
-            using (var connection = DBHelper.Instance.GetDbConnection())
+            return DBHelper.Instance.Execute((connection, tran) =>
             {
-                using (var tran = connection.BeginTransaction())
+                var tag = new Tag()
                 {
-                    var tag = new Tag()
-                    {
-                        Name = name,
-                        Ruby = ruby,
-                        Description = description
-                    };
-                    return TagRepository.UpsertAsync(connection, tran, tag);
-                }
-            }
+                    Name = name,
+                    Ruby = ruby,
+                    Description = description
+                };
+                return TagRepository.UpsertAsync(connection, tran, tag);
+            });
         } 
     }
 }

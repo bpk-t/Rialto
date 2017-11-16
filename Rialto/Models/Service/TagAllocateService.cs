@@ -47,87 +47,78 @@ namespace Rialto.Models.Service
 
         public Task<Unit> InitTabSettingPanelAsync()
         {
-            using (var connection = DBHelper.Instance.GetDbConnection())
+            return DBHelper.Instance.Execute((connection, tran) =>
             {
-                using (var tran = connection.BeginTransaction())
+                TabPanels.Clear();
+                return TagRepository.GetAllTagGroupAsync(connection).SelectMany(results =>
                 {
-                    TabPanels.Clear();
-                    return TagRepository.GetAllTagGroupAsync(connection).SelectMany(results =>
+                    results.ForEach(group =>
                     {
-                        results.ForEach(group =>
+                        var tabInfo = new TabInfo
                         {
-                            var tabInfo = new TabInfo
+                            Header = group.Key.Name,
+                        };
+
+                        group.Value.Select(tag =>
+                            new TagAddButtonInfo()
                             {
-                                Header = group.Key.Name,
-                            };
-
-                            group.Value.Select(tag =>
-                                new TagAddButtonInfo()
-                                {
-                                    TagId = tag.Id,
-                                    Name = tag.Name,
-                                    ClickEvent = AddTagAssign
-                                })
-                                .ForEach(x => tabInfo.Buttons.Add(x));
-                            TabPanels.Add(tabInfo);
-                        });
-
-                        return Task.FromResult(unit);
+                                TagId = tag.Id,
+                                Name = tag.Name,
+                                ClickEvent = AddTagAssign
+                            })
+                            .ForEach(x => tabInfo.Buttons.Add(x));
+                        TabPanels.Add(tabInfo);
                     });
-                }
-            }
+
+                    return Task.FromResult(unit);
+                });
+            });
         }
 
         public Task<ObservableCollection<TagMasterInfo>> GetAllocatedTags(long imgId)
         {
-            using (var connection = DBHelper.Instance.GetDbConnection())
+            return DBHelper.Instance.Execute((connection, tran) =>
             {
-                using (var tran = connection.BeginTransaction())
+                return TagRepository.GetTagByImageAssignedAsync(connection, tran, imgId).Select(results =>
                 {
-                    return TagRepository.GetTagByImageAssignedAsync(connection, tran, imgId).Select(results =>
-                    {
-                        var tags = new ObservableCollection<TagMasterInfo>();
-                        results.ForEach(x => tags.Add(TagToTagMaster(x)));
-                        return tags;
-                    });
-                }
-            }
+                    var tags = new ObservableCollection<TagMasterInfo>();
+                    results.ForEach(x => tags.Add(TagToTagMaster(x)));
+                    return tags;
+                });
+            });
         }
 
         private void AddTagAssign(TagAddButtonInfo buttonInfo)
         {
-            using (var connection = DBHelper.Instance.GetDbConnection())
+            DBHelper.Instance.Execute((connection, tran) =>
             {
-                using (var tran = connection.BeginTransaction())
+                selectedThumbnailImgList.ForEach(x =>
+                    TagRepository.InsertTagAssignAsync(connection, tran,
+                        new TagAssign
+                        {
+                            RegisterImageId = x.ImgID,
+                            TagId = buttonInfo.TagId
+                        }));
+
+                if (selectedThumbnailImgList.Count == 1)
                 {
-                    selectedThumbnailImgList.ForEach(x =>
-                        TagRepository.InsertTagAssignAsync(connection, tran,
-                            new TagAssign
-                            {
-                                RegisterImageId = x.ImgID,
-                                TagId = buttonInfo.TagId
-                            }));
+                    var imgId = selectedThumbnailImgList[0].ImgID;
 
-                    if (selectedThumbnailImgList.Count == 1)
+                    TagRepository.GetTagByImageAssignedAsync(connection, tran, imgId).Select(results =>
                     {
-                        var imgId = selectedThumbnailImgList[0].ImgID;
-
-                        TagRepository.GetTagByImageAssignedAsync(connection, tran, imgId).Select(results =>
-                        {
-                            var tags = new ObservableCollection<TagMasterInfo>();
-                            results.ForEach(x => tags.Add(TagToTagMaster(x)));
-                            return tags;
-                        }).Select(tags =>
-                        {
-                            OnChange(tags);
-                            return unit;
-                        });
-                    }
-
-                    TagRepository.UpdateAssignImageCount(connection, tran, buttonInfo.TagId);
-                    tran.Commit();
+                        var tags = new ObservableCollection<TagMasterInfo>();
+                        results.ForEach(x => tags.Add(TagToTagMaster(x)));
+                        return tags;
+                    }).Select(tags =>
+                    {
+                        OnChange(tags);
+                        return unit;
+                    });
                 }
-            }
+
+                TagRepository.UpdateAssignImageCount(connection, tran, buttonInfo.TagId);
+                return unit;
+            });
         }
 
         private TagMasterInfo TagToTagMaster(Tag x)

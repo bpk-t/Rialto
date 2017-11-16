@@ -21,33 +21,29 @@ namespace Rialto.Models.Service
         {
             if (Directory.Exists(exportDir))
             {
-                using (var connection = DBHelper.Instance.GetDbConnection())
-                {
-                    using (var tran = connection.BeginTransaction())
+                return DBHelper.Instance.Execute((connection, tran) => {
+                    return GetAllImage(connection, tagId).Select(list =>
                     {
-                        return GetAllImage(connection, tagId).Select(list =>
-                        {
-                            return list.Select(item =>
-                            (from registerImage in item.Item1
-                             from repository in item.Item2
-                             select (Path.Combine(repository.Path, registerImage.FilePath), registerImage.FileName))
-                                 .Fold(Try<string>(new Exception("Option None")), (acc, x) => {
-                                     (string sourcePath, string fileName) = x;
-                                     try
-                                     {
-                                         var destFilePath = Path.Combine(exportDir, fileName);
-                                         File.Copy(sourcePath, destFilePath);
-                                         return Try(destFilePath);
-                                     }
-                                     catch (Exception e)
-                                     {
-                                         return Try<string>(e);
-                                     }
-                                 })
-                            );
-                        });
-                    }
-                }
+                        return list.Select(item =>
+                        (from registerImage in item.Item1
+                         from repository in item.Item2
+                         select (Path.Combine(repository.Path, registerImage.FilePath), registerImage.FileName))
+                             .Fold(Try<string>(new Exception("Option None")), (acc, x) => {
+                                 (string sourcePath, string fileName) = x;
+                                 try
+                                 {
+                                     var destFilePath = Path.Combine(exportDir, fileName);
+                                     File.Copy(sourcePath, destFilePath);
+                                     return Try(destFilePath);
+                                 }
+                                 catch (Exception e)
+                                 {
+                                     return Try<string>(e);
+                                 }
+                             })
+                        );
+                    });
+                });
             } else
             {
                 return Task.FromResult(Enumerable.Empty<Try<string>>());
