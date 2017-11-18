@@ -23,6 +23,7 @@ using System.Reactive.Linq;
 using Akka.Actor;
 using LanguageExt;
 using static LanguageExt.Prelude;
+using MaterialDesignThemes.Wpf;
 
 namespace Rialto.ViewModels
 {
@@ -66,7 +67,7 @@ namespace Rialto.ViewModels
                     {
                         some.IfSucc(image =>
                         {
-                            SideImage = image.Image;
+                            SideImage = image.Image.IfFailThrow(); // TODO
                         });
                     },
                     () =>
@@ -704,6 +705,36 @@ namespace Rialto.ViewModels
                 }
                 RaisePropertyChanged(() => ProgressBarVisible);
             }
+        }
+
+        private ExportDialogViewModel ExportDialog_ = null;
+        public ExportDialogViewModel ExportDialog
+        {
+            get => ExportDialog_;
+            set
+            {
+                ExportDialog_ = value;
+                RaisePropertyChanged(() => ExportDialog);
+            }
+        }
+
+        private bool ExportDialogIsOpen_ = false;
+        public bool ExportDialogIsOpen
+        {
+            get => ExportDialogIsOpen_;
+            set
+            {
+                ExportDialogIsOpen_ = value;
+                RaisePropertyChanged(() => ExportDialogIsOpen);
+            }
+        }
+
+        public void Export()
+        {
+            ExportDialog = new ExportDialogViewModel("テスト", "テストA");
+            DialogHost.Show(ExportDialog);
+            
+            ExportDialogIsOpen = true;
         }
     }
 }

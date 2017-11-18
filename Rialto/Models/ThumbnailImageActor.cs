@@ -17,11 +17,14 @@ using Rialto.Models.DAO.Entity;
 using System.IO;
 using System.Drawing;
 using System.Data.Common;
+using NLog;
 
 namespace Rialto.Models
 {
     public class ThumbnailImageActor : ReceiveActor
     {
+        private static readonly Logger logger = LogManager.GetLogger("fileLogger");
+
         public class GotToPageMessage
         {
             public long TagId { get; }
@@ -194,11 +197,11 @@ namespace Rialto.Models
                     return GetImageCount(tagId).SelectMany(imgCount =>
                     {
                         var img = cacheImages[index];
-                        return LoadBitmapImage(img.SourceImageFilePath).Select(loadImage =>
+                        return LoadBitmapImage(img.SourceImageFilePath).Select(loadImageTry =>
                         {
                             var pagingImage = new PagingImage(
                                                         allCount: imgCount,
-                                                        image: loadImage,
+                                                        image: loadImageTry,
                                                         imageId: img.ImgID,
                                                         index: cachePage + cacheLimit + index,
                                                         page: pageInfo);
@@ -286,10 +289,10 @@ namespace Rialto.Models
             }
         }
 
-        private Task<BitmapImage> LoadBitmapImage(Uri filePath)
+        private Task<Try<BitmapImage>> LoadBitmapImage(Uri filePath)
         {
             var message = new CachedImageActor.LoadImageMessage(filePath);
-            return cachedImageActor.Ask<Task<BitmapImage>>(message).SelectMany(x => x);
+            return cachedImageActor.Ask<Task<Try<BitmapImage>>>(message).SelectMany(x => x);
         }
 
         private Task<PagingInfo> GetThumbnailImage(long tagId, long page, long limit, Order imageOrder)
@@ -325,7 +328,7 @@ namespace Rialto.Models
                 var imageLoadTask = GetThumbnailImage(sourceImagePath, img.Fold("", (a, x) => x.Md5Hash))
                         .Bind(thumbnailImageUri => Try(BitmapImageAsyncFactory.Create(thumbnailImageUri.AbsolutePath)))
                         .BiFold(state: Task.FromResult(Try((BitmapImage)null)),
-                           Succ: (acc, x) => x.Map(y => Try(y)),
+                           Succ: (acc, x) => x,
                            Fail: (acc, e) => Task.FromResult(Try<BitmapImage>(e))
                         );
                 result.SetImage(imageLoadTask);
@@ -401,7 +404,8 @@ namespace Rialto.Models
         /// <param name="imgHash">元画像のハッシュ</param>
         private Try<Uri> CreateThumbnailImage(string imgPath, string imgHash)
         {
-            return Try(() => {
+            try
+            {
                 using (var image = Image.FromFile(imgPath))
                 {
                     var resizeH = image.Height;
@@ -425,11 +429,15 @@ namespace Rialto.Models
                             // サムネイル画像の保存
                             canvas.Save(savePath, System.Drawing.Imaging.ImageFormat.Jpeg);
 
-                            return new Uri(savePath);
+                            return Try(new Uri(savePath));
                         }
                     }
                 }
-            });
+            } catch (Exception e)
+            {
+                logger.Error(e);
+                return Try<Uri>(e);
+            }
         }
     }
 }

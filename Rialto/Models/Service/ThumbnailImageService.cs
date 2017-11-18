@@ -23,7 +23,7 @@ namespace Rialto.Models.Service
     public class PagingImage
     {
         public long AllCount { get; }
-        public BitmapImage Image { get; }
+        public Try<BitmapImage> Image { get; }
         public long ImageId { get; }
         public long Index { get; }
 
@@ -32,7 +32,7 @@ namespace Rialto.Models.Service
         /// </summary>
         public Option<PagingInfo> Page { get; }
 
-        public PagingImage(long allCount, BitmapImage image, long imageId, long index, Option<PagingInfo> page)
+        public PagingImage(long allCount, Try<BitmapImage> image, long imageId, long index, Option<PagingInfo> page)
         {
             AllCount = allCount;
             Image = image;

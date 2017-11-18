@@ -46,7 +46,7 @@ namespace Rialto.ViewModels
                 imgOptTry.ForEach(imgTry => 
                     imgTry.IfSucc(img =>
                     {
-                        this.CurrentImage = img.Image;
+                        this.CurrentImage = img.Image.IfFailThrow(); // TODO
                         this.selectedImgId = img.ImageId;
                     })
                 );

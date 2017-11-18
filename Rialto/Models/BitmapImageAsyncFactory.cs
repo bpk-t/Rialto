@@ -1,28 +1,40 @@
-﻿using System;
+﻿using NLog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media.Imaging;
+using LanguageExt;
+using static LanguageExt.Prelude;
 
 namespace Rialto.Models
 {
     public class BitmapImageAsyncFactory
     {
-        public static Task<BitmapImage> Create(string filePath)
+        private static readonly Logger logger = LogManager.GetLogger("fileLogger");
+
+        public static Task<Try<BitmapImage>> Create(string filePath)
         {
             return Task.Run(() =>
             {
-                using (var stream = new ScapegoatStream(new MemoryStream(File.ReadAllBytes(filePath))))
+                try
                 {
-                    var tmpBitmapImage = new BitmapImage();
-                    tmpBitmapImage.BeginInit();
-                    tmpBitmapImage.StreamSource = stream;
-                    tmpBitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                    tmpBitmapImage.EndInit();
-                    tmpBitmapImage.Freeze();
-                    return tmpBitmapImage;
+                    using (var stream = new ScapegoatStream(new MemoryStream(File.ReadAllBytes(filePath))))
+                    {
+                        var tmpBitmapImage = new BitmapImage();
+                        tmpBitmapImage.BeginInit();
+                        tmpBitmapImage.StreamSource = stream;
+                        tmpBitmapImage.CacheOption = BitmapCacheOption.OnLoad;
+                        tmpBitmapImage.EndInit();
+                        tmpBitmapImage.Freeze();
+                        return Try(tmpBitmapImage);
+                    }
+                } catch (Exception e)
+                {
+                    logger.Error(e);
+                    return Try<BitmapImage>(e);
                 }
             });
         }

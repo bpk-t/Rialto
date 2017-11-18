@@ -26,6 +26,9 @@
         <DataTemplate DataType="{x:Type vm:ErrorDialogViewModel}">
             <v:ErrorDialog/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type vm:ExportDialogViewModel}">
+            <v:ExportDialog/>
+        </DataTemplate>
     </Window.Resources>
 
     <i:Interaction.Triggers>
@@ -51,6 +54,7 @@
         </l:InteractionMessageTrigger>
     </i:Interaction.Triggers>
 
+    <!--<materialDesign:DialogHost DialogContent="{Binding ExportDialog}" IsOpen="{Binding ExportDialogIsOpen}">-->
     <materialDesign:DialogHost DialogContent="{Binding ErrorDialog}" IsOpen="{Binding ErrorDialogIsOpen}">
         <Grid ShowGridLines="False">
             <Grid.RowDefinitions>
@@ -86,7 +90,13 @@
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                         </MenuItem>
-                        <MenuItem Header="エクスポート(_E)" />
+                        <MenuItem Header="エクスポート(_E)">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Export"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </MenuItem>
                     </MenuItem>
                     <MenuItem Header="表示(_V)">
                         <MenuItem Header="シャッフル(_S)" >
@@ -465,4 +475,5 @@
             </Grid>
         </Grid>
     </materialDesign:DialogHost>
+    <!--</materialDesign:DialogHost>-->
 </Window>

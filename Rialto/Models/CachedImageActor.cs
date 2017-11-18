@@ -22,7 +22,7 @@ namespace Rialto.Models
         }
 
         private int MAX_CACHE_ITEM_COUNT = 50;
-        private IList<KeyValuePair<Uri, Task<BitmapImage>>> imageLoadTaskCache = new List<KeyValuePair<Uri, Task<BitmapImage>>>();
+        private IList<KeyValuePair<Uri, Task<Try<BitmapImage>>>> imageLoadTaskCache = new List<KeyValuePair<Uri, Task<Try<BitmapImage>>>>();
 
         public CachedImageActor()
         {
@@ -32,7 +32,7 @@ namespace Rialto.Models
             });
         }
 
-        private Task<BitmapImage> LoadBitmapImage(Uri filePath)
+        private Task<Try<BitmapImage>> LoadBitmapImage(Uri filePath)
         {
             return imageLoadTaskCache.Find(x => x.Key.Equals(filePath))
                 .Map(x =>
@@ -50,7 +50,7 @@ namespace Rialto.Models
                         imageLoadTaskCache.HeadOrNone()
                             .ForEach(head => imageLoadTaskCache.Remove(head));
                     }
-                    imageLoadTaskCache.Add(new KeyValuePair<Uri, Task<BitmapImage>>(filePath, loadTask));
+                    imageLoadTaskCache.Add(new KeyValuePair<Uri, Task<Try<BitmapImage>>>(filePath, loadTask));
                     return loadTask;
                 });
         }
