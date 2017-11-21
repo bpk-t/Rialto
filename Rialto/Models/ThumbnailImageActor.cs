@@ -334,14 +334,13 @@ namespace Rialto.Models
                     SourceImageFilePath = new Uri(sourceImagePath)
                 };
 
-                var imageLoadTask = GetThumbnailImage(sourceImagePath, img.Fold("", (a, x) => x.Md5Hash))
-                        .Bind(thumbnailImageUri => Try(BitmapImageAsyncFactory.Create(thumbnailImageUri.AbsolutePath)))
-                        .BiFold(state: Task.FromResult(Try((BitmapImage)null)),
-                           Succ: (acc, x) => x,
-                           Fail: (acc, e) => Task.FromResult(Try<BitmapImage>(e))
-                        );
-                result.SetImage(imageLoadTask);
+                var imageLoadTask = (
+                    from thumbnailImageUri in GetThumbnailImage(sourceImagePath, img.Fold("", (a, x) => x.Md5Hash))
+                    from bitmapImage in BitmapImageAsyncFactory.Create(thumbnailImageUri.AbsolutePath)
+                    select bitmapImage
+                    );
 
+                result.SetImage(imageLoadTask);
                 return result;
             }
 
@@ -384,24 +383,32 @@ namespace Rialto.Models
         /// <param name="imgPath">元画像のファイルパス</param>
         /// <param name="imgHash">元画像のハッシュ</param>
         /// <returns></returns>
-        private Try<Uri> GetThumbnailImage(string imgPath, string imgHash)
+        private Task<Uri> GetThumbnailImage(string imgPath, string imgHash)
         {
-            Try<string> GetPath(string fileName) => Try(() =>
+            Task<string> GetPath(string fileName)
+            {
+                try
                 {
                     if (!Directory.Exists(Properties.Settings.Default.ThumbnailImageDirectory))
                     {
-                        throw new Exception("サムネイル画像保存ディレクトリが存在しません。");
+                        Directory.CreateDirectory(Properties.Settings.Default.ThumbnailImageDirectory);
                     }
-                    return Path.Combine(Properties.Settings.Default.ThumbnailImageDirectory, fileName);
+                    return Task.FromResult(Path.Combine(Properties.Settings.Default.ThumbnailImageDirectory, fileName));
+                } catch (Exception e)
+                {
+                    logger.Error(e);
+                    return Task.FromException<string>(e);
                 }
-            );
+            }
+
             return GetPath(imgHash).Bind((string filePath) => {
                 if (!File.Exists(filePath))
                 {
                     return CreateThumbnailImage(imgPath, imgHash);
-                } else
+                }
+                else
                 {
-                    return Try(() => new Uri(Path.GetFullPath(filePath)));
+                    return Task.FromResult(new Uri(Path.GetFullPath(filePath)));
                 }
             });
         }
@@ -411,42 +418,45 @@ namespace Rialto.Models
         /// </summary>
         /// <param name="imgPath">元画像のファイルパス</param>
         /// <param name="imgHash">元画像のハッシュ</param>
-        private Try<Uri> CreateThumbnailImage(string imgPath, string imgHash)
+        private Task<Uri> CreateThumbnailImage(string imgPath, string imgHash)
         {
-            try
-            {
-                using (var image = Image.FromFile(imgPath))
+            return Task.Run(() => {
+                try
                 {
-                    var resizeH = image.Height;
-                    var resizeW = image.Width;
-
-                    // リサイズ後の縦横を計算
-                    if (image.Height > 240)
+                    using (var image = Image.FromFile(imgPath))
                     {
-                        resizeH = 240;
-                        resizeW = (int)((double)resizeW * ((double)240 / (double)image.Height));
-                    }
+                        var resizeH = image.Height;
+                        var resizeW = image.Width;
 
-                    using (var canvas = new Bitmap(resizeW, resizeH))
-                    {
-                        using (var g = Graphics.FromImage(canvas))
+                        // リサイズ後の縦横を計算
+                        if (image.Height > 240)
                         {
-                            g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                            g.DrawImage(image, new Rectangle(0, 0, resizeW, resizeH));
+                            resizeH = 240;
+                            resizeW = (int)((double)resizeW * ((double)240 / (double)image.Height));
+                        }
 
-                            var savePath = Path.Combine(Properties.Settings.Default.ThumbnailImageDirectory, imgHash);
-                            // サムネイル画像の保存
-                            canvas.Save(savePath, System.Drawing.Imaging.ImageFormat.Jpeg);
+                        using (var canvas = new Bitmap(resizeW, resizeH))
+                        {
+                            using (var g = Graphics.FromImage(canvas))
+                            {
+                                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                                g.DrawImage(image, new Rectangle(0, 0, resizeW, resizeH));
 
-                            return Try(new Uri(savePath));
+                                var savePath = Path.Combine(Properties.Settings.Default.ThumbnailImageDirectory, imgHash);
+                                // サムネイル画像の保存
+                                canvas.Save(savePath, System.Drawing.Imaging.ImageFormat.Jpeg);
+
+                                return new Uri(savePath);
+                            }
                         }
                     }
                 }
-            } catch (Exception e)
-            {
-                logger.Error(e);
-                return Try<Uri>(e);
-            }
+                catch (Exception e)
+                {
+                    logger.Error(e);
+                    throw e;
+                }
+            });
         }
     }
 }
