@@ -18,6 +18,7 @@ using System.IO;
 using System.Drawing;
 using System.Data.Common;
 using NLog;
+using System.Threading;
 
 namespace Rialto.Models
 {
@@ -295,22 +296,30 @@ namespace Rialto.Models
             return cachedImageActor.Ask<Task<Try<BitmapImage>>>(message).SelectMany(x => x);
         }
 
+        private CancellationTokenSource cancelTokenSource;
         private Task<PagingInfo> GetThumbnailImage(long tagId, long page, long limit, Order imageOrder)
         {
-            return _GetThumbnailImage(tagId, page, limit, imageOrder).Select(x => {
+            return _GetThumbnailImage(tagId, page, limit, imageOrder).Select(x => 
+            {
                 // 先読み
-                x.ThumbnailImageList
-                    .Select(img => new CachedImageActor.LoadImageMessage(img.SourceImageFilePath))
-                    .Fold(
-                        Task.FromResult(0),
-                        (acc, message) => {
-                            return acc.SelectMany(nouse => {
-                                return Task.Delay(TimeSpan.FromMilliseconds(1000))
-                                        .ContinueWith(nouse2 => cachedImageActor.Ask(message))
-                                        .SelectMany(y => y);
-                                    })
-                                    .Map(nouse => 0);
-                            });
+                if (cancelTokenSource != null)
+                {
+                    cancelTokenSource.Cancel();
+                }
+                cancelTokenSource = new CancellationTokenSource();
+                var token = cancelTokenSource.Token;
+
+                Task.Run(async () => {
+                    foreach (var img in x.ThumbnailImageList)
+                    {
+                        token.ThrowIfCancellationRequested();
+
+                        var message = new CachedImageActor.LoadImageMessage(img.SourceImageFilePath);
+
+                        await cachedImageActor.Ask(message);
+                        await Task.Delay(TimeSpan.FromMilliseconds(1500));                        
+                    }
+                }, token);
                 return x;
             });
         }
