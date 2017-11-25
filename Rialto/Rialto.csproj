@@ -195,6 +195,7 @@
     <Compile Include="Models\Service\TagMasterService.cs" />
     <Compile Include="Models\Service\ThumbnailImageService.cs" />
     <Compile Include="Models\ThumbnailImageActor.cs" />
+    <Compile Include="Models\ThumbnailPagingActor.cs" />
     <Compile Include="Util\CompareSelector.cs" />
     <Compile Include="Util\MD5Helper.cs" />
     <Compile Include="Util\RangeObservableCollection.cs" />

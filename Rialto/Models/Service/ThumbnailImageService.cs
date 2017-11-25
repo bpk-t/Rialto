@@ -60,7 +60,7 @@ namespace Rialto.Models.Service
     { 
         public ThumbnailImageService(ActorSystem system)
         {
-            thumbnailImageActor = system.ActorOf<ThumbnailImageActor>(nameof(ThumbnailImageActor));
+            thumbnailImageActor = system.ActorOf<ThumbnailPagingActor>(nameof(ThumbnailPagingActor));
             OnChangeSelect += (nouse) => { };
             OnChangePage += (nouse) => { };
         }
@@ -84,7 +84,7 @@ namespace Rialto.Models.Service
         private Option<int> selectImageIndex = None;
         public Task<Option<Try<PagingImage>>> SelectImage(long imgId)
         {
-            var message = new ThumbnailImageActor.GetImageMessage(imgId, currentTagId);
+            var message = new ThumbnailPagingActor.GetImageMessage(imgId, currentTagId);
             return thumbnailImageActor.Ask<Option<Try<PagingImage>>>(message)
                 .Select(x => {
                     OnChangeSelect(x);
@@ -98,7 +98,7 @@ namespace Rialto.Models.Service
 
         public Task<Option<Try<PagingImage>>> NextImage()
         {
-            var message = new ThumbnailImageActor.GetNextImageMessage();
+            var message = new ThumbnailPagingActor.GetNextImageMessage();
             return thumbnailImageActor.Ask<Option<Try<PagingImage>>>(message)
                 .Select(x => {
                     x.IfSome(y => y.IfSucc(pagingImg => pagingImg.Page.IfSome(page => OnChangePage(page))));
@@ -109,7 +109,7 @@ namespace Rialto.Models.Service
 
         public Task<Option<Try<PagingImage>>> PrevImageImage()
         {
-            var message = new ThumbnailImageActor.GetPrevImageMessage();
+            var message = new ThumbnailPagingActor.GetPrevImageMessage();
             return thumbnailImageActor.Ask<Option<Try<PagingImage>>>(message)
                 .Select(x => {
                     x.IfSome(y => y.IfSucc(pagingImg => pagingImg.Page.IfSome(page => OnChangePage(page))));
@@ -131,7 +131,7 @@ namespace Rialto.Models.Service
 
         public Task<PagingInfo> GoToNextPage()
         {
-            var message = new ThumbnailImageActor.GoToNextPageMessage();
+            var message = new ThumbnailPagingActor.GoToNextPageMessage();
             return thumbnailImageActor.Ask<PagingInfo>(message)
                 .Select(x => {
                     OnChangePage(x);
@@ -141,7 +141,7 @@ namespace Rialto.Models.Service
 
         public Task<PagingInfo> GetPrevPage()
         {
-            var message = new ThumbnailImageActor.GoToPrevPageMessage();
+            var message = new ThumbnailPagingActor.GoToPrevPageMessage();
             return thumbnailImageActor.Ask<PagingInfo>(message)
                 .Select(x => {
                     OnChangePage(x);
@@ -164,7 +164,7 @@ namespace Rialto.Models.Service
 
         public Task<PagingInfo> GoToPage(int page = 0)
         {
-            var message = new ThumbnailImageActor.GotToPageMessage(currentTagId, page, OnePageItemCount, currentImageOrder);
+            var message = new ThumbnailPagingActor.GotToPageMessage(currentTagId, page, OnePageItemCount, currentImageOrder);
             return thumbnailImageActor.Ask<PagingInfo>(message)
                 .Select(x => {
                     OnChangePage(x);
