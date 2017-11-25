@@ -51,7 +51,7 @@ namespace Rialto.Model.DataModel
                 LoadingVisible = false;
                 imageTry.Match(
                     succ => DispImage = succ,
-                    fail => DispImage = ImageAwesome.CreateImageSource(FontAwesomeIcon.Spinner, System.Windows.Media.Brushes.Black, 200)
+                    fail => DispImage = ImageAwesome.CreateImageSource(FontAwesomeIcon.ExclamationTriangle, System.Windows.Media.Brushes.Black, 200)
                     );
                 return unit;
             });

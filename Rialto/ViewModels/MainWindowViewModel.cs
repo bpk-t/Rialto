@@ -24,6 +24,8 @@ using Akka.Actor;
 using LanguageExt;
 using static LanguageExt.Prelude;
 using MaterialDesignThemes.Wpf;
+using FontAwesome.WPF;
+using System.Windows.Media;
 
 namespace Rialto.ViewModels
 {
@@ -63,12 +65,15 @@ namespace Rialto.ViewModels
             thumbnailService.OnChangeSelect += (value) =>
             {
                 value.Match(
-                    (some) =>
+                    (pagingImageTry) =>
                     {
-                        some.IfSucc(image =>
-                        {
-                            SideImage = image.Image.IfFailThrow(); // TODO
-                        });
+                        (from pagingImage in pagingImageTry
+                         from image in pagingImage.Image
+                         select image)
+                         .Match(
+                                succ => SideImage = succ,
+                                fail => SideImage = ImageAwesome.CreateImageSource(FontAwesomeIcon.ExclamationTriangle, System.Windows.Media.Brushes.Black, 200)
+                                );
                     },
                     () =>
                     {
@@ -269,8 +274,8 @@ namespace Rialto.ViewModels
         /// <summary>
         /// サイドペインに表示する画像（選択された画像）
         /// </summary>
-        private BitmapImage SideImage_;
-        public BitmapImage SideImage
+        private ImageSource SideImage_;
+        public ImageSource SideImage
         {
             get => SideImage_;
             set
