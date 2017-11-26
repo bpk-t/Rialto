@@ -128,10 +128,9 @@ namespace Rialto.Models
 
         private Task<PagingInfo> GoToNextPage()
         {
-            var nextPage = cachePage + 1;
-            return ExistsNextPage(cacheTagId, nextPage, cacheLimit).SelectMany(existsNextPage =>
+            return ExistsNextPage(cacheTagId, cachePage, cacheLimit).SelectMany(existsNextPage =>
             {
-                var page = existsNextPage ? nextPage : 0;
+                var page = existsNextPage ? cachePage + 1 : 0;
                 cachePage = page;
                 return GetThumbnailImage(cacheTagId, page, cacheLimit, cacheImageOrder).Select(x => {
                     cacheImages = x.ThumbnailImageList;
@@ -141,10 +140,9 @@ namespace Rialto.Models
         }
         private Task<PagingInfo> GotoPrevPage()
         {
-            var prevPage = cachePage - 1;
-            return ExistsPrevPage(cacheTagId, prevPage).SelectMany(existsPrevPage =>
+            return ExistsPrevPage(cacheTagId, cachePage).SelectMany(existsPrevPage =>
             {
-                var page = existsPrevPage ? prevPage : 0;
+                var page = existsPrevPage ? cachePage - 1 : 0;
                 cachePage = page;
                 return GetThumbnailImage(cacheTagId, page, cacheLimit, cacheImageOrder).Select(x => {
                     cacheImages = x.ThumbnailImageList;
