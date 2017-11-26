@@ -11,14 +11,27 @@
              Background="{DynamicResource MaterialDesignPaper}"
              FontFamily="{DynamicResource MaterialDesignFont}"
              mc:Ignorable="d">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+    </UserControl.Resources>
+    
     <StackPanel Margin="10" Orientation="Vertical">
         <TextBlock Grid.Row="0" Margin="5" FontStyle="Oblique">画像のエクスポート</TextBlock>
+
         <StackPanel Orientation="Horizontal" Margin="8">
             <TextBlock Margin="5" VerticalAlignment="Center">保存先のディレクトリ：</TextBlock>
             <TextBox Margin="5" Width="400px" Text="{Binding SaveDirectory}"></TextBox>
             <Button Margin="5" Content="...">
             </Button>
         </StackPanel>
+
+        <GroupBox Margin="5">
+            <GroupBox.Header>
+                詳細設定
+            </GroupBox.Header>
+        </GroupBox>
+
+        <ProgressBar IsIndeterminate="True" Margin="4" Visibility="{Binding Exporting, Converter={StaticResource BoolToVisibility}}" />
 
         <StackPanel Orientation="Horizontal">
 

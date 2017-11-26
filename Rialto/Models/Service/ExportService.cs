@@ -25,44 +25,50 @@ namespace Rialto.Models.Service
             if (Directory.Exists(exportDir))
             {
                 return DBHelper.Instance.Execute((connection, tran) => {
-                    return GetAllImage(connection, tagId).Select(list =>
-                    {
-                        return list.Select(item =>
-                        (from registerImage in item.Item1
-                         from repository in item.Item2
-                         select (Path.Combine(repository.Path, registerImage.FilePath), $"{registerImage.FileName}.{registerImage.FileExtension}"))
-                             .Fold(Try<string>(new Exception("Option None")), (acc, x) =>
-                             {
-                                 (string sourcePath, string fileName) = x;
-                                 try
-                                 {
-                                     var destFilePath = Path.Combine(exportDir, fileName);
-                                     if (File.Exists(destFilePath))
-                                     {
-                                         // スキップ
-                                         logger.Debug($"Export Skip = {destFilePath}");
-                                     } else
-                                     {
-                                         File.Copy(sourcePath, destFilePath);
-                                     }
-                                     
-                                     return Try(destFilePath);
-                                 }
-                                 catch (Exception e)
-                                 {
-                                     return Try<string>(e);
-                                 }
-                             })
-                        ).ToList();
-                    });
+
+                    return (from list in GetAllImage(connection, tagId)
+                            from destList in CopyFiles(list, exportDir)
+                            select destList);
                 });
             } else
             {
-                
                 return Task.FromResult(new System.Collections.Generic.List<Try<string>>());
             }
         }
 
+        private Task<List<Try<string>>> CopyFiles(IEnumerable<(Option<RegisterImage>, Option<ImageRepository>)> list, string exportDir)
+        {
+            return Task.Run(() => {
+                return list.Select(item =>
+                    (from registerImage in item.Item1
+                     from repository in item.Item2
+                     select (Path.Combine(repository.Path, registerImage.FilePath), $"{registerImage.FileName}.{registerImage.FileExtension}"))
+                         .Fold(Try<string>(new Exception("Option None")), (acc, x) =>
+                         {
+                             (string sourcePath, string fileName) = x;
+                             try
+                             {
+                                 var destFilePath = Path.Combine(exportDir, fileName);
+                                 if (File.Exists(destFilePath))
+                                 {
+                                                 // スキップ
+                                                 logger.Debug($"Export Skip = {destFilePath}");
+                                 }
+                                 else
+                                 {
+                                     File.Copy(sourcePath, destFilePath);
+                                 }
+
+                                 return Try(destFilePath);
+                             }
+                             catch (Exception e)
+                             {
+                                 return Try<string>(e);
+                             }
+                         })
+                    ).ToList();
+            });
+        }
         private Task<IEnumerable<(Option<RegisterImage>, Option<ImageRepository>)>> GetAllImage(DbConnection connection, long tagId)
         {
             if (tagId == TagConstant.ALL_TAG_ID)
