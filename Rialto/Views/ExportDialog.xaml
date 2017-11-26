@@ -2,15 +2,47 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
              xmlns:local="clr-namespace:Rialto.Views"
-             xmlns:material="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:qc="http://QuickConverter.CodePlex.com/"
+             Background="{DynamicResource MaterialDesignPaper}"
+             FontFamily="{DynamicResource MaterialDesignFont}"
              mc:Ignorable="d">
-    <Grid>
-        <Label Content="{Binding Title}" x:Name="labelTitle" FontSize="24"/>
-        <Label Content="{Binding Message}" x:Name="labelMessage"/>
-        <Button Content="OK"
-                Style="{DynamicResource MaterialDesignFlatButton}"
-                Command="{x:Static material:DialogHost.CloseDialogCommand}"/>
-    </Grid>
+    <StackPanel Margin="10" Orientation="Vertical">
+        <TextBlock Grid.Row="0" Margin="5" FontStyle="Oblique">画像のエクスポート</TextBlock>
+        <StackPanel Orientation="Horizontal" Margin="8">
+            <TextBlock Margin="5" VerticalAlignment="Center">保存先のディレクトリ：</TextBlock>
+            <TextBox Margin="5" Width="400px" Text="{Binding SaveDirectory}"></TextBox>
+            <Button Margin="5" Content="...">
+            </Button>
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal">
+
+            <Button Margin="5px" HorizontalAlignment="Center" IsEnabled="{qc:Binding '!$P', P={Binding Exporting}}">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Floppy" Grid.Column="0" Margin="5"/>
+                        <TextBlock Margin="2" VerticalAlignment="Center">エクスポートする</TextBlock>
+                    </StackPanel>
+                </Button.Content>
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Click">
+                        <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Export"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </Button>
+            <Button Margin="5px" IsCancel="{Binding Exporting}" Command="{x:Static materialDesign:DialogHost.CloseDialogCommand}" HorizontalAlignment="Center" IsEnabled="{qc:Binding '!$P', P={Binding Exporting}}">
+                <Button.Content>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Close" Grid.Column="0" Margin="5"/>
+                        <TextBlock Margin="2" VerticalAlignment="Center">閉じる</TextBlock>
+                    </StackPanel>
+                </Button.Content>
+            </Button>
+        </StackPanel>
+    </StackPanel>
 </UserControl>

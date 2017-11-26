@@ -32,7 +32,6 @@
     </Window.Resources>
 
     <i:Interaction.Triggers>
-
         <!--WindowのContentRenderedイベントのタイミングでViewModelのInitializeメソッドが呼ばれます-->
         <i:EventTrigger EventName="ContentRendered">
             <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Initialize"/>
@@ -54,8 +53,7 @@
         </l:InteractionMessageTrigger>
     </i:Interaction.Triggers>
 
-    <!--<materialDesign:DialogHost DialogContent="{Binding ExportDialog}" IsOpen="{Binding ExportDialogIsOpen}">-->
-    <materialDesign:DialogHost DialogContent="{Binding ErrorDialog}" IsOpen="{Binding ErrorDialogIsOpen}">
+    <materialDesign:DialogHost>
         <Grid ShowGridLines="False">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -90,10 +88,10 @@
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                         </MenuItem>
-                        <MenuItem Header="エクスポート(_E)">
+                        <MenuItem Header="エクスポート(_E)" Command="{x:Static materialDesign:DialogHost.OpenDialogCommand}">
                             <i:Interaction.Triggers>
                                 <i:EventTrigger EventName="Click">
-                                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Export"/>
+                                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ShowExportDialog"/>
                                 </i:EventTrigger>
                             </i:Interaction.Triggers>
                         </MenuItem>
@@ -298,7 +296,7 @@
                     </Border>
 
                     <ProgressBar Grid.Row="2" IsIndeterminate="True" Margin="4" Visibility="{Binding ProgressBarVisible, Converter={StaticResource BoolToVisibility}}" />
-                    
+
                     <Grid Grid.Row="3">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="1*" />
@@ -365,7 +363,7 @@
                                 </Button>
                             </Border>
                         </StackPanel>
-                        
+
                         <!-- 次のページ -->
                         <Button Grid.Column="3" Margin="5" IsEnabled="{Binding NextPageButtoIsEnable}" Style="{StaticResource MaterialDesignRaisedLightButton}" ToolTip="次のページへ移動">
                             <materialDesign:PackIcon Kind="ArrowRightBold" />
@@ -443,7 +441,7 @@
                     </GroupBox>
 
                     <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
-                    
+
                     <!-- タグ設定タブ -->
                     <TabControl x:Name="tabControl" Grid.Row="2" Margin="5" ItemsSource="{Binding TabPanels}">
                         <TabControl.ItemTemplate>
@@ -475,5 +473,4 @@
             </Grid>
         </Grid>
     </materialDesign:DialogHost>
-    <!--</materialDesign:DialogHost>-->
 </Window>

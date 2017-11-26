@@ -712,34 +712,17 @@ namespace Rialto.ViewModels
             }
         }
 
-        private ExportDialogViewModel ExportDialog_ = null;
-        public ExportDialogViewModel ExportDialog
+        public async void ShowExportDialog()
         {
-            get => ExportDialog_;
-            set
+            var tagId = SelectedTagItems.Count > 0 ? (SelectedTagItems[0] as TagItem).ID : TagConstant.ALL_TAG_ID;
+            // Viewに依存しちゃっている…
+            var exportDialog = new Rialto.Views.ExportDialog
             {
-                ExportDialog_ = value;
-                RaisePropertyChanged(() => ExportDialog);
-            }
-        }
+                DataContext = new ExportDialogViewModel(tagId)
+            };
 
-        private bool ExportDialogIsOpen_ = false;
-        public bool ExportDialogIsOpen
-        {
-            get => ExportDialogIsOpen_;
-            set
-            {
-                ExportDialogIsOpen_ = value;
-                RaisePropertyChanged(() => ExportDialogIsOpen);
-            }
-        }
-
-        public void Export()
-        {
-            ExportDialog = new ExportDialogViewModel("テスト", "テストA");
-            DialogHost.Show(ExportDialog);
-            
-            ExportDialogIsOpen = true;
+            var result = await DialogHost.Show(exportDialog);
+            Debug.WriteLine(result);
         }
     }
 }
