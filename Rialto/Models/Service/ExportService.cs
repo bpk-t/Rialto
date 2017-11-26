@@ -35,7 +35,7 @@ namespace Rialto.Models.Service
                 return DBHelper.Instance.Execute((connection, tran) => {
 
                     return (from list in GetAllImage(connection, tagId)
-                            from destList in CopyFiles(list, exportDir)
+                            from destList in CopyFiles(list, exportDir, options)
                             select destList);
                 });
             } else
@@ -44,19 +44,23 @@ namespace Rialto.Models.Service
             }
         }
 
-        private Task<List<Try<string>>> CopyFiles(IEnumerable<(Option<RegisterImage>, Option<ImageRepository>)> list, string exportDir)
+        private Task<List<Try<string>>> CopyFiles(IEnumerable<(Option<RegisterImage>, Option<ImageRepository>)> list, string exportDir, Option<ExportOptions> options)
         {
             return Task.Run(() => {
-                return list.Select(item =>
+                return list.Select((item, index) =>
                     (from registerImage in item.Item1
                      from repository in item.Item2
-                     select (Path.Combine(repository.Path, registerImage.FilePath), $"{registerImage.FileName}.{registerImage.FileExtension}"))
+                     select (Path.Combine(repository.Path, registerImage.FilePath), registerImage.FileName, registerImage.FileExtension)
+                     )
                          .Fold(Try<string>(new Exception("Option None")), (acc, x) =>
                          {
-                             (string sourcePath, string fileName) = x;
+                             (string sourcePath, string fileName, string fileExtension) = x;
                              try
                              {
-                                 var destFilePath = Path.Combine(exportDir, fileName);
+                                 var destFilePath = options.Bind(y => y.OrderRename ? Some(y) : None).Fold(
+                                     Path.Combine(exportDir, fileName),
+                                     (a, y) => Path.Combine(exportDir, string.Format("{0:000000}.{1}", index, fileExtension)));
+
                                  if (File.Exists(destFilePath))
                                  {
                                     // スキップ
@@ -81,15 +85,15 @@ namespace Rialto.Models.Service
         {
             if (tagId == TagConstant.ALL_TAG_ID)
             {
-                return RegisterImageRepository.GetAllAsync(connection, None, None, Order.Asc);
+                return RegisterImageRepository.GetAllAsync(connection, None, None, Order.Desc);
             }
             else if (tagId == TagConstant.NOTAG_TAG_ID)
             {
-                return RegisterImageRepository.GetNoTagAsync(connection, None, None, Order.Asc);
+                return RegisterImageRepository.GetNoTagAsync(connection, None, None, Order.Desc);
             }
             else
             {
-                return RegisterImageRepository.GetByTagAsync(connection, tagId, None, None, Order.Asc);
+                return RegisterImageRepository.GetByTagAsync(connection, tagId, None, None, Order.Desc);
             }
         }
     }
