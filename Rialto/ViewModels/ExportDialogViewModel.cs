@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using LanguageExt;
+using static LanguageExt.Prelude;
 
 namespace Rialto.ViewModels
 {
@@ -44,7 +46,7 @@ namespace Rialto.ViewModels
         public async void Export()
         {
             Exporting = true;
-            await service.Export(SaveDirectory, tagId);
+            await service.Export(SaveDirectory, tagId, None);
             Exporting = false;
         }
     }

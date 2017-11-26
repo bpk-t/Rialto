@@ -195,21 +195,26 @@ namespace Rialto.Models
                 var index = cacheImages.FindIndex(x => x.ImgID == imgId);
                 if (index >= 0)
                 {
-                    return GetImageCount(tagId).SelectMany(imgCount =>
-                    {
-                        var img = cacheImages[index];
-                        return LoadBitmapImage(img.SourceImageFilePath).Select(loadImageTry =>
-                        {
-                            var pagingImage = new PagingImage(
-                                                        allCount: imgCount,
-                                                        image: loadImageTry,
-                                                        imageId: img.ImgID,
-                                                        index: cachePage + cacheLimit + index,
-                                                        page: pageInfo);
-                            return Some(Try(pagingImage));
+                    var img = cacheImages[index];
+                    var imageCountTask = GetImageCount(tagId);
+                    var loadBitmapImageTask = LoadBitmapImage(img.SourceImageFilePath);
 
-                        });
-                    });
+                    if (index + 1 < cacheImages.Count)
+                    {
+                        // 先読み
+                        var nextImage = cacheImages[index + 1];
+                        LoadBitmapImage(nextImage.SourceImageFilePath);
+                    }
+
+                    return (from imgCount in imageCountTask
+                            from loadImageTry in loadBitmapImageTask
+                            select new PagingImage(
+                                allCount: imgCount,
+                                image: loadImageTry,
+                                imageId: img.ImgID,
+                                index: cachePage + cacheLimit + index,
+                                page: pageInfo
+                            )).Select(x => Some(Try(x)));
                 }
                 else
                 {

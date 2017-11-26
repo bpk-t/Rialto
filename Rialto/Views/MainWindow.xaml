@@ -133,6 +133,13 @@
 
                     <MenuItem Header="ツール(_T)">
                         <MenuItem Header="設定(_S)" />
+                        <MenuItem Header="タブ設定">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ShowTabSettingDialog"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </MenuItem>
                         <MenuItem Header="スコア決定" />
                         <MenuItem Header="タグ付加実績を表示" />
                     </MenuItem>

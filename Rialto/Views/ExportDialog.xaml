@@ -29,6 +29,10 @@
             <GroupBox.Header>
                 詳細設定
             </GroupBox.Header>
+
+            <StackPanel Orientation="Vertical">
+                <CheckBox>表示順になるようにファイル名を変更する</CheckBox>
+            </StackPanel>
         </GroupBox>
 
         <ProgressBar IsIndeterminate="True" Margin="4" Visibility="{Binding Exporting, Converter={StaticResource BoolToVisibility}}" />

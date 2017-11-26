@@ -86,6 +86,7 @@ namespace Rialto.ViewModels
 
         private Task Refresh()
         {
+            logger.Debug().Write();
             var thumbnailTask = thumbnailService.GetFirstPage(TagConstant.ALL_TAG_ID);
             var tagSettingTask = tagAllocateService.InitTabSettingPanelAsync();
             var initTagTask = tagMasterService.GetAllTagItemAsync()
@@ -722,6 +723,16 @@ namespace Rialto.ViewModels
             };
 
             var result = await DialogHost.Show(exportDialog);
+            Debug.WriteLine(result);
+        }
+
+        public async void ShowTabSettingDialog()
+        {
+            var tabSettingsDialog= new Rialto.Views.TabSettingsDialog
+            {
+                DataContext = new TabSettingsDialogViewModel()
+            };
+            var result = await DialogHost.Show(tabSettingsDialog);
             Debug.WriteLine(result);
         }
     }

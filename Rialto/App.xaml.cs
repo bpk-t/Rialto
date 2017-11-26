@@ -6,6 +6,7 @@ using System.Linq;
 using System.Windows;
 
 using Livet;
+using NLog;
 
 namespace Rialto
 {
@@ -14,6 +15,8 @@ namespace Rialto
     /// </summary>
     public partial class App : Application
     {
+        private static readonly Logger logger = LogManager.GetLogger("fileLogger");
+
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             DispatcherHelper.UIDispatcher = Dispatcher;
@@ -21,16 +24,11 @@ namespace Rialto
         }
 
         //集約エラーハンドラ
-        //private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
-        //{
-        //    //TODO:ロギング処理など
-        //    MessageBox.Show(
-        //        "不明なエラーが発生しました。アプリケーションを終了します。",
-        //        "エラー",
-        //        MessageBoxButton.OK,
-        //        MessageBoxImage.Error);
-        //
-        //    Environment.Exit(1);
-        //}
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            logger.Error($"sender = {sender.ToString()}");
+            logger.Error(e);
+            Environment.Exit(1);
+        }
     }
 }

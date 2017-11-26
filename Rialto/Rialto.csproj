@@ -205,6 +205,7 @@
     <Compile Include="ViewModels\ExportDialogViewModel.cs" />
     <Compile Include="ViewModels\ErrorDialogViewModel.cs" />
     <Compile Include="ViewModels\RegisterListWindowViewModel.cs" />
+    <Compile Include="ViewModels\TabSettingsDialogViewModel.cs" />
     <Compile Include="ViewModels\TagSettingWindowViewModel.cs" />
     <Compile Include="Views\Behaviors\FileDragAndDropBehavior.cs" />
     <Compile Include="Views\Behaviors\PlaceHolderBehavior.cs" />
@@ -216,6 +217,9 @@
     </Compile>
     <Compile Include="Views\RegisterListWindow.xaml.cs">
       <DependentUpon>RegisterListWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\TabSettingsDialog.xaml.cs">
+      <DependentUpon>TabSettingsDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TagSettingWindow.xaml.cs">
       <DependentUpon>TagSettingWindow.xaml</DependentUpon>
@@ -261,6 +265,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\RegisterListWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\TabSettingsDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

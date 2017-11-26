@@ -16,11 +16,19 @@ using NLog;
 
 namespace Rialto.Models.Service
 {
+    public class ExportOptions
+    {
+        /// <summary>
+        /// 表示順になるようにファイル名を変更する
+        /// </summary>
+        public bool OrderRename { get; set; }
+    }
+
     public class ExportService
     {
         private static readonly Logger logger = LogManager.GetLogger("fileLogger");
 
-        public Task<List<Try<string>>> Export(string exportDir, long tagId)
+        public Task<List<Try<string>>> Export(string exportDir, long tagId, Option<ExportOptions> options)
         {
             if (Directory.Exists(exportDir))
             {
@@ -51,8 +59,8 @@ namespace Rialto.Models.Service
                                  var destFilePath = Path.Combine(exportDir, fileName);
                                  if (File.Exists(destFilePath))
                                  {
-                                                 // スキップ
-                                                 logger.Debug($"Export Skip = {destFilePath}");
+                                    // スキップ
+                                    logger.Debug($"Export Skip = {destFilePath}");
                                  }
                                  else
                                  {
