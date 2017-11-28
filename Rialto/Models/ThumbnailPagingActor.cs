@@ -19,6 +19,7 @@ using System.Drawing;
 using System.Data.Common;
 using NLog;
 using System.Threading;
+using Rialto.Models.DAO.Table;
 
 namespace Rialto.Models
 {
@@ -35,8 +36,8 @@ namespace Rialto.Models
             /// </summary>
             public long Page { get; }
             public long Limit { get; }
-            public Order ImageOrder { get; }
-            public GotToPageMessage(long tagId, long page, int limit, Order imageOrder)
+            public RegisterImageOrder ImageOrder { get; }
+            public GotToPageMessage(long tagId, long page, int limit, RegisterImageOrder imageOrder)
             {
                 TagId = tagId;
                 Page = page;
@@ -65,7 +66,7 @@ namespace Rialto.Models
         private long cacheTagId;
         private long cachePage;
         private long cacheLimit;
-        private Order cacheImageOrder;
+        private RegisterImageOrder cacheImageOrder;
         private Option<long> cacheSelectedImageId = None;
         private List<ImageInfo> cacheImages = new List<ImageInfo>();
 
@@ -302,7 +303,7 @@ namespace Rialto.Models
         }
 
         private CancellationTokenSource cancelTokenSource;
-        private Task<PagingInfo> GetThumbnailImage(long tagId, long page, long limit, Order imageOrder)
+        private Task<PagingInfo> GetThumbnailImage(long tagId, long page, long limit, RegisterImageOrder imageOrder)
         {
             return _GetThumbnailImage(tagId, page, limit, imageOrder).Select(x => 
             {
@@ -328,7 +329,7 @@ namespace Rialto.Models
                 return x;
             });
         }
-        private Task<PagingInfo> _GetThumbnailImage(long tagId, long page, long limit, Order imageOrder)
+        private Task<PagingInfo> _GetThumbnailImage(long tagId, long page, long limit, RegisterImageOrder imageOrder)
         {
             ImageInfo RegisterImageToImageInfo(Option<RegisterImage> img, Option<ImageRepository> repository)
             {
@@ -350,19 +351,19 @@ namespace Rialto.Models
                 if (tagId == TagConstant.ALL_TAG_ID)
                 {
                     var countTask = RegisterImageRepository.GetAllCountAsync(connection);
-                    var getListTask = RegisterImageRepository.GetAllAsync(connection, Some(offset), Some(limit), imageOrder);
+                    var getListTask = RegisterImageRepository.GetAllAsync(connection, Some(offset), Some(limit), imageOrder.ToOrderByItem());
                     return (countTask, getListTask);
                 }
                 else if (tagId == TagConstant.NOTAG_TAG_ID)
                 {
                     var countTask = RegisterImageRepository.GetNoTagCountAsync(connection);
-                    var getListTask = RegisterImageRepository.GetNoTagAsync(connection, Some(offset), Some(limit), imageOrder);
+                    var getListTask = RegisterImageRepository.GetNoTagAsync(connection, Some(offset), Some(limit), imageOrder.ToOrderByItem());
                     return (countTask, getListTask);
                 }
                 else
                 {
                     var countTask = RegisterImageRepository.GetByTagCountAsync(connection, tagId);
-                    var getListTask = RegisterImageRepository.GetByTagAsync(connection, tagId, Some(offset), Some(limit), imageOrder);
+                    var getListTask = RegisterImageRepository.GetByTagAsync(connection, tagId, Some(offset), Some(limit), imageOrder.ToOrderByItem());
                     return (countTask, getListTask);
                 }
             }

@@ -179,6 +179,7 @@
     <Compile Include="Models\DAO\Table\VIEW_HISTORY.cs" />
     <Compile Include="Models\DataModel\PageViewImageCount.cs" />
     <Compile Include="Models\DataModel\ThumbnailImageSize.cs" />
+    <Compile Include="Models\RegisterImageOrder.cs" />
     <Compile Include="Models\Repository\RegisterImageRepository.cs" />
     <Compile Include="Models\Repository\TagRepository.cs" />
     <Compile Include="Models\AverageHashGenerator.cs" />

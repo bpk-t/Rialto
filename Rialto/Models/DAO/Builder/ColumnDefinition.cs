@@ -33,5 +33,8 @@ namespace Rialto.Models.DAO.Builder
 
         public Condition IsNull() => new ConditionIsNull(this.ToSqlString());
         public Condition IsNotNull() => new ConditionIsNotNull(this.ToSqlString());
+
+        public OrderByItem Asc() => new OrderByItem(FullName, Order.Asc);
+        public OrderByItem Desc() => new OrderByItem(FullName, Order.Desc);
     }
 }

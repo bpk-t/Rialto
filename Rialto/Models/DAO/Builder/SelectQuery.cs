@@ -85,6 +85,12 @@ namespace Rialto.Models.DAO.Builder
             return this;
         }
 
+        public SelectQuery OrderBy(OrderByItem item)
+        {
+            orderByItems.Add(item);
+            return this;
+        }
+
         public SelectQuery Where(Condition condition)
         {
             whereConditions.Add(condition);

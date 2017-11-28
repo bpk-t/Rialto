@@ -68,7 +68,9 @@ namespace Rialto.Models.Service
         private IActorRef thumbnailImageActor;
 
         private long currentTagId = TagConstant.ALL_TAG_ID;
-        private Order currentImageOrder = Order.Desc;
+
+        // TODO 引数で受け取るように修正
+        private RegisterImageOrder currentImageOrder = RegisterImageOrder.IdDesc;
         public int OnePageItemCount { get; set; }
 
         /// <summary>
@@ -152,13 +154,13 @@ namespace Rialto.Models.Service
         public Task<PagingInfo> GetFirstPage(long tagId)
         {
             currentTagId = tagId;
-            currentImageOrder = Order.Desc;
+            currentImageOrder = RegisterImageOrder.IdDesc;
             return GoToPage();
         }
 
         public Task<PagingInfo> Reverse()
         {
-            currentImageOrder = Order.Asc;
+            currentImageOrder = currentImageOrder.Invert();
             return GoToPage();
         }
 

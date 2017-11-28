@@ -83,17 +83,19 @@ namespace Rialto.Models.Service
         }
         private Task<IEnumerable<(Option<RegisterImage>, Option<ImageRepository>)>> GetAllImage(DbConnection connection, long tagId)
         {
+            // TODO Optionから取得する
+            var order = RegisterImageOrder.IdDesc;
             if (tagId == TagConstant.ALL_TAG_ID)
             {
-                return RegisterImageRepository.GetAllAsync(connection, None, None, Order.Desc);
+                return RegisterImageRepository.GetAllAsync(connection, None, None, order.ToOrderByItem());
             }
             else if (tagId == TagConstant.NOTAG_TAG_ID)
             {
-                return RegisterImageRepository.GetNoTagAsync(connection, None, None, Order.Desc);
+                return RegisterImageRepository.GetNoTagAsync(connection, None, None, order.ToOrderByItem());
             }
             else
             {
-                return RegisterImageRepository.GetByTagAsync(connection, tagId, None, None, Order.Desc);
+                return RegisterImageRepository.GetByTagAsync(connection, tagId, None, None, order.ToOrderByItem());
             }
         }
     }
