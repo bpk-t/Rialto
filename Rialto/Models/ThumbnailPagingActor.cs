@@ -213,7 +213,7 @@ namespace Rialto.Models
                                 allCount: imgCount,
                                 image: loadImageTry,
                                 imageId: img.ImgID,
-                                index: cachePage + cacheLimit + index,
+                                index: cachePage * cacheLimit + index + 1,
                                 page: pageInfo
                             )).Select(x => Some(Try(x)));
                 }

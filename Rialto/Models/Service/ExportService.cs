@@ -58,7 +58,7 @@ namespace Rialto.Models.Service
                              try
                              {
                                  var destFilePath = options.Bind(y => y.OrderRename ? Some(y) : None).Fold(
-                                     Path.Combine(exportDir, fileName),
+                                     Path.Combine(exportDir, $"{fileName}.{fileExtension}"),
                                      (a, y) => Path.Combine(exportDir, string.Format("{0:000000}.{1}", index, fileExtension)));
 
                                  if (File.Exists(destFilePath))

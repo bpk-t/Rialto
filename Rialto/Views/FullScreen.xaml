@@ -41,5 +41,6 @@
     
     <Grid>
         <Image Source="{Binding CurrentImage}"></Image>
+        <TextBlock FontSize="30" Foreground="LightGreen" Text="{Binding PageNumberView}"></TextBlock>
     </Grid>
 </Window>

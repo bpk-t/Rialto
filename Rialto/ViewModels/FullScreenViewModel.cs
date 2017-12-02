@@ -32,6 +32,15 @@ namespace Rialto.ViewModels
 
         #endregion
 
+        private string _PageNumberView;
+        public string PageNumberView
+        {
+            get { return _PageNumberView; }
+            set {
+                _PageNumberView = value;
+                RaisePropertyChanged(nameof(PageNumberView));
+            }
+        }
 
         /// <summary>
         /// コンストラクタ
@@ -46,6 +55,7 @@ namespace Rialto.ViewModels
                 imgOptTry.ForEach(imgTry => 
                     imgTry.IfSucc(img =>
                     {
+                        PageNumberView = $"{img.Index}/{img.AllCount}";
                         this.CurrentImage = img.Image.IfFailThrow(); // TODO
                         this.selectedImgId = img.ImageId;
                     })
