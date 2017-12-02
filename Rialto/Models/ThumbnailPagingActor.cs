@@ -164,24 +164,20 @@ namespace Rialto.Models
 
         private Task<long> GetImageCount(long tagId)
         {
-            using (var connection = DBHelper.Instance.GetDbConnection())
-            {
-                using (var tran = connection.BeginTransaction())
+            return DBHelper.Execute((connection, tran) => {
+                if (tagId == TagConstant.ALL_TAG_ID)
                 {
-                    if (tagId == TagConstant.ALL_TAG_ID)
-                    {
-                        return RegisterImageRepository.GetAllCountAsync(connection);
-                    }
-                    else if (tagId == TagConstant.NOTAG_TAG_ID)
-                    {
-                        return RegisterImageRepository.GetNoTagCountAsync(connection);
-                    }
-                    else
-                    {
-                        return RegisterImageRepository.GetByTagCountAsync(connection, tagId);
-                    }
+                    return RegisterImageRepository.GetAllCountAsync(connection);
                 }
-            }
+                else if (tagId == TagConstant.NOTAG_TAG_ID)
+                {
+                    return RegisterImageRepository.GetNoTagCountAsync(connection);
+                }
+                else
+                {
+                    return RegisterImageRepository.GetByTagCountAsync(connection, tagId);
+                }
+            });
         }
 
         private Task<Option<Try<PagingImage>>> GetImage(long imgId, long tagId) => GetImage(imgId, tagId, None);
@@ -367,7 +363,7 @@ namespace Rialto.Models
                     return (countTask, getListTask);
                 }
             }
-            return DBHelper.Instance.Execute((connection, tran) =>
+            return DBHelper.Execute((connection, tran) =>
             {
                 var offset = page * limit;
                 var (countTask, getListTask) = GetAllCountAndList(connection, offset);

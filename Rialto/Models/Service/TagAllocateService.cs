@@ -47,7 +47,7 @@ namespace Rialto.Models.Service
 
         public Task<Unit> InitTabSettingPanelAsync()
         {
-            return DBHelper.Instance.Execute((connection, tran) =>
+            return DBHelper.Execute((connection, tran) =>
             {
                 TabPanels.Clear();
                 return TagRepository.GetAllTagGroupAsync(connection).SelectMany(results =>
@@ -77,7 +77,7 @@ namespace Rialto.Models.Service
 
         public Task<ObservableCollection<TagMasterInfo>> GetAllocatedTags(long imgId)
         {
-            return DBHelper.Instance.Execute((connection, tran) =>
+            return DBHelper.Execute((connection, tran) =>
             {
                 return TagRepository.GetTagByImageAssignedAsync(connection, tran, imgId).Select(results =>
                 {
@@ -90,7 +90,7 @@ namespace Rialto.Models.Service
 
         private void AddTagAssign(TagAddButtonInfo buttonInfo)
         {
-            DBHelper.Instance.Execute((connection, tran) =>
+            DBHelper.Execute((connection, tran) =>
             {
                 selectedThumbnailImgList.ForEach(x =>
                     TagRepository.InsertTagAssignAsync(connection, tran,

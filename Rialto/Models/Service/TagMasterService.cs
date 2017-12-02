@@ -20,7 +20,7 @@ namespace Rialto.Models.Service
 
         public Task<ObservableCollection<TagItem>> GetAllTagItemAsync(Func<Tag, bool> predicate)
         {
-            return DBHelper.Instance.Execute((connection, tran) =>
+            return DBHelper.Execute((connection, tran) =>
             {
                 var allTagsTask = TagRepository.GetAllTagAsync(connection);
                 var allCountTask = RegisterImageRepository.GetAllCountAsync(connection);
@@ -60,7 +60,7 @@ namespace Rialto.Models.Service
 
         public Task<ObservableCollection<Tag>> GetAllTagAsync()
         {
-            return DBHelper.Instance.Execute((connection, tran) =>
+            return DBHelper.Execute((connection, tran) =>
             {
                 var allTagsTask = TagRepository.GetAllTagAsync(connection);
                 var allCountTask = RegisterImageRepository.GetAllCountAsync(connection);
@@ -81,7 +81,7 @@ namespace Rialto.Models.Service
 
         public Task UpsertTag(string name, string ruby, string description)
         {
-            return DBHelper.Instance.Execute((connection, tran) =>
+            return DBHelper.Execute((connection, tran) =>
             {
                 var tag = new Tag()
                 {

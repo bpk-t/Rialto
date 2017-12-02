@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
+using LanguageExt;
+using static LanguageExt.Prelude;
 
 namespace Rialto.Models.Service
 {
@@ -12,9 +14,9 @@ namespace Rialto.Models.Service
     {
         public void CreateSchema()
         {
-            using (var con = DBHelper.Instance.GetDbConnection())
+            DBHelper.Execute((connection, tran) =>
             {
-                con.Execute(
+                connection.Execute(
                     @"
                     CREATE TABLE ""register_image"" ( 
                       `id` INTEGER PRIMARY KEY AUTOINCREMENT
@@ -34,7 +36,7 @@ namespace Rialto.Models.Service
                     )
                     ");
 
-                con.Execute(
+                connection.Execute(
                     @"
                     CREATE TABLE ""image_repository"" ( 
                       `id` INTEGER PRIMARY KEY AUTOINCREMENT
@@ -44,7 +46,7 @@ namespace Rialto.Models.Service
                     )
                     ");
 
-                con.Execute(
+                connection.Execute(
                     @"
                     CREATE TABLE ""tag"" ( 
                       `id` INTEGER PRIMARY KEY AUTOINCREMENT
@@ -58,7 +60,7 @@ namespace Rialto.Models.Service
                     )
                 ");
 
-                con.Execute(
+                connection.Execute(
                     @"
                     CREATE TABLE tag_group( 
                       id INTEGER PRIMARY KEY AUTOINCREMENT
@@ -68,7 +70,7 @@ namespace Rialto.Models.Service
                     )
                 ");
 
-                con.Execute(
+                connection.Execute(
                     @"
                     CREATE TABLE tag_group_assign( 
                       tag_group_id INTEGER
@@ -79,7 +81,7 @@ namespace Rialto.Models.Service
                     )
                 ");
 
-                con.Execute(
+                connection.Execute(
                     @"
                     CREATE TABLE tag_assign( 
                       register_image_id INTEGER
@@ -90,7 +92,7 @@ namespace Rialto.Models.Service
                     )
                 ");
 
-                con.Execute(
+                connection.Execute(
                     @"
                     CREATE TABLE image_score( 
                       register_image_id INTEGER
@@ -102,7 +104,7 @@ namespace Rialto.Models.Service
                     )
                 ");
 
-                con.Execute(
+                connection.Execute(
                     @"
                     CREATE TABLE view_history( 
                       id INTEGER PRIMARY KEY AUTOINCREMENT
@@ -113,7 +115,8 @@ namespace Rialto.Models.Service
                       , `updated_at` TIMESTAMP DEFAULT (datetime('now', 'localtime'))
                     );
                 ");
-            }
+                return unit;
+            });
         }
     }
 }

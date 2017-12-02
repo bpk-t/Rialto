@@ -65,7 +65,7 @@ namespace Rialto.Models.Service
             /// <param name="fileList">登録する画像ファイル、または画像ファイルが格納されたディレクトリ</param>
             public Task<IEnumerable<Either<RegisterFailureInfo, FileInfo>>> RegisterImages(string[] fileList, Option<int> tagId)
             {
-                return DBHelper.Instance.Execute((connection, tran) =>
+                return DBHelper.Execute((connection, tran) =>
                 {
                     var destDir = MakeTodayDir();
                     var tasks = TreeToList(fileList)

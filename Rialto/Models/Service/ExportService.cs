@@ -32,7 +32,7 @@ namespace Rialto.Models.Service
         {
             if (Directory.Exists(exportDir))
             {
-                return DBHelper.Instance.Execute((connection, tran) => {
+                return DBHelper.Execute((connection, tran) => {
 
                     return (from list in GetAllImage(connection, tagId)
                             from destList in CopyFiles(list, exportDir, options)
