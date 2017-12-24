@@ -735,5 +735,11 @@ namespace Rialto.ViewModels
             var result = await DialogHost.Show(tabSettingsDialog);
             Debug.WriteLine(result);
         }
+
+        public void ClearSearchTagText()
+        {
+            SearchTagText = string.Empty;
+            SearchTag();
+        }
     }
 }

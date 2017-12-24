@@ -148,11 +148,11 @@
 
             <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="2*" />
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="5*" />
+                    <ColumnDefinition Width="7*" />
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="4*" />
                 </Grid.ColumnDefinitions>
 
                 <Grid Grid.Column="0">
@@ -166,6 +166,7 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <materialDesign:PackIcon Kind="FileFind" Grid.Column="0" Margin="5,5,0,5"/>
@@ -179,6 +180,14 @@
                                 <KeyBinding Key="Enter" Command="{Binding SearchTagCommand}" />
                             </TextBox.InputBindings>
                         </TextBox>
+                        <Button Grid.Column="2">
+                            <materialDesign:PackIcon Kind="Close"/>
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ClearSearchTagText"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Button>
                     </Grid>
 
                     <!-- タグリスト -->
@@ -325,7 +334,7 @@
 
                         <StackPanel Grid.Column="2" Orientation="Horizontal">
                             <Border BorderThickness="{Binding PageNumberCurrentIndex[0]}" BorderBrush="LightGray" Margin="5">
-                                <Button Width="50px"  Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[0]}">
+                                <Button Width="60px"  Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[0]}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="OnClickPageNumber" MethodParameter="0" />
@@ -334,7 +343,7 @@
                                 </Button>
                             </Border>
                             <Border BorderThickness="{Binding PageNumberCurrentIndex[1]}" BorderBrush="LightGray" Margin="5">
-                                <Button Width="50px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[1]}">
+                                <Button Width="60px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[1]}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="OnClickPageNumber" MethodParameter="1" />
@@ -343,7 +352,7 @@
                                 </Button>
                             </Border>
                             <Border BorderThickness="{Binding PageNumberCurrentIndex[2]}" BorderBrush="LightGray" Margin="5">
-                                <Button Width="50px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[2]}">
+                                <Button Width="60px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[2]}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="OnClickPageNumber" MethodParameter="2" />
@@ -352,7 +361,7 @@
                                 </Button>
                             </Border>
                             <Border BorderThickness="{Binding PageNumberCurrentIndex[3]}" BorderBrush="LightGray" Margin="5">
-                                <Button Width="50px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[3]}">
+                                <Button Width="60px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[3]}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="OnClickPageNumber" MethodParameter="3" />
@@ -361,7 +370,7 @@
                                 </Button>
                             </Border>
                             <Border BorderThickness="{Binding PageNumberCurrentIndex[4]}" BorderBrush="LightGray" Margin="5">
-                                <Button Width="50px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[4]}">
+                                <Button Width="60px" Style="{StaticResource MaterialDesignFlatButton}" Content="{Binding PageNumberList[4]}">
                                     <i:Interaction.Triggers>
                                         <i:EventTrigger EventName="Click">
                                             <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="OnClickPageNumber" MethodParameter="4" />

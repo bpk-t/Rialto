@@ -46,7 +46,7 @@ namespace Rialto.ViewModels
         public async void Export()
         {
             Exporting = true;
-            await service.Export(SaveDirectory, tagId, None);
+            await service.Export(SaveDirectory, tagId, Some(new ExportOptions { OrderRename = true }));
             Exporting = false;
         }
     }
