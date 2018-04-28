@@ -42,6 +42,28 @@ namespace Rialto.ViewModels
             }
         }
 
+        private double _ImageWidth;
+        public double ImageWidth
+        {
+            get { return _ImageWidth; }
+            set
+            {
+                _ImageWidth = value;
+                RaisePropertyChanged(nameof(ImageWidth));
+            }
+        }
+
+        private double _ImageHeight;
+        public double ImageHeight
+        {
+            get { return _ImageHeight; }
+            set
+            {
+                _ImageHeight = value;
+                RaisePropertyChanged(nameof(ImageHeight));
+            }
+        }
+
         /// <summary>
         /// コンストラクタ
         /// </summary>
@@ -55,8 +77,42 @@ namespace Rialto.ViewModels
                 imgOptTry.ForEach(imgTry => 
                     imgTry.IfSucc(img =>
                     {
+                        var screenHeight = SystemParameters.WorkArea.Height;
+                        var screenWidth = SystemParameters.WorkArea.Width;
+                        
                         PageNumberView = $"{img.Index}/{img.AllCount}";
-                        this.CurrentImage = img.Image.IfFailThrow(); // TODO
+
+                        var currentImage = img.Image.IfFailThrow(); // TODO
+                        if (currentImage.PixelWidth <= screenWidth && currentImage.PixelHeight <= screenHeight)
+                        {
+                            ImageHeight = currentImage.PixelHeight;
+                            ImageWidth = currentImage.PixelWidth;
+                        }
+                        else if (currentImage.PixelWidth > screenWidth && currentImage.PixelHeight > screenHeight)
+                        {
+                            var resizeHeight = screenHeight;
+                            var resizeWidth = currentImage.PixelWidth * (screenHeight / currentImage.PixelHeight);
+
+                            if (resizeWidth > screenWidth)
+                            {
+                                resizeHeight = resizeHeight * (screenWidth / resizeWidth);
+                                resizeWidth = screenWidth;
+                            }
+                            ImageWidth = resizeWidth;
+                            ImageHeight = resizeHeight;
+                        }
+                        else if (currentImage.PixelWidth > screenWidth)
+                        {
+                            ImageWidth = screenWidth;
+                            ImageHeight = currentImage.PixelHeight * (screenWidth / currentImage.PixelWidth);
+                        }
+                        else if (currentImage.PixelHeight > screenHeight)
+                        {
+                            ImageHeight = screenHeight;
+                            ImageWidth = currentImage.PixelWidth * (screenHeight / currentImage.PixelHeight);
+                        }
+
+                        this.CurrentImage = currentImage;
                         this.selectedImgId = img.ImageId;
                     })
                 );

@@ -40,7 +40,7 @@
     </Window.InputBindings>
     
     <Grid>
-        <Image Source="{Binding CurrentImage}"></Image>
+        <Image Source="{Binding CurrentImage}" Width="{Binding ImageWidth}" Height="{Binding ImageHeight}"></Image>
         <TextBlock FontSize="30" Foreground="LightGreen" Text="{Binding PageNumberView}"></TextBlock>
     </Grid>
 </Window>
