@@ -18,6 +18,7 @@ using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Threading.Tasks;
 using Rialto.Models.Service;
+using System.Collections.Concurrent;
 
 namespace Rialto.ViewModels
 {
@@ -116,6 +117,7 @@ namespace Rialto.ViewModels
                         this.selectedImgId = img.ImageId;
                     })
                 );
+                opQueue.TryDequeue(out var nouse);
             };
             this.selectedImgId = selectedImgId;
         }
@@ -171,6 +173,8 @@ namespace Rialto.ViewModels
         }
         #endregion
 
+        private ConcurrentQueue<int> opQueue = new ConcurrentQueue<int>();
+
         #region NextPictureCommand
         private ListenerCommand<object> _NextPictureCommand;
         public ListenerCommand<object> NextPictureCommand
@@ -191,7 +195,11 @@ namespace Rialto.ViewModels
         /// <param name="parameter"></param>
         public void NextPicture(object parameter)
         {
-            thumbnailImageService.NextImage();
+            if (opQueue.Count <= 1)
+            {
+                opQueue.Enqueue(0);
+                thumbnailImageService.NextImage();
+            }
         }
         #endregion
 
@@ -215,9 +223,12 @@ namespace Rialto.ViewModels
         /// <param name="parameter"></param>
         public void PrevPicture(object parameter)
         {
-            thumbnailImageService.PrevImageImage();
+            if (opQueue.Count <= 1)
+            {
+                opQueue.Enqueue(0);
+                thumbnailImageService.PrevImageImage();
+            }
         }
         #endregion
-
     }
 }
