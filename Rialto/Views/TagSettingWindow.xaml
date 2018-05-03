@@ -5,6 +5,7 @@
         xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions"
         xmlns:l="http://schemas.livet-mvvm.net/2011/wpf"
         xmlns:v="clr-namespace:Rialto.Views"
+        xmlns:behaviors="clr-namespace:Rialto.Views.Behaviors"
         xmlns:vm="clr-namespace:Rialto.ViewModels"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
@@ -14,96 +15,242 @@
         TextOptions.TextRenderingMode="Auto"        
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}"
-        Title="TagSettingWindow" Height="600" Width="800">
+        Title="TagSettingWindow" Height="1000" Width="1200">
     
     <Window.DataContext>
         <vm:TagSettingWindowViewModel/>
     </Window.DataContext>
 
     <i:Interaction.Triggers>
-        <!--WindowのContentRenderedイベントのタイミングでViewModelのInitializeメソッドが呼ばれます-->
         <i:EventTrigger EventName="ContentRendered">
             <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="Initialize"/>
         </i:EventTrigger>
-
-        <!--Windowが閉じたタイミングでViewModelのDisposeメソッドが呼ばれます-->
         <i:EventTrigger EventName="Closed">
             <l:DataContextDisposeAction/>
         </i:EventTrigger>
-
-        <!--WindowのCloseキャンセル処理に対応する場合は、WindowCloseCancelBehaviorの使用を検討してください-->
-
     </i:Interaction.Triggers>
-    
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="10" />
-            <RowDefinition Height="24*" />
-            <RowDefinition Height="2*" />
-            <RowDefinition Height="2*" />
-            <RowDefinition Height="2*" />
-            <RowDefinition Height="10" />
-        </Grid.RowDefinitions>
 
+    <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="10" />
-            <ColumnDefinition Width="5*" />
-            <ColumnDefinition Width="10" />
-            <ColumnDefinition Width="20*" />
-            <ColumnDefinition Width="10" />
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="5px" />
+            <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
 
-        <ListView x:Name="TagListView" Grid.Row="1"  Grid.Column="1" Grid.ColumnSpan="3" ItemsSource="{Binding AllTags}" >
-            <ListView.View>
-                <GridView>
-                    <GridViewColumn Header="タグ名" DisplayMemberBinding="{Binding Name}"></GridViewColumn>
-                    <GridViewColumn Header="タグ定義(説明)" DisplayMemberBinding="{Binding Description}"></GridViewColumn>
-                    <GridViewColumn Header="検索回数" DisplayMemberBinding="{Binding SearchCount}"></GridViewColumn>
-                    <GridViewColumn Header="作成日時" DisplayMemberBinding="{Binding CreatedAt, StringFormat='yyyy/MM/dd HH:mm:ss'}"></GridViewColumn>
-                    <GridViewColumn Header="更新日時" DisplayMemberBinding="{Binding UpdatedAt, StringFormat='yyyy/MM/dd HH:mm:ss'}"></GridViewColumn>
-                </GridView>
-            </ListView.View>
+        <GroupBox Header="タグマスタ一覧" Margin="3px" Grid.Column="0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="35px" />
+                    <RowDefinition Height="6*" />
+                    <RowDefinition Height="2*" />
+                </Grid.RowDefinitions>
 
-            <ListView.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="削除する">
+                <Grid Grid.Row="0">
+                    <!-- タグマスタ検索 -->
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="1*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <materialDesign:PackIcon Kind="FileFind" Grid.Column="0" Margin="5,5,0,5"/>
+
+                    <TextBox Grid.Column="1" Margin="5" MaxLines="1" Text="{Binding SearchTagText, UpdateSourceTrigger=PropertyChanged}">
+                        <i:Interaction.Behaviors>
+                            <behaviors:PlaceHolderBehavior PlaceHolderText="タグの検索" />
+                        </i:Interaction.Behaviors>
+
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Enter" Command="{Binding SearchTagCommand}" />
+                        </TextBox.InputBindings>
+                    </TextBox>
+                    <Button Grid.Column="2">
+                        <materialDesign:PackIcon Kind="Close"/>
                         <i:Interaction.Triggers>
                             <i:EventTrigger EventName="Click">
-                                <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="DeleteTag"/>
+                                <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="ClearSearchTagText"/>
                             </i:EventTrigger>
                         </i:Interaction.Triggers>
-                    </MenuItem>
-                </ContextMenu>
-            </ListView.ContextMenu>
+                    </Button>
+                </Grid>
+                
+                <Grid Grid.Row="1">
+                    <!-- タグマスタ一覧 -->
+                    <ListView x:Name="TagListView" Margin="5px" ItemsSource="{Binding AllTags}">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="タグ名" DisplayMemberBinding="{Binding Name}"></GridViewColumn>
+                                <GridViewColumn Header="タグ定義(説明)" DisplayMemberBinding="{Binding Description}"></GridViewColumn>
+                                <GridViewColumn Header="検索回数" DisplayMemberBinding="{Binding SearchCount}"></GridViewColumn>
+                                <GridViewColumn Header="作成日時" DisplayMemberBinding="{Binding CreatedAt, StringFormat='yyyy/MM/dd HH:mm:ss'}"></GridViewColumn>
+                                <GridViewColumn Header="更新日時" DisplayMemberBinding="{Binding UpdatedAt, StringFormat='yyyy/MM/dd HH:mm:ss'}"></GridViewColumn>
+                            </GridView>
+                        </ListView.View>
 
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectionChanged">
-                    <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedTags" Value="{Binding Path=SelectedItems, ElementName=TagListView}"/>
-                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="TagListSelectionChanged"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-        </ListView>
-        
-        <TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center">タグ名</TextBlock>
-        <TextBox x:Name="TagNameTextBox" Grid.Row="2" Grid.Column="3" MaxLines="1" 
-                 Width="300px" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{Binding TagNameText}" />
-        <TextBlock Grid.Row="3" Grid.Column="1" VerticalAlignment="Center">タグ定義(説明)</TextBlock>
-        <TextBox x:Name="TagDefineTextBox" Grid.Row="3" Grid.Column="3" 
-                 MaxLines="1" Width="300px" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{Binding TagDefineText}" />
-        <Button Grid.Row="4" Grid.Column="1" Width="100px" HorizontalAlignment="Right" Content="タグを追加">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="Click">
-                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="AddTag"/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-        </Button>
-        <Button Grid.Row="4" Grid.Column="3" Width="100px" HorizontalAlignment="Left" Content="クリア">
-            <i:Interaction.Triggers>
-                <i:EventTrigger EventName="Click">
-                    <ei:ChangePropertyAction TargetObject="{Binding ElementName=TagNameTextBox}" PropertyName="Text" Value=""/>
-                    <ei:ChangePropertyAction TargetObject="{Binding ElementName=TagDefineTextBox}" PropertyName="Text" Value=""/>
-                </i:EventTrigger>
-            </i:Interaction.Triggers>
-        </Button>
+                        <ListView.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="削除する">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="DeleteTag"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                            </ContextMenu>
+                        </ListView.ContextMenu>
+
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedTags" Value="{Binding Path=SelectedItems, ElementName=TagListView}"/>
+                                <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="TagListSelectionChanged"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ListView>
+                </Grid>
+
+                <Grid Grid.Row="2">
+                    <!-- タグマスタ入力フォーム -->
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30px" />
+                        <RowDefinition Height="30px" />
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="110px" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="5px" VerticalAlignment="Center">タグ名</TextBlock>
+                    <TextBox Grid.Row="0" Grid.Column="1" x:Name="TagNameTextBox" MaxLines="1" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding TagNameText}" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="5px" VerticalAlignment="Center">タグ定義(説明)</TextBlock>
+                    <TextBox x:Name="TagDefineTextBox" Grid.Row="1" Grid.Column="1" MaxLines="1" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding TagDefineText}" />
+
+                    <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+                        <Button Margin="5px" Width="100px" Content="タグを追加">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="AddTag"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Button>
+                        <Button Width="100px" Content="クリア">
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Click">
+                                    <ei:ChangePropertyAction TargetObject="{Binding ElementName=TagNameTextBox}" PropertyName="Text" Value=""/>
+                                    <ei:ChangePropertyAction TargetObject="{Binding ElementName=TagDefineTextBox}" PropertyName="Text" Value=""/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </GroupBox>
+
+        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Center"></GridSplitter>
+
+        <Grid Grid.Column="2">
+            <!-- タブマスタ -->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="1*" />
+            </Grid.RowDefinitions>
+
+            <GroupBox Header="タブマスタ一覧" Margin="3px" Grid.Row="0">
+                <Grid>
+                    <!-- タブマスタ一覧 -->
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="5*" />
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
+
+                    <ListView x:Name="TabListView" Margin="5px" Grid.Row="0">
+                        <ListView.View>
+                            <GridView>
+                                <GridViewColumn Header="タブ名称" DisplayMemberBinding="{Binding Name}"></GridViewColumn>
+                                <GridViewColumn Header="作成日時" DisplayMemberBinding="{Binding CreatedAt, StringFormat='yyyy/MM/dd HH:mm:ss'}"></GridViewColumn>
+                                <GridViewColumn Header="更新日時" DisplayMemberBinding="{Binding UpdatedAt, StringFormat='yyyy/MM/dd HH:mm:ss'}"></GridViewColumn>
+                            </GridView>
+                        </ListView.View>
+
+                        <ListView.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="削除する">
+                                    <i:Interaction.Triggers>
+                                        <i:EventTrigger EventName="Click">
+                                            <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="DeleteTag"/>
+                                        </i:EventTrigger>
+                                    </i:Interaction.Triggers>
+                                </MenuItem>
+                            </ContextMenu>
+                        </ListView.ContextMenu>
+
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <ei:ChangePropertyAction TargetObject="{Binding Mode=OneWay}" PropertyName="SelectedTags" Value="{Binding Path=SelectedItems, ElementName=TabListView}"/>
+                                <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="TagListSelectionChanged"/>
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                    </ListView>
+                    
+                    <!-- タブマスタ一覧入力フォーム -->
+                    <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30px" />
+                            <RowDefinition Height="1*" />
+                        </Grid.RowDefinitions>
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="110px" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5px" VerticalAlignment="Center">タブ名</TextBlock>
+                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="TabNameTextBox" MaxLines="1" Height="Auto" VerticalAlignment="Center" HorizontalAlignment="Stretch" Text="{Binding TabNameText}" />
+
+                        <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal">
+                            <Button Margin="5px" Width="100px" Content="タブを追加">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <l:LivetCallMethodAction MethodTarget="{Binding}" MethodName="AddTag"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </Button>
+                            <Button Margin="5px" Width="100px" Content="クリア">
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Click">
+                                        <ei:ChangePropertyAction TargetObject="{Binding ElementName=TagNameTextBox}" PropertyName="Text" Value=""/>
+                                        <ei:ChangePropertyAction TargetObject="{Binding ElementName=TagDefineTextBox}" PropertyName="Text" Value=""/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </GroupBox>
+
+            <GridSplitter Grid.Row="1" Height="5px" HorizontalAlignment="Stretch" VerticalAlignment="Center"></GridSplitter>
+
+            <Grid Grid.Row="2">
+                <!-- タグ割り当てボタン一覧 -->
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="60px" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Vertical" VerticalAlignment="Center">
+                    <Button Margin="5px">→</Button>
+                    <Button Margin="5px">←</Button>
+                </StackPanel>
+
+                <GroupBox Header="タグ割り当てボタン一覧" Margin="3px" Grid.Column="1">
+                    <ListView>
+                        <!-- TODO --> 
+                    </ListView>
+                </GroupBox>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>
